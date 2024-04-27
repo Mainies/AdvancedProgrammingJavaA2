@@ -1,0 +1,10 @@
+--Template for collecting orders
+UPDATE Orders
+SET Collected = true
+WHERE OrderNumber = 1;
+
+--Get uncollected orders for user
+SELECT OrderNumber FROM Orders
+WHERE OrderNumber IN (SElECT OrderNumber FROM UserOrders WHERE UserName = "Mainies")
+
+
