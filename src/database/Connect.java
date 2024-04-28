@@ -1,5 +1,7 @@
 package database;
 
+import restaurant.Order;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -108,5 +110,55 @@ public class Connect {
         } 
         return true; 
     }
-
+    
+    public boolean createVIPUser(String userName, String password, String firstName, String lastName, String email) {
+        if (connection == null) {
+            System.out.println("No connection to the database. Please connect first.");
+            return false;
+        }
+        
+        String query = "INSERT INTO Users (userName, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, userName);
+            pstmt.setString(2, password);
+            pstmt.setString(3, firstName);
+            pstmt.setString(4, lastName);
+            pstmt.setString(5, email);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("User added successfully.");
+            } else {
+                System.out.println("No rows affected.");
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
+        } 
+        return true; 
+    }
+    
+    public boolean isVIP(String userName) {
+    	String query = "SELECT email FROM users WHERE userName = ?";
+    	try(PreparedStatement pstmt = connection.prepareStatement(query)){
+    		pstmt.setString(1, userName);
+    		try(ResultSet results = pstmt.executeQuery()){
+    			if (results.next()) {
+    				String email = results.getString("email");
+    				return email != null && !email.isEmpty();
+    			}
+    			else {
+    				return false;
+    			}
+    		}
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	return false;
+    }
+    
+    public void newOrder(Order order) {
+    	
+    }
+    
 }

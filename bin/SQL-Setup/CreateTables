@@ -2,7 +2,8 @@ CREATE TABLE Users(
 UserName TEXT PRIMARY KEY NOT NULL,
 FirstName TEXT,
 LastName TEXT,
-Password TEXT NOT NULL
+Password TEXT NOT NULL,
+Email Text
 ) WITHOUT ROWID;
 
 CREATE TABLE Orders(

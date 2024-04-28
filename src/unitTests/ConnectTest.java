@@ -1,8 +1,10 @@
-package database;
+package unitTests;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import database.Connect;
 
 public class ConnectTest {
 	private Connect connector = new Connect();
