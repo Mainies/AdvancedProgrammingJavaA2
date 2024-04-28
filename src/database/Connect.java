@@ -1,6 +1,5 @@
 package database;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,7 +13,7 @@ public class Connect {
     public void connect() { // Changed to non-static to modify the instance variable 'connection'
         try {
             // db parameters - fixed path
-            String url = "jdbc:sqlite:C:\\Users\\Sam\\eclipse-workspace\\JDBC_connect\\src\\Restaurant.db";
+            String url = "jdbc:sqlite:C:\\Users\\Sam\\eclipse-workspace\\A2_s3939120\\src\\Restaurant.db";
             // create a connection to the database
             connection = DriverManager.getConnection(url);
             
