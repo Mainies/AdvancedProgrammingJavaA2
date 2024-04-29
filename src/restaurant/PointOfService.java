@@ -223,6 +223,10 @@ public class PointOfService {
 		return sale;
 	}
 	
+	public double calculateSale(Order order) {
+		return this.checkout(order);
+	}
+	
 	private void cashier(double saleamount) {
 	    // Allows the PointOfService class to accept the appropriate amount of money and return change. 
 	    double money = 0.00;
