@@ -59,6 +59,16 @@ public class Order {
 		}
 	}
 	
+	public String getOrder() {
+		//Printing method for order.
+		String order = String.format("Your order is %d Burritos, %d Fries and %d Sodas.%n", 
+				this.numBurritos, this.numFries, this.numSoda);
+		if (this.numMeals > 0) {
+			order = order + String.format("You have ordered %d meal deal", this.numMeals);
+		}
+		return order;
+	}
+	
 	public int getBurritos() {
 		return numBurritos;
 	}

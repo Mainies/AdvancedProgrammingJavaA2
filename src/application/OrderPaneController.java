@@ -1,8 +1,8 @@
 package application;
 
 import javafx.event.ActionEvent;
-import restaurant.Order;
-import restaurant.PointOfService;
+import restaurant.*;
+import restaurant.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -40,6 +40,7 @@ public class OrderPaneController {
 			validateOrderInput();
 		} catch (Exception e) {
 			errorMessage.setText("Error: " + e.getMessage());
+			return null; //had to add this so an order wasn't created in the event of a bad input.
 		}	
 		
 		int numBurritos = Integer.parseInt(burrito.getText());
@@ -93,4 +94,16 @@ public class OrderPaneController {
         sodas.textProperty().addListener((observable) -> {});
         meals.textProperty().addListener((observable) -> {});
 	}
+	/*
+	public void buildAndConfirmOrder(ActionEvent event) throws Exception {
+		Kitchen kitchen = new Kitchen();
+		Order order = orderFood(event);
+		// Load order details. 
+		String orderDetails = order.getOrder();
+		int cookingTime = kitchen.cookTime(order);
+		
+	}
+	*/
+	
+	
 }
