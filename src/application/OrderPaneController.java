@@ -1,8 +1,6 @@
 package application;
 
 import javafx.event.ActionEvent;
-import restaurant.*;
-import restaurant.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,9 +12,15 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import exceptions.*;
-
+import database.Connect;
+import database.User;
+import restaurant.Kitchen;
+import restaurant.Order;
+import restaurant.PointOfService;
+import service.ApplicationService; 
 
 public class OrderPaneController {
+	
 	@FXML
 	private TextField burrito;
 	
@@ -35,28 +39,85 @@ public class OrderPaneController {
 	@FXML
 	private Button make_order;
 	
-	public Order orderFood(ActionEvent event) throws Exception {
-		try{
-			validateOrderInput();
-		} catch (Exception e) {
-			errorMessage.setText("Error: " + e.getMessage());
-			return null; //had to add this so an order wasn't created in the event of a bad input.
-		}	
-		
-		int numBurritos = Integer.parseInt(burrito.getText());
-		int numFries = Integer.parseInt(fries.getText());
-		int numSodas = Integer.parseInt(sodas.getText());
-		int numMeals = Integer.parseInt(meals.getText());
-		
-		numBurritos += numMeals;
-		numFries += numMeals;
-		numSodas += numMeals;
-		Order order = new Order(numBurritos, numFries, numSodas, numMeals);
-		order.printOrder();
-		return order;
-	}
+	@FXML
+	private Label currentUser;
 	
-	public void validateOrderInput() throws Exception{
+	@FXML
+	private Label numBurritos;
+	
+	@FXML
+	private Label numSodas;
+	
+	@FXML
+	private Label numFries;
+	
+	@FXML
+	private Label mealDeals;
+	
+	@FXML
+	private Label totalPrice;
+
+    private ApplicationService appService = ApplicationService.getInstance(); 
+
+    @FXML
+    public void initialize() {
+        updateUserName();
+        if (appService.getOrder() != null) {
+        	updateOrders();
+        };
+    }
+     
+
+    private void updateUserName() {
+        User user = appService.getUser(); 
+        if (user != null && currentUser != null) {
+            currentUser.setText(user.username); 
+        } else {
+            if (currentUser != null) {
+                currentUser.setText("No user logged in");
+            }
+        }
+    }
+    
+    private void updateOrders() {
+        Order order = appService.getOrder();
+        PointOfService pos = appService.getPos();
+        if (order != null) {
+            double price = pos.calculateSale(order);
+            if (numBurritos != null) {
+                numBurritos.setText(Integer.toString(order.getBurritos()));
+            } 
+            if (numFries != null) numFries.setText(Integer.toString(order.getFries()));
+            if (numSodas != null) numSodas.setText(Integer.toString(order.getSodas()));
+            if (mealDeals != null) mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " meal deals.");
+            if (totalPrice != null) totalPrice.setText("Total Price: $" + Double.toString(price));
+        }
+    }
+
+
+    public void orderFood(ActionEvent event) throws Exception {
+        try {
+            validateOrderInput();
+        } catch (Exception e) {
+            errorMessage.setText("Error: " + e.getMessage());
+            return;
+        }
+
+        int numBurritos = Integer.parseInt(burrito.getText());
+        int numFries = Integer.parseInt(fries.getText());
+        int numSodas = Integer.parseInt(sodas.getText());
+        int numMeals = Integer.parseInt(meals.getText());
+
+        numBurritos += numMeals;
+        numFries += numMeals;
+        numSodas += numMeals;
+        Order order = new Order(numBurritos, numFries, numSodas, numMeals);
+        order.printOrder();
+        appService.setOrder(order); 
+        this.changeToCheckout(event);
+    }
+
+    public void validateOrderInput() throws Exception{
 		PointOfService pos = new PointOfService();
 		try{
 			pos.validateNumber(burrito.getText());
@@ -70,7 +131,6 @@ public class OrderPaneController {
 		try {
 			pos.wholeNumber(Double.parseDouble(burrito.getText()));
 	        pos.wholeNumber(Double.parseDouble(fries.getText()));
-	        pos.wholeNumber(Double.parseDouble(sodas.getText()));
 	        pos.wholeNumber(Double.parseDouble(meals.getText()));	
 		} 
 		catch(NotWholeNumber e) {
@@ -86,24 +146,61 @@ public class OrderPaneController {
 			throw e;
 		}
 	}
+
+    @FXML
+    public void initializeListeners() {
+        burrito.textProperty().addListener((observable) -> validateInput());
+        fries.textProperty().addListener((observable) -> validateInput());
+        sodas.textProperty().addListener((observable) -> validateInput());
+        meals.textProperty().addListener((observable) -> validateInput());
+    }
+
+    private void validateInput() {
+        try {
+            validateOrderInput();
+        } catch (Exception e) {
+            errorMessage.setText("Input Error: " + e.getMessage());
+        }
+    }
+    
+    public void changeToCheckout(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ConfirmOrder.fxml")); 
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace(); 
+        }
+    }
+    
+    public void backToOrder(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Orderer.fxml")); 
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace(); 
+        }
+    }
+
 	
-	@FXML
-	public void initializeListeners() {
-        burrito.textProperty().addListener((observable) -> {});
-        fries.textProperty().addListener((observable) -> {});
-        sodas.textProperty().addListener((observable) -> {});
-        meals.textProperty().addListener((observable) -> {});
-	}
-	/*
 	public void buildAndConfirmOrder(ActionEvent event) throws Exception {
-		Kitchen kitchen = new Kitchen();
-		Order order = orderFood(event);
-		// Load order details. 
-		String orderDetails = order.getOrder();
+		Kitchen kitchen = appService.getKitchen();
+		Order order = appService.getOrder();
+		String userName = appService.getUser().username;
 		int cookingTime = kitchen.cookTime(order);
-		
+		/* need to implement this so it sends the food to the kitchen, returns the cooking time and adds a new order to the db and a 
+		 * new order to userOrders
+		 */
 	}
-	*/
-	
-	
 }
+
+
+	
+

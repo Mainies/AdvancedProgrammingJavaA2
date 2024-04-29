@@ -245,4 +245,67 @@ public class Connect {
 			} catch (Exception e) {
 		}
     }
+    
+
+	public boolean isUser(String user) {
+	    String query = "SELECT 1 FROM Users WHERE UserName = ?"; 
+	    try {
+	        connect(); 
+	        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	            stmt.setString(1, user);
+	            ResultSet results = stmt.executeQuery();
+	            connection.close();
+	            return results.next(); 
+	        } 
+	    } catch (SQLException e) {
+	        System.err.println("Database error: " + e.getMessage());
+	        return false;          	
+	    } 
+	} 
+
+	public boolean checkPassword(String user, String inputPassword) {
+	    String query = "SELECT Password FROM Users WHERE UserName = ?";
+	    try {
+	        connect(); 
+	        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	            stmt.setString(1, user);
+	            ResultSet results = stmt.executeQuery();
+	            if (results.next()) {
+	                String storedPassword = results.getString("Password");
+	                return storedPassword.equals(inputPassword); 
+	            }
+	            return false; 
+	        } 
+	    } catch (SQLException e) {
+	        System.err.println("Database error: " + e.getMessage());
+	        return false;
+	    }
+	}
+
+	public User getUserFromDatabase(String username) {
+		User user = null;
+        String query = "SELECT UserName, Password, FirstName, LastName, Email FROM Users WHERE UserName = ?";
+        try {
+            connect(); 
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, username);
+                ResultSet results = stmt.executeQuery();
+                if (results.next()) {
+                    String user1 = results.getString("UserName");
+                    String pass = results.getString("Password");
+                    String first = results.getString("FirstName");
+                    String last = results.getString("LastName");
+                    String email = results.getString("Email");
+                    if (email != null) {
+                        return new User(user1, pass, first, last, email); 
+                    } else {
+                        return new User(user1, pass, first, last); 
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+        }
+        return user;
+    }
 }
