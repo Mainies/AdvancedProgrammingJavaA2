@@ -1,56 +1,21 @@
 package service;
 
-import database.User;
-import restaurant.Kitchen;
-import restaurant.Order;
-import restaurant.PointOfService;
+public interface ApplicationService<T> {
 
-public class ApplicationService {
-    private static ApplicationService instance;
-    private User currentUser;
-    private Order currentOrder;
-    private final PointOfService pos;
-    private final Kitchen kitchen;
-
-    private ApplicationService() {
-    	this.pos = new PointOfService();
-    	this.kitchen = new Kitchen();
+    static ApplicationService<?> getInstance() {
+    	throw new UnsupportedOperationException("This method should be implemented by the singleton service class.");
     }
 
-    public static ApplicationService getInstance() {
-        if (instance == null) {
-            instance = new ApplicationService();
-        }
-        return instance;
+    public default void setObject() {
+    	throw new UnsupportedOperationException("This method should be implemented by the class.");
     }
 
-    public void setUser(User user) {
-        this.currentUser = user;
+    public default T getObject() {
+    	throw new UnsupportedOperationException("This method should be implemented by the class.");
     }
-
-    public User getUser() {
-        return currentUser;
-    }
-
-    public void setOrder(Order order) {
-        this.currentOrder = order;
-    }
-
-    public Order getOrder() {
-        return currentOrder;
-    }
-
-	public PointOfService getPos() {
-		return pos;
-	}
-
-	public Kitchen getKitchen() {
-		return kitchen;
-	}
-	
-	 //Method for Logout
-    public void clearUser() {
-        this.currentUser = null;
+       
+    public default void clearObject() {
+    	throw new UnsupportedOperationException("This method should be implemented by the class.");
     }
 
 }
