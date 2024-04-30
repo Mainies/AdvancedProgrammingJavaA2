@@ -17,7 +17,7 @@ public class LandingController {
     
     @FXML
     Label userName; 
-    
+        
     private ApplicationService appService = ApplicationService.getInstance();
     
     @FXML
@@ -36,7 +36,6 @@ public class LandingController {
         }
     }
 
-    @FXML
     public void openOrderPane(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Orderer.fxml")); 
@@ -49,4 +48,20 @@ public class LandingController {
             e.printStackTrace(); 
         }
     }
+    
+    
+    public void managerLogin(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("AccessControl.fxml"));
+            Parent root = loader.load();
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
 }

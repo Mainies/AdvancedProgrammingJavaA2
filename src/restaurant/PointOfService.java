@@ -34,19 +34,20 @@ public class PointOfService {
 	public Burrito getBurrito() {
 		return this.burrito;
 	}
-
+	/*
 	public void openingHours(Kitchen kitchen) {
-		/* Recursive menu calling function that calls an input handler and a function to take a valid input
-		and perform desired output */
+		//recursive menu calling function that calls an input handler and a function to take a valid input
+		and perform desired output
 	    PointOfService pos = new PointOfService();
 	    boolean isOpen = true;
 	    while (isOpen) {
 	            String optionSelect = getValidMenuOption(pos);
 	            isOpen = doSelectedOption(optionSelect, pos, kitchen);
 	    }
-	    pos.closingTime(kitchen); //
+	    pos.closingTime(kitchen); 
 	}
-
+	*/
+	/*
 	private String getValidMenuOption(PointOfService pos) {
 	    while (true) {
 	        try {
@@ -59,7 +60,9 @@ public class PointOfService {
 	        }
 	    }
 	}
-
+	*/
+	
+	/*
 	private boolean doSelectedOption(String optionSelect, PointOfService pos, Kitchen kitchen) {
 		// Switch currently capable of Building an Order, Printing Sales Report, Update Prices
 	    switch (optionSelect) {
@@ -77,7 +80,9 @@ public class PointOfService {
 	        return false;
 	    }
 	}
-
+	*/
+	
+	/*
 	private void orderFood(Kitchen kitchen) {
 		//Takes an order and returns the cooking time.
 		try {
@@ -92,6 +97,7 @@ public class PointOfService {
             System.out.println("Error processing order: " + e.getMessage());
         }
 	}
+	*/
 	
 	
 	private void updateSaleQuantities(Order order) {
@@ -101,7 +107,14 @@ public class PointOfService {
 		this.soldItems.put("Meals", (this.soldItems.get("Meals") + order.getMeals()));
 	}
 	
-
+	/*
+	
+	public void updateAppSoldItems(Order order) {
+		// Method for accessing through AppService
+		this.updateSaleQuantities(order);
+	}
+	*/
+	
 	private void updateSales(Order order) {
 		// Gets current price for each food item in order and adds to sales total.
 		// Allows for changing sales totals.
@@ -112,6 +125,12 @@ public class PointOfService {
 		sale -= order.getMeals() * 3;
 		this.totalSales = sale;
 	}
+	/*
+	public void updateAppDailySales(Order order) {
+		// Method for app service
+		this.updateSales(order);
+	}
+	*/
 	
 	
 	public void updatePOS(Order order) {
@@ -125,11 +144,13 @@ public class PointOfService {
 		soldItems.put(item, (soldItems.get(item) + price));
 	}
 	
+	/*
 	public static String readUserInput() {
 		Scanner scanner = new Scanner(System.in);
 		return scanner.nextLine().toLowerCase();
 	}
-
+	*/
+	/*
 	public int getQuantity() {
 		// Gets quantity of food item required by user and holds methods for handling input exceptions.
 	    String input;
@@ -152,7 +173,9 @@ public class PointOfService {
 	    }
 	    return quantity;
 	}
-
+	*/
+	
+	/*
 	 public Order buildOrder() {
 	        Order currentOrder = new Order(0, 0, 0);  
 	        boolean complete = false;
@@ -167,7 +190,9 @@ public class PointOfService {
 	        }
 	        return currentOrder;
 	    }
-
+	*/
+	
+	/*
     private String getUserFoodSelection() {
         while (true) {
             try {
@@ -179,7 +204,9 @@ public class PointOfService {
             }
         }
     }
-
+    */
+	
+	/*
     private void processOrderItem(String option, Order currentOrder) {
         if (option.equals("4")) { 
             handleMealItem(currentOrder);
@@ -193,7 +220,7 @@ public class PointOfService {
         int quantity = getValidQuantity();
         updateMealItems(quantity, currentOrder);
     }
-
+	
     private int getValidQuantity() {
         while (true) {
             try {
@@ -205,13 +232,15 @@ public class PointOfService {
             }
         }
     }
-
+    */
+	/*
     private void updateMealItems(int quantity, Order currentOrder) {
         currentOrder.setBurritos(currentOrder.getBurritos() + quantity);
         currentOrder.setFries(currentOrder.getFries() + quantity);
         currentOrder.setSodas(currentOrder.getSodas() + quantity);
         currentOrder.setMeals(currentOrder.getMeals() + quantity);
     }
+    */
 
 	private double checkout(Order order) {
 		//Calculates total price for current sale.
@@ -227,6 +256,7 @@ public class PointOfService {
 		return this.checkout(order);
 	}
 	
+	/*
 	private void cashier(double saleamount) {
 	    // Allows the PointOfService class to accept the appropriate amount of money and return change. 
 	    double money = 0.00;
@@ -252,14 +282,16 @@ public class PointOfService {
 	    double change = money - saleamount;
 	    System.out.printf("Your change is $%.2f. Thank you.%n", change);
 	}
-	
+	*/
+	/*
 	public void updatePrice() {
 	    String option = getValidFoodOption();
 	    double correctPrice = getValidPrice();
 
 	    updateFoodPrice(option, correctPrice);
 	}
-
+	*/
+	/*
 	private String getValidFoodOption() {
 	    while (true) {
 	        try {
@@ -306,8 +338,9 @@ public class PointOfService {
 	        updatePrice(); // Consider removing this recursive call if possible, or replacing with a different strategy.
 	    }
 	}
+	*/
 
-	
+	/*
 	private void closingTime(Kitchen kitchen) {
 		//Method for closing Point of Service and restaurant. Prints fries in kitchen and outputs final sales total.
 		System.out.println("End of Day Totals.");
@@ -315,7 +348,9 @@ public class PointOfService {
 		this.printSales();
 		System.out.println("Thank you for coming to Burrito King.");
 	}
+	*/
 	
+	/*
 	// Printers
 	
 	private void printMenu() {
@@ -361,7 +396,7 @@ public class PointOfService {
 		System.out.println("2. Fries");
 		System.out.println("3. Soda");
 	}
-	
+	*/
 	
 	// Exceptions Handling Section
 	

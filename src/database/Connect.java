@@ -248,13 +248,14 @@ public class Connect {
     
 
 	public boolean isUser(String user) {
+		Connect connector = new Connect();
+		connector.connect();
 	    String query = "SELECT 1 FROM Users WHERE UserName = ?"; 
 	    try {
 	        connect(); 
 	        try (PreparedStatement stmt = connection.prepareStatement(query)) {
 	            stmt.setString(1, user);
 	            ResultSet results = stmt.executeQuery();
-	            connection.close();
 	            return results.next(); 
 	        } 
 	    } catch (SQLException e) {

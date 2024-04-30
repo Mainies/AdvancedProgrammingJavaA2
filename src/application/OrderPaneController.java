@@ -193,12 +193,17 @@ public class OrderPaneController {
 	public void buildAndConfirmOrder(ActionEvent event) throws Exception {
 		Kitchen kitchen = appService.getKitchen();
 		Order order = appService.getOrder();
+		PointOfService pos = appService.getPos();
 		String userName = appService.getUser().username;
 		int cookingTime = kitchen.cookTime(order);
 		/* need to implement this so it sends the food to the kitchen, returns the cooking time and adds a new order to the db and a 
 		 * new order to userOrders
 		 */
+		//pos.
+		
 	}
+	
+	
 }
 
 
