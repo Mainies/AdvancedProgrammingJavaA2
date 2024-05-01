@@ -1,25 +1,26 @@
 package application;
 
 import database.Connect;
+import database.NormalUser;
 import database.User;
+import database.VIPUser;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import service.ApplicationService; 
+import service.*; 
 
 public class LoginController {
     private Stage stage;
     private Scene scene;
     private Connect connector = new Connect();
-    private ApplicationService appService = ApplicationService.getInstance(); 
+    private UserService userService = UserService.getInstance(); 
 
     // User Login Interface
     @FXML
@@ -54,7 +55,7 @@ public class LoginController {
     public void attemptLogin(ActionEvent event) {
         User currentUser = login();
         if (currentUser != null) {
-            ApplicationService.getInstance().setUser(currentUser);
+            userService.setObject(currentUser);
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("LandingPage.fxml"));
                 Parent root = loader.load();
@@ -100,13 +101,13 @@ public class LoginController {
             String last = newLastName.getText();
             String email = newEmail.getText();
             if (email.isEmpty()) {
-                newUser = new User(username, pass, first, last);
+                newUser = new NormalUser(username, pass, first, last);
                 connector.createUser(username, pass, first, last);
             } else {
-                newUser = new User(username, pass, first, last, email);
+                newUser = new VIPUser(username, pass, first, last, email);
                 connector.createVIPUser(username, pass, first, last, email);
             }
-            appService.setUser(newUser); 
+            userService.setObject(newUser); 
         } else {
             errorMessageNewUser.setText("Username is already in use. Try again");
         }

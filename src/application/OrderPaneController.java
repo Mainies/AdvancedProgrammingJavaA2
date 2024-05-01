@@ -17,9 +17,10 @@ import database.User;
 import restaurant.Kitchen;
 import restaurant.Order;
 import restaurant.PointOfService;
-import service.ApplicationService; 
+import service.*; 
 
 public class OrderPaneController {
+	
 	
 	@FXML
 	private TextField burrito;
@@ -57,21 +58,24 @@ public class OrderPaneController {
 	@FXML
 	private Label totalPrice;
 
-    private ApplicationService appService = ApplicationService.getInstance(); 
+    private UserService userService = UserService.getInstance();
+    private POSService posService = POSService.getInstance();
+    private KitchenService kitchenService = KitchenService.getInstance();
+    private OrderService orderService = OrderService.getInstance();
 
     @FXML
     public void initialize() {
         updateUserName();
-        if (appService.getOrder() != null) {
+        if (orderService.getObject() != null) {
         	updateOrders();
         };
     }
      
 
     private void updateUserName() {
-        User user = appService.getUser(); 
+        User user = userService.getObject(); 
         if (user != null && currentUser != null) {
-            currentUser.setText(user.username); 
+            currentUser.setText(user.getUsername()); 
         } else {
             if (currentUser != null) {
                 currentUser.setText("No user logged in");
@@ -80,8 +84,8 @@ public class OrderPaneController {
     }
     
     private void updateOrders() {
-        Order order = appService.getOrder();
-        PointOfService pos = appService.getPos();
+        Order order = orderService.getObject();
+        PointOfService pos = posService.getObject();
         if (order != null) {
             double price = pos.calculateSale(order);
             if (numBurritos != null) {
@@ -113,7 +117,7 @@ public class OrderPaneController {
         numSodas += numMeals;
         Order order = new Order(numBurritos, numFries, numSodas, numMeals);
         order.printOrder();
-        appService.setOrder(order); 
+        orderService.setObject(order); 
         this.changeToCheckout(event);
     }
 
@@ -191,10 +195,10 @@ public class OrderPaneController {
 
 	
 	public void buildAndConfirmOrder(ActionEvent event) throws Exception {
-		Kitchen kitchen = appService.getKitchen();
-		Order order = appService.getOrder();
-		PointOfService pos = appService.getPos();
-		String userName = appService.getUser().username;
+		Kitchen kitchen = kitchenService.getObject();
+		Order order = orderService.getObject();
+		PointOfService pos = posService.getObject();
+		String userName = userService.getObject().getUsername();
 		int cookingTime = kitchen.cookTime(order);
 		/* need to implement this so it sends the food to the kitchen, returns the cooking time and adds a new order to the db and a 
 		 * new order to userOrders

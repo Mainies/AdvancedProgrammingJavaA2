@@ -9,7 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import service.ApplicationService; 
+import service.*; 
 
 public class LandingController {
     private Stage stage;
@@ -18,7 +18,8 @@ public class LandingController {
     @FXML
     Label userName; 
         
-    private ApplicationService appService = ApplicationService.getInstance();
+    private UserService userService = UserService.getInstance();
+    private POSService posService = POSService.getInstance();
     
     @FXML
     public void initialize() {
@@ -26,9 +27,9 @@ public class LandingController {
     }
 
     private void updateUserName() {
-        User user = appService.getUser(); 
+        User user = userService.getObject(); 
         if (user != null && userName != null) {
-            userName.setText(user.username); 
+            userName.setText(user.getUsername()); 
         } else {
             if (userName != null) {
                 userName.setText("No user logged in");

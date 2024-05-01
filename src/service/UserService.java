@@ -26,4 +26,6 @@ public class UserService implements ApplicationService<User> {
 	    public void clearObject() {
 	    	this.user = null;
 	    }
+
+
 }

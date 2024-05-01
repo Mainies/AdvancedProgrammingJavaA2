@@ -298,9 +298,9 @@ public class Connect {
                     String last = results.getString("LastName");
                     String email = results.getString("Email");
                     if (email != null) {
-                        return new User(user1, pass, first, last, email); 
+                        return new VIPUser(user1, pass, first, last, email); 
                     } else {
-                        return new User(user1, pass, first, last); 
+                        return new NormalUser(user1, pass, first, last); 
                     }
                 }
             }
