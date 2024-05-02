@@ -2,12 +2,13 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OrderPaneController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="714.0" prefWidth="598.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OrderPaneController">
    <children>
       <Label layoutX="240.0" layoutY="81.0" text="Your Order Is" />
       <GridPane layoutX="193.0" layoutY="110.0">
@@ -30,8 +31,17 @@
          </children>
       </GridPane>
       <Label fx:id="mealDeals" layoutX="209.0" layoutY="206.0" prefHeight="17.0" prefWidth="169.0" text="Inclusive of   meal deals." />
-      <Button fx:id="checkout" layoutX="228.0" layoutY="264.0" mnemonicParsing="false" text="Confirm &amp; Pay" />
-      <Button fx:id="backToOrder" layoutX="245.0" layoutY="309.0" mnemonicParsing="false" onAction="#backToOrder" text="Go Back" />
+      <Button fx:id="checkout" layoutX="242.0" layoutY="489.0" mnemonicParsing="false" onAction="#checkOut" text="Confirm &amp; Pay" />
+      <Button fx:id="backToOrder" layoutX="259.0" layoutY="541.0" mnemonicParsing="false" onAction="#backToOrder" text="Go Back" />
       <Label fx:id="totalPrice" layoutX="261.0" layoutY="236.0" text="Label" />
+      <Label layoutX="235.0" layoutY="285.0" prefHeight="17.0" prefWidth="82.0" text="Card Number" />
+      <TextField fx:id="cardNumber" layoutX="209.0" layoutY="309.0" />
+      <TextField fx:id="expiry" layoutX="202.0" layoutY="357.0" prefHeight="17.0" prefWidth="71.0" />
+      <TextField fx:id="csv" layoutX="304.0" layoutY="357.0" prefHeight="17.0" prefWidth="60.0" />
+      <Label layoutX="194.0" layoutY="334.0" prefHeight="17.0" prefWidth="82.0" text="Expiry (MM/YY)" />
+      <Label layoutX="317.0" layoutY="334.0" prefHeight="17.0" prefWidth="38.0" text="CSV" />
+      <Label fx:id="cardError" layoutX="172.0" layoutY="404.0" prefHeight="17.0" prefWidth="290.0" textFill="RED" />
+      <Label layoutX="146.0" layoutY="443.0" text="Estimated Pick Up Time:" />
+      <Label fx:id="waitTime" layoutX="280.0" layoutY="443.0" text="Label" />
    </children>
 </AnchorPane>

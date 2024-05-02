@@ -27,10 +27,11 @@ public class LandingController {
     
     @FXML
     Label userName; 
+    @FXML
+    Label fullName;
         
     private UserService userService = UserService.getInstance();
     private POSService posService = POSService.getInstance();
-    
     
     @FXML private TableView<Order> orders;
     @FXML private TableColumn<Order, String> date;
@@ -44,6 +45,7 @@ public class LandingController {
     @FXML
     public void initialize() {
         updateUserName();
+        updateFullName();
         
         //user Orders initialise for uncollected orders for tableview
         date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
@@ -59,6 +61,17 @@ public class LandingController {
         User user = userService.getObject(); 
         if (user != null && userName != null) {
             userName.setText(user.getUsername()); 
+        } else {
+            if (userName != null) {
+                userName.setText("No user logged in");
+            }
+        }
+    }
+    
+    private void updateFullName() {
+    	User user = userService.getObject(); 
+        if (user != null && userName != null) {
+            fullName.setText(user.getFirstName() + " " + user.getLastName()); 
         } else {
             if (userName != null) {
                 userName.setText("No user logged in");
@@ -93,12 +106,38 @@ public class LandingController {
         }
     }
     
+    public void goToPickup(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("CollectOrder.fxml"));
+            Parent root = loader.load();
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+
+    public void goToPast(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("PastOrders.fxml"));
+            Parent root = loader.load();
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     private ObservableList<Order> fetchDataForUser() {
     	String username = userService.getObject().getUsername();
     	Connect connector = new Connect();
         ObservableList<Order> ordersList = FXCollections.observableArrayList();
-        String query = "SELECT dateCreated, OrderNumber, Burritos, Fries, Sodas, Price FROM Orders WHERE Collected = FALSE AND dateCollected IS NULL AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?)";
+        String query = "SELECT dateCreated, OrderNumber, Burritos, Fries, Sodas, Price FROM Orders WHERE Status = 'await for collection' AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?) ORDER BY dateCreated DESC";
 
         try (Connection conn = connector.make_connect();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -109,9 +148,7 @@ public class LandingController {
             	int orderNum = rs.getInt("OrderNumber");
                 int burritos = rs.getInt("Burritos");
                 int fries = rs.getInt("Fries");
-
                 int sodas = rs.getInt("Sodas");
-
                 double price = rs.getDouble("Price");
 
                 burritos = rs.wasNull() ? 0 : burritos;
@@ -135,6 +172,31 @@ public class LandingController {
         return ordersList;
     }
     
+    public void goToUpdateDetails(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateDetails.fxml"));
+            Parent root = loader.load();
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void toVIPPortal(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("BecomeVIP.fxml"));
+            Parent root = loader.load();
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
   
 }

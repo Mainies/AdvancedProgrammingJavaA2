@@ -11,9 +11,8 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onDragDetected="#openOrderPane" prefHeight="619.0" prefWidth="912.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LandingController">
    <children>
       <Button fx:id="order" layoutX="620.0" layoutY="85.0" mnemonicParsing="false" onAction="#openOrderPane" prefHeight="69.0" prefWidth="164.0" text="New Order" />
-      <Label fx:id="userName" layoutX="217.0" layoutY="38.0" prefHeight="17.0" prefWidth="110.0" />
-      <Button layoutX="620.0" layoutY="175.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Pick Up Order" />
-      <Button layoutX="620.0" layoutY="222.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Past Orders" />
+      <Button fx:id="pickUpButton" layoutX="620.0" layoutY="175.0" mnemonicParsing="false" onAction="#goToPickup" prefHeight="25.0" prefWidth="156.0" text="Pick Up Order" />
+      <Button fx:id="seeAllOrdersButton" layoutX="620.0" layoutY="222.0" mnemonicParsing="false" onAction="#goToPast" prefHeight="25.0" prefWidth="156.0" text="Past Orders" />
       <Button layoutX="647.0" layoutY="272.0" mnemonicParsing="false" onAction="#managerLogin" prefHeight="25.0" prefWidth="110.0" text="Manager Login" />
       <ScrollPane layoutX="61.0" layoutY="85.0" prefHeight="261.0" prefWidth="483.0">
          <content>
@@ -29,16 +28,21 @@
             </TableView>
          </content>
       </ScrollPane>
-      <Button layoutX="646.0" layoutY="316.0" mnemonicParsing="false" text="Add/Update Email" />
+      <Button layoutX="646.0" layoutY="316.0" mnemonicParsing="false" onAction="#toVIPPortal" text="Add/Update Email" />
       <Label layoutX="231.0" layoutY="429.0" prefHeight="17.0" prefWidth="472.0" text="Don't forget to add your email to become a VIP member and get a $3 on meals!" />
-      <FlowPane layoutX="61.0" layoutY="34.0" prefHeight="17.0" prefWidth="235.0">
+      <FlowPane layoutX="61.0" layoutY="38.0" prefHeight="17.0" prefWidth="191.0">
          <children>
             <Label text="Hello, " />
-            <Label fx:id="FirstName" prefHeight="17.0" prefWidth="49.0" text="First" />
-            <Label fx:id="Last" prefHeight="17.0" prefWidth="64.0" text="Label" />
+            <Label fx:id="fullName" prefHeight="17.0" prefWidth="148.0" text="fullName" />
          </children>
       </FlowPane>
       <Label layoutX="61.0" layoutY="68.0" prefHeight="17.0" prefWidth="102.0" text="Available Orders" />
-      <Button layoutX="656.0" layoutY="362.0" mnemonicParsing="false" text="Update Details" />
+      <Button layoutX="656.0" layoutY="362.0" mnemonicParsing="false" onAction="#goToUpdateDetails" text="Update Details" />
+      <FlowPane layoutX="61.0" layoutY="480.0" prefHeight="25.0" prefWidth="260.0">
+         <children>
+            <Label prefHeight="17.0" prefWidth="74.0" text="Current User: " />
+            <Label fx:id="userName" prefHeight="17.0" prefWidth="110.0" />
+         </children>
+      </FlowPane>
    </children>
 </AnchorPane>

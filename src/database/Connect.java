@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Connect {
 	
@@ -45,7 +47,7 @@ public class Connect {
     	return this.orderNumber;
     }
     
-    private void MaxValue() {
+    public void MaxValue() {
         try (Connection conn = DriverManager.getConnection(dbURL)) {
             // Query to find the maximum value in the numbers column
             String query = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
@@ -55,6 +57,8 @@ public class Connect {
                 
                 if (rs.next()) {
                     this.orderNumber = rs.getInt("max_number");
+                    System.out.println(this.orderNumber);
+                    System.out.println("order number updated");
                 } else {
                     System.out.println("No data found.");
                 }
@@ -62,6 +66,10 @@ public class Connect {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    
+    public void nextOrderNumber() {
+    	this.orderNumber++;
     }
 
     public void listTables() {
@@ -205,14 +213,15 @@ public class Connect {
     	double price = pos.calculateSale(order, vipStatus);
     	this.MaxValue();
     	this.orderNumber++; 
-    	String query = "INSERT INTO Orders(OrderNumber, Burritos, Fries, Sodas, Meals, Collected, Price) VALUES(?, ?, ?, ?, ?, ?, ?)";
+    	String query = "INSERT INTO Orders(OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price) VALUES(?, ?, ?, ?, ?, ?, ?)";
     	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, this.orderNumber);
             pstmt.setInt(2, burritos);
             pstmt.setInt(3, fries);
             pstmt.setInt(4, sodas);
             pstmt.setInt(5, meals);
-            pstmt.setBoolean(6, false);
+            String collection = "await for collection";
+            pstmt.setString(6, collection);
             pstmt.setDouble(7, price);
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -237,16 +246,38 @@ public class Connect {
     }
     
     public void pickUpOrder(int orderNumber) {
-    	String query = "UPDATE Orders SET Collected = ? WHERE OrderNumber = ?";
-    	boolean pickup = true;
-    	try (PreparedStatement pstmt = connection.prepareStatement(query)){
-    		pstmt.setBoolean(1, pickup);
-    		pstmt.setInt(2, orderNumber);
-    		pstmt.executeUpdate();
-    		    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
+    	connect();
+        String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+        String formattedDate = currentDateTime.format(formatter);
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, "collected");  
+            pstmt.setString(2, formattedDate); 
+            pstmt.setInt(3, orderNumber);    
+            int rowsAffected = pstmt.executeUpdate(); 
+            if (rowsAffected > 0) {
+                System.out.println("Order updated successfully.");
+            } else {
+                System.out.println("No order was updated. Please check the order number."); 
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
     }
+    
+    public void cancelOrder(int OrderNumber) {
+    		connect();
+	    	String query = "UPDATE Orders SET Status = ? WHERE OrderNumber = ?";
+	    	String pickup = "cancelled";
+	    	try (PreparedStatement pstmt = connection.prepareStatement(query)){
+	    		pstmt.setString(1, pickup);
+	    		pstmt.setInt(2, orderNumber);
+	    		pstmt.executeUpdate();
+	    		    	} catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	    }
     
     public void deleteOrders(int OrderNumber) {
 		String removeTestOrder = "DELETE FROM Orders WHERE orderNumber = ?";
@@ -330,5 +361,45 @@ public class Connect {
         return user;
     }
 	
+	
+	public void updateFirstName(String newName, String currentUser) {
+		String query = "UPDATE Users SET FirstName = ? WHERE UserName = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)){
+			pstmt.setString(1, newName);
+			pstmt.setString(2, currentUser);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+		}
+	}
+	
+	public void updateLastName(String newName, String currentUser) {
+		String query = "UPDATE Users SET LastName = ? WHERE UserName = ?";
+		try(PreparedStatement pstmt = connection.prepareStatement(query)){
+			pstmt.setString(1, newName);
+			pstmt.setString(2, currentUser);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+	}
+	}
+		
+	public void updatePassword(String newPass, String currentUser) {
+		String query = "UPDATE Users SET Password = ? WHERE UserName = ?";
+		try(PreparedStatement pstmt = connection.prepareStatement(query)){
+			pstmt.setString(1, newPass);
+			pstmt.setString(2, currentUser);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+	}
+	}
+	
+	public void updateEmail(String email, String currentUser) {
+		String query = "UPDATE Users SET email = ? WHERE UserName = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(query)){
+			pstmt.setString(1, email);
+			pstmt.setString(2, currentUser);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+		}
+	}
 	
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="512.0" prefWidth="754.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OrderManagerController">
+   <children>
+      <Button layoutX="601.0" layoutY="273.0" mnemonicParsing="false" onAction="#backToLanding" text="GoBack" />
+      <ScrollPane layoutX="71.0" layoutY="95.0" prefHeight="235.0" prefWidth="447.0">
+         <content>
+            <TableView fx:id="orders" prefHeight="242.0" prefWidth="441.0">
+               <columns>
+                  <TableColumn fx:id="date" prefWidth="75.0" text="Date" />
+                  <TableColumn fx:id="orderNum" prefWidth="86.0" text="OrderNumber" />
+                  <TableColumn fx:id="burritos" prefWidth="77.0" text="Burritos" />
+                  <TableColumn fx:id="fries" prefWidth="75.0" text="Fries" />
+                  <TableColumn fx:id="sodas" prefWidth="75.0" text="Sodas" />
+                  <TableColumn fx:id="price" prefWidth="75.0" text="Price" />
+               </columns>
+            </TableView>
+         </content>
+      </ScrollPane>
+      <TextField fx:id="orderNo" layoutX="552.0" layoutY="139.0" promptText="Order Number" />
+      <Button layoutX="600.0" layoutY="181.0" mnemonicParsing="false" onAction="#pickUpOrder" text="Collect Order" />
+      <Button layoutX="601.0" layoutY="221.0" mnemonicParsing="false" onAction="#cancelOrder" text="Cancel Order" />
+      <Label fx:id="warningMsg" layoutX="367.0" layoutY="372.0" prefHeight="17.0" prefWidth="303.0" textFill="RED" />
+   </children>
+</AnchorPane>

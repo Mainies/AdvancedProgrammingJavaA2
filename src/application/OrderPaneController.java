@@ -19,6 +19,15 @@ import restaurant.Order;
 import restaurant.PointOfService;
 import service.*; 
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.LocalTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+
 public class OrderPaneController {
 	
 	
@@ -57,6 +66,9 @@ public class OrderPaneController {
 	
 	@FXML
 	private Label totalPrice;
+	
+	@FXML
+	private Label waitTime;
 
     private UserService userService = UserService.getInstance();
     private POSService posService = POSService.getInstance();
@@ -68,9 +80,18 @@ public class OrderPaneController {
         updateUserName();
         if (orderService.getObject() != null) {
         	updateOrders();
-        };
-    }
+        	updateWaitTime();
+        }
      
+    }
+    
+    private void updateWaitTime() {
+    	Order order = orderService.getObject();
+    	Kitchen kitchen = kitchenService.getObject();
+    	int wait = kitchen.cookTime(order);
+    	String waitingTime = Integer.toString(wait);
+    	waitTime.setText(waitingTime + " minutes.");
+    }
 
     private void updateUserName() {
         User user = userService.getObject(); 
@@ -95,10 +116,14 @@ public class OrderPaneController {
             if (numFries != null) numFries.setText(Integer.toString(order.getFries()));
             if (numSodas != null) numSodas.setText(Integer.toString(order.getSodas()));
             if (vipStatus) {
-            	if (mealDeals != null) mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " VIP meal deal discounts.");
+            	if (mealDeals != null) {mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " VIP meal deal discounts.");}
+            	else {mealDeals.setText("");}
+            } else {
+            	if (mealDeals != null) {mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " VIP meal deal discounts.");}
+        	else {mealDeals.setText("");};}
+            if (totalPrice != null) {totalPrice.setText("Total Price: $" + Double.toString(price));
             }
-            if (totalPrice != null) totalPrice.setText("Total Price: $" + Double.toString(price));
-        }
+        }      
     }
 
 
@@ -119,7 +144,6 @@ public class OrderPaneController {
         numFries += numMeals;
         numSodas += numMeals;
         Order order = new Order(numBurritos, numFries, numSodas, numMeals);
-        order.printOrder();
         orderService.setObject(order); 
         this.changeToCheckout(event);
     }
@@ -195,22 +219,153 @@ public class OrderPaneController {
             e.printStackTrace(); 
         }
     }
-
 	
-	public void buildAndConfirmOrder(ActionEvent event) throws Exception {
-		Kitchen kitchen = kitchenService.getObject();
-		Order order = orderService.getObject();
-		PointOfService pos = posService.getObject();
-		String userName = userService.getObject().getUsername();
-		int cookingTime = kitchen.cookTime(order);
-		/* need to implement this so it sends the food to the kitchen, returns the cooking time and adds a new order to the db and a 
-		 * new order to userOrders
-		 */
-		//pos.
-		
+	@FXML
+	TextField csv;
+	
+	@FXML
+	TextField expiry;
+	
+	@FXML
+	TextField cardNumber;
+	
+	@FXML
+	Label cardError;
+	
+	public boolean isValidCardNumber(String cardNumber) {
+	    return cardNumber.matches("\\d{16}");
+	}
+	
+	public boolean isValidExpiryFormat(String expiry) {
+	    if (!expiry.matches("\\d{2}/\\d{2}")) {
+	        return false; 
+	    }
+		return true;
+	}
+	
+	public boolean isValidExpiryDate(String expiry) {
+	    try {
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+	        YearMonth expiryDate = YearMonth.parse(expiry, formatter);
+	        YearMonth currentMonth = YearMonth.now();
+
+	        return expiryDate.isAfter(currentMonth);
+	    } catch (DateTimeParseException e) {
+	        return false; 
+	    }
+	}
+	
+	public boolean isValidCSV(String csv) {
+	    return csv.matches("\\d{3}");
+	}
+	
+	public boolean validatePaymentInfo() {
+	    String card = cardNumber.getText();
+	    String exp = expiry.getText();
+	    String csvnumber = csv.getText();
+
+	    if (!isValidCardNumber(card)) {
+	        cardError.setText("Invalid card number. Must be 16 digits.");
+	        return false;
+	    } else if (!isValidExpiryFormat(exp)) {
+	        cardError.setText("Invalid expiry date. Must be in the format mm/yy");
+	        return false;
+	    } else if (!isValidExpiryDate(exp)) {
+	        cardError.setText("Expiry date must be in the future.");
+	        return false;
+	    } else if (!isValidCSV(csvnumber)) {
+	    	cardError.setText("CSV must be 3 numbers");
+	    	return false;
+	    } else {
+	    	return true;}
 	}
 	
 	
+	public void checkOut(ActionEvent e) {
+		if (!validatePaymentInfo()) {
+		} else {
+		Order thisOrder = orderService.getObject();
+		User thisuser = userService.getObject();
+		LocalDateTime currentDateTime = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+		String date = currentDateTime.format(formatter);
+		thisOrder.setDateCreated(date);
+		boolean vip = thisuser.isVIP();
+		double price = posService.getObject().calculateSale(thisOrder, vip);
+		thisOrder.setPrice(price);
+		newOrder(thisOrder);
+		orderService.clearObject();
+		backToLanding(e);
+		}
+	}
+	
+    public void newOrder(Order order) {
+    	Connect connector = new Connect();
+    	int burritos = order.getBurritos();
+    	int fries = order.getFries();
+    	int sodas = order.getSodas(); 
+    	int meals = order.getMeals();
+    	double price = order.getPrice();
+    	connector.MaxValue();
+    	int orderNumber = connector.getOrderNumber();
+    	orderNumber++;
+    	order.setOrderNum(orderNumber);
+    	String query = "INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+    	try (Connection conn = connector.make_connect();
+    		PreparedStatement pstmt = conn.prepareStatement(query)) {
+    		pstmt.setString(1, order.getDateCreated());
+            pstmt.setInt(2, orderNumber);
+            pstmt.setInt(3, burritos);
+            pstmt.setInt(4, fries);
+            pstmt.setInt(5, sodas);
+            pstmt.setInt(6, meals);
+            String collection = "await for collection";
+            pstmt.setString(7, collection);
+            pstmt.setDouble(8, price);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Order added successfully.");
+            } else {
+                System.out.println("No rows affected.");
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
+        } 
+    	String userName = userService.getObject().getUsername();
+    	addUserOrder(userName, orderNumber);
+    }
+    
+    public void addUserOrder(String userName, int orderNumber) {
+    	Connect connector = new Connect();
+    	String query = "INSERT INTO UserOrders(Username, OrderNumber) VALUES (?, ?)";
+    	try (Connection connect = connector.make_connect();
+    		PreparedStatement pstmt = connect.prepareStatement(query)) {
+            pstmt.setString(1, userName);
+            pstmt.setInt(2, orderNumber);
+            int result = pstmt.executeUpdate();
+            if (result > 0) {
+                System.out.println("Order successfully added to UserOrders.");
+            } else {
+                System.out.println("No rows affected.");
+            }
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    public void backToLanding(ActionEvent event) {
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("LandingPage.fxml")); 
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace(); 
+        }
+    }
+    
 }
 
 

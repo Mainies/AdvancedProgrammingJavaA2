@@ -31,6 +31,7 @@ public class LoginController {
 
     @FXML
     Label errorMessage;
+ 
     
     public LoginController() {
         connector.connect(); 

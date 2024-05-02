@@ -14,6 +14,7 @@ public class Order {
 	private String datePickedUp;
 	private double price;
 	private int orderNum;
+	private String status;
 	
 	
 	public Order(int Burritos, int Fries, int Soda) {
@@ -116,6 +117,14 @@ public class Order {
 	public int getOrderNum() {
 		return this.orderNum;
 		
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }
