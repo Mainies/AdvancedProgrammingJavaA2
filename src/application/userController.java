@@ -40,7 +40,7 @@ public class userController {
     Label updateMessage;
     
     @FXML
-    TextField emailInput;
+    TextField emailTextInput;
     
     @FXML
     ChoiceBox choices;
@@ -52,8 +52,8 @@ public class userController {
     @FXML
     public void intialize() {
     	choices.getItems().addAll("First Name", "Last Name", "Password");
-    choices.setValue("First Name");
-    choices.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+    	choices.setValue("First Name");
+    	choices.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
             System.out.println("Selected item: " + newValue);
@@ -78,7 +78,7 @@ public class userController {
        
     public void becomeVIP(ActionEvent e) {
     	if (tickBox.isSelected()) {
-    	String email = emailInput.getText();
+    	String email = emailTextInput.getText();
     	String user = userService.getObject().getUsername();
     	Connect connector = new Connect();
     	connector.updateEmail(email, user);

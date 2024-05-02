@@ -1,9 +1,13 @@
 package restaurant;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 public class Order {
 	/* Public class used to hold various food quantities
  	Order is used to retrieve quantities of food to be cooked or processed for sales
  	*/
+	
 	
 	//Attributes
 	private int numBurritos;
@@ -126,5 +130,19 @@ public class Order {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	private BooleanProperty selected = new SimpleBooleanProperty(false);
+
+    public BooleanProperty selectedProperty() {
+        return selected;
+    }
+
+    public Boolean getSelected() {
+        return selected.get();
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected.set(selected);
+    }
 	
 }

@@ -44,5 +44,6 @@
             <Label fx:id="userName" prefHeight="17.0" prefWidth="110.0" />
          </children>
       </FlowPane>
+      <Button fx:id="logOutBt" layoutX="677.0" layoutY="541.0" mnemonicParsing="false" onAction="#logOut" text="Log Out" />
    </children>
 </AnchorPane>
