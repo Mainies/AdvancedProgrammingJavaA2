@@ -10,6 +10,11 @@ public class Order {
 	private int numFries;
 	private int numSoda;
 	private int numMeals = 0;
+	private String dateCreated;
+	private String datePickedUp;
+	private double price;
+	private int orderNum;
+	
 	
 	public Order(int Burritos, int Fries, int Soda) {
 		//instantiates a new order to build on.
@@ -26,30 +31,7 @@ public class Order {
 		numSoda = Soda;
 		numMeals = Meals;
 	}
-	
-	public void addToOrder(String food, int number) {
-		//Takes an input that corresponds to a menu with a quantity to update.
-		if (food.equals("1")) {
-			this.numBurritos += number;
-		}
 		
-		else if (food.equals("2")) {
-			this.numFries += number;
-		}
-		
-		else if (food.equals("4")) {
-			//caters for adding a meal (1x each food item)
-			this.numBurritos += number;
-			this.numFries += number;
-			this.numSoda += number;
-			this.numMeals += number;
-		}
-		else {
-			//adds soda
-			this.numSoda += number;
-		}
-	}
-	
 	public void printOrder() {
 		//Printing method for order.
 		System.out.printf("Your order is %d Burritos, %d Fries and %d Sodas.%n", 
@@ -102,6 +84,38 @@ public class Order {
 		numMeals = meals;
 	}
 
+	public String getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(String dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public String getDatePickedUp() {
+		return datePickedUp;
+	}
+
+	public void setDatePickedUp(String datePickedUp) {
+		this.datePickedUp = datePickedUp;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public void setOrderNum(int orderNum) {
+		this.orderNum = orderNum;
+		
+	}
 	
+	public int getOrderNum() {
+		return this.orderNum;
+		
+	}
 	
 }

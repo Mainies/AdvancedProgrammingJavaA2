@@ -10,7 +10,7 @@ import java.sql.Statement;
 
 public class Connect {
 	
-    private Connection connection; // Made it a class member so it's accessible in listTables()
+    public Connection connection; // Made it a class member so it's accessible in listTables()
     private String dbURL = "jdbc:sqlite:C:\\Users\\Sam\\eclipse-workspace\\A2_s3939120\\src\\Restaurant.db";
     private int orderNumber;
     
@@ -26,10 +26,25 @@ public class Connect {
         } 
     }
     
+    public Connection make_connect() {
+        try {
+            // db parameters - fixed path for stability
+            // create a connection to the database
+            connection = DriverManager.getConnection(dbURL);
+            System.out.println("Connection to SQLite has been established.");
+            
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } 
+        
+        return connection;
+    }
+    
     public int getOrderNumber() {
     	// method created for ease in testing
     	return this.orderNumber;
     }
+    
     private void MaxValue() {
         try (Connection conn = DriverManager.getConnection(dbURL)) {
             // Query to find the maximum value in the numbers column
@@ -134,19 +149,20 @@ public class Connect {
         return true; 
     }
     
-    public boolean createVIPUser(String userName, String password, String firstName, String lastName, String email) {
+    public boolean createVIPUser(String userName, String password, String firstName, String lastName, String email, int points) {
         if (connection == null) {
             System.out.println("No connection to the database. Please connect first.");
             return false;
         }
         
-        String query = "INSERT INTO Users (userName, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Users (userName, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, userName);
             pstmt.setString(2, password);
             pstmt.setString(3, firstName);
             pstmt.setString(4, lastName);
             pstmt.setString(5, email);
+            pstmt.setInt(6, points);
             
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -185,7 +201,8 @@ public class Connect {
     	int fries = order.getFries();
     	int sodas = order.getSodas(); 
     	int meals = order.getMeals();
-    	double price = pos.calculateSale(order);
+    	boolean vipStatus = this.isVIP(userName);
+    	double price = pos.calculateSale(order, vipStatus);
     	this.MaxValue();
     	this.orderNumber++; 
     	String query = "INSERT INTO Orders(OrderNumber, Burritos, Fries, Sodas, Meals, Collected, Price) VALUES(?, ?, ?, ?, ?, ?, ?)";
@@ -265,6 +282,7 @@ public class Connect {
 	} 
 
 	public boolean checkPassword(String user, String inputPassword) {
+		System.out.println(inputPassword);
 	    String query = "SELECT Password FROM Users WHERE UserName = ?";
 	    try {
 	        connect(); 
@@ -273,6 +291,7 @@ public class Connect {
 	            ResultSet results = stmt.executeQuery();
 	            if (results.next()) {
 	                String storedPassword = results.getString("Password");
+	                System.out.println("Password: " + storedPassword);
 	                return storedPassword.equals(inputPassword); 
 	            }
 	            return false; 
@@ -285,7 +304,7 @@ public class Connect {
 
 	public User getUserFromDatabase(String username) {
 		User user = null;
-        String query = "SELECT UserName, Password, FirstName, LastName, Email FROM Users WHERE UserName = ?";
+        String query = "SELECT UserName, Password, FirstName, LastName, Email, Points FROM Users WHERE UserName = ?";
         try {
             connect(); 
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -297,8 +316,9 @@ public class Connect {
                     String first = results.getString("FirstName");
                     String last = results.getString("LastName");
                     String email = results.getString("Email");
+                    int points =  results.getInt("Points");
                     if (email != null) {
-                        return new VIPUser(user1, pass, first, last, email); 
+                        return new VIPUser(user1, pass, first, last, email, points); 
                     } else {
                         return new NormalUser(user1, pass, first, last); 
                     }
@@ -309,4 +329,6 @@ public class Connect {
         }
         return user;
     }
+	
+	
 }

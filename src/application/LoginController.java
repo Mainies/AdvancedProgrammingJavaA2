@@ -51,7 +51,6 @@ public class LoginController {
         }
     }
 
-    @FXML
     public void attemptLogin(ActionEvent event) {
         User currentUser = login();
         if (currentUser != null) {
@@ -104,8 +103,8 @@ public class LoginController {
                 newUser = new NormalUser(username, pass, first, last);
                 connector.createUser(username, pass, first, last);
             } else {
-                newUser = new VIPUser(username, pass, first, last, email);
-                connector.createVIPUser(username, pass, first, last, email);
+                newUser = new VIPUser(username, pass, first, last, email, 0);
+                connector.createVIPUser(username, pass, first, last, email, 0);
             }
             userService.setObject(newUser); 
         } else {
@@ -116,7 +115,7 @@ public class LoginController {
 	public void backtoLogin(ActionEvent event) {
 		try {
 		Parent root = (Parent) FXMLLoader.load(getClass().getResource("Login.fxml"));
-		stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+		stage = (Stage) ((Node)event.getSource()).getScene( ).getWindow();
 		scene = new Scene(root);
 		stage.setScene(scene);
 		stage.show();

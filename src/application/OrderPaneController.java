@@ -87,13 +87,16 @@ public class OrderPaneController {
         Order order = orderService.getObject();
         PointOfService pos = posService.getObject();
         if (order != null) {
-            double price = pos.calculateSale(order);
+        	boolean vipStatus = userService.getObject().isVIP();
+            double price = pos.calculateSale(order, vipStatus);
             if (numBurritos != null) {
                 numBurritos.setText(Integer.toString(order.getBurritos()));
             } 
             if (numFries != null) numFries.setText(Integer.toString(order.getFries()));
             if (numSodas != null) numSodas.setText(Integer.toString(order.getSodas()));
-            if (mealDeals != null) mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " meal deals.");
+            if (vipStatus) {
+            	if (mealDeals != null) mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " VIP meal deal discounts.");
+            }
             if (totalPrice != null) totalPrice.setText("Total Price: $" + Double.toString(price));
         }
     }

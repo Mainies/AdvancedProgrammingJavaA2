@@ -1,4 +1,6 @@
 package database;
+import java.util.ArrayList;
+import restaurant.Order;
 
 public abstract class User {
 	private String username;
@@ -7,6 +9,7 @@ public abstract class User {
 	private String lastName;
 	private String email;
 	private boolean isVIP;
+	//private ArrayList<Order> userOrders = new ArrayList<Order>();
 	
 	public User(String user, String pass, String first, String last) {
 		this.setUsername(user);
@@ -65,5 +68,5 @@ public abstract class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
+	
 }

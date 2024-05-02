@@ -28,7 +28,7 @@ public class PointOfServiceTest {
 	public void updateSalesTestmeal() {
 		//check update sales with a meal
 		Order order = new Order(1, 1, 1, 1);
-		pos.updatePOS(order);
+		pos.updatePOS(order, true);
 		assertEquals((int) pos.soldItems.get("Fries"), 1);
 		assertEquals((int) pos.soldItems.get("Meals"), 1);
 		assertEquals(pos.totalSales, 12.0, 0.00001);
@@ -38,7 +38,7 @@ public class PointOfServiceTest {
 	public void updateSalesTestnoMeal(){
 		//check update sales without a meal
 		Order order = new Order(1, 1, 1);
-		pos.updatePOS(order);
+		pos.updatePOS(order, true);
 		assertEquals((int) pos.soldItems.get("Fries"), 1);
 		assertEquals(pos.totalSales, 15.0, 0.00001);
 	}
@@ -47,7 +47,7 @@ public class PointOfServiceTest {
 	public void updatePriceCheck() {
 		pos.getBurrito().setPrice(5);
 		Order order = new Order(1, 0, 0);
-		pos.updatePOS(order);
+		pos.updatePOS(order, true);
 		assertEquals(pos.totalSales, 5.0, 0.00001);
 	}
 	
@@ -55,10 +55,10 @@ public class PointOfServiceTest {
 	public void updatePriceSalesMemory() {
 		//check update sales without a meal
 		Order order = new Order(1, 1, 1);
-		pos.updatePOS(order);
+		pos.updatePOS(order, true);
 		pos.getBurrito().setPrice(5);
 		order = new Order(1, 0, 0);
-		pos.updatePOS(order);
+		pos.updatePOS(order, true);
 		assertEquals(pos.totalSales, 20.0, 000001);
 		assertEquals((int) pos.soldItems.get("Burrito"), 2);
 	}

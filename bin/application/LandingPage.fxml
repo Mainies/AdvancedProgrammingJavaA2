@@ -6,26 +6,39 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onDragDetected="#openOrderPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LandingController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onDragDetected="#openOrderPane" prefHeight="619.0" prefWidth="912.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LandingController">
    <children>
-      <Button fx:id="order" layoutX="404.0" layoutY="95.0" mnemonicParsing="false" onAction="#openOrderPane" prefHeight="69.0" prefWidth="164.0" text="New Order" />
-      <Label layoutX="183.0" layoutY="38.0" text="Hello, " />
+      <Button fx:id="order" layoutX="620.0" layoutY="85.0" mnemonicParsing="false" onAction="#openOrderPane" prefHeight="69.0" prefWidth="164.0" text="New Order" />
       <Label fx:id="userName" layoutX="217.0" layoutY="38.0" prefHeight="17.0" prefWidth="110.0" />
-      <Button layoutX="412.0" layoutY="188.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Pick Up Order" />
-      <Button layoutX="412.0" layoutY="231.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Past Orders" />
-      <Button layoutX="435.0" layoutY="284.0" mnemonicParsing="false" onAction="#managerLogin" prefHeight="25.0" prefWidth="110.0" text="Manager Login" />
-      <ScrollPane layoutX="67.0" layoutY="95.0" prefHeight="253.0" prefWidth="244.0">
+      <Button layoutX="620.0" layoutY="175.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Pick Up Order" />
+      <Button layoutX="620.0" layoutY="222.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="156.0" text="Past Orders" />
+      <Button layoutX="647.0" layoutY="272.0" mnemonicParsing="false" onAction="#managerLogin" prefHeight="25.0" prefWidth="110.0" text="Manager Login" />
+      <ScrollPane layoutX="61.0" layoutY="85.0" prefHeight="261.0" prefWidth="483.0">
          <content>
-            <TableView prefHeight="242.0" prefWidth="323.0">
+            <TableView fx:id="orders" prefHeight="303.0" prefWidth="535.0">
               <columns>
-                <TableColumn prefWidth="75.0" text="Date" />
-                <TableColumn prefWidth="86.0" text="OrderNumber" />
-                  <TableColumn prefWidth="77.0" text="Price" />
-                  <TableColumn prefWidth="75.0" text="Collected" />
+                <TableColumn fx:id="date" prefWidth="75.0" text="Date" />
+                <TableColumn fx:id="orderNum" prefWidth="86.0" text="OrderNumber" />
+                  <TableColumn fx:id="burritos" prefWidth="77.0" text="Burritos" />
+                  <TableColumn fx:id="fries" prefWidth="75.0" text="Fries" />
+                  <TableColumn fx:id="sodas" prefWidth="75.0" text="Sodas" />
+                  <TableColumn fx:id="price" prefWidth="75.0" text="Price" />
               </columns>
             </TableView>
          </content>
       </ScrollPane>
+      <Button layoutX="646.0" layoutY="316.0" mnemonicParsing="false" text="Add/Update Email" />
+      <Label layoutX="231.0" layoutY="429.0" prefHeight="17.0" prefWidth="472.0" text="Don't forget to add your email to become a VIP member and get a $3 on meals!" />
+      <FlowPane layoutX="61.0" layoutY="34.0" prefHeight="17.0" prefWidth="235.0">
+         <children>
+            <Label text="Hello, " />
+            <Label fx:id="FirstName" prefHeight="17.0" prefWidth="49.0" text="First" />
+            <Label fx:id="Last" prefHeight="17.0" prefWidth="64.0" text="Label" />
+         </children>
+      </FlowPane>
+      <Label layoutX="61.0" layoutY="68.0" prefHeight="17.0" prefWidth="102.0" text="Available Orders" />
+      <Button layoutX="656.0" layoutY="362.0" mnemonicParsing="false" text="Update Details" />
    </children>
 </AnchorPane>

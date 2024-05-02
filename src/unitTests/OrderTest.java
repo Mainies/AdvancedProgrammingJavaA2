@@ -13,14 +13,14 @@ public class OrderTest {
 		order = new Order(0, 0, 0);
 	}
 
-
-	@Test
+	//Old test Prior to Order Change
+	/*@Test
 	public void MealTest() {
 		order.addToOrder("4", 3);
 		assertEquals(order.getBurritos(), 3);
 		assertEquals(order.getSodas(), 3);
 		assertEquals(order.getFries(), 3);
 		System.out.println("Meals adding to Order as Intended");
-	}
+	}*/
 	
 }
