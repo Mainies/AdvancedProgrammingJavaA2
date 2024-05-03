@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Connect {
 	
@@ -163,7 +164,7 @@ public class Connect {
             return false;
         }
         
-        String query = "INSERT INTO Users (userName, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Users (userName, password, firstName, lastName, email, points) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, userName);
             pstmt.setString(2, password);
@@ -245,12 +246,38 @@ public class Connect {
     	}
     }
     
+    
+    public boolean checkIfReadyForPickUp(int orderNumber) {
+        connect();
+        String orderQuery = "SELECT dateCollected FROM Orders WHERE OrderNumber = ?";
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+
+        try (PreparedStatement pstmt = connection.prepareStatement(orderQuery)) {
+            pstmt.setInt(1, orderNumber);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String pickUpTime = rs.getString("dateCollected");
+                LocalDateTime pickUpDateTime = LocalDateTime.parse(pickUpTime, formatter);
+                return currentDateTime.isAfter(pickUpDateTime) || currentDateTime.isEqual(pickUpDateTime);
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        } catch (DateTimeParseException e) {
+            System.err.println("Date Parsing Error: " + e.getMessage());
+        }
+        return false;
+    }
+    	
+    	
     public void pickUpOrder(int orderNumber) {
     	connect();
         String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
+        
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
         String formattedDate = currentDateTime.format(formatter);
+        
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, "collected");  
             pstmt.setString(2, formattedDate); 
@@ -266,19 +293,36 @@ public class Connect {
         }
     }
     
-    public void cancelOrder(int OrderNumber) {
-    		connect();
-	    	String query = "UPDATE Orders SET Status = ? WHERE OrderNumber = ?";
-	    	String pickup = "cancelled";
-	    	try (PreparedStatement pstmt = connection.prepareStatement(query)){
-	    		pstmt.setString(1, pickup);
-	    		pstmt.setInt(2, orderNumber);
-	    		pstmt.executeUpdate();
-	    		    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    	}
-	    }
-    
+    public void cancelOrder(int orderNumber) {
+        Connect connector = new Connect();
+        connector.connect();  // Make sure this setup is appropriate and that resources are managed properly.
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+        String formattedDate = currentDateTime.format(formatter);
+
+        // Fixed SQL statement by removing the extraneous comma
+        String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
+        String cancelledStatus = "cancelled";
+
+        try (Connection conn = connector.connection;  // Assuming this connection is properly managed
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, cancelledStatus);
+            pstmt.setString(2, formattedDate);
+            pstmt.setInt(3, orderNumber);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Order cancelled successfully.");
+            } else {
+                System.out.println("No rows affected. Check if the order number exists and is correct.");
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error during order cancellation: " + e.getMessage());
+            e.printStackTrace();  // Print the full stack trace to diagnose the error
+        }
+    }
+
     public void deleteOrders(int OrderNumber) {
 		String removeTestOrder = "DELETE FROM Orders WHERE orderNumber = ?";
 		String removeFromUserOrders = "DELETE FROM UserOrders WHERE orderNumber = ?";
@@ -393,13 +437,44 @@ public class Connect {
 	}
 	
 	public void updateEmail(String email, String currentUser) {
-		String query = "UPDATE Users SET email = ? WHERE UserName = ?";
-			try (PreparedStatement pstmt = connection.prepareStatement(query)){
-			pstmt.setString(1, email);
-			pstmt.setString(2, currentUser);
-			pstmt.executeUpdate();
-		} catch (Exception e) {
-		}
+		Connect connector = new Connect();
+	    connector.connect();  
+	    String query = "UPDATE Users SET Email = ? WHERE UserName = ?";
+	    try (Connection conn = connector.connection; 
+	         PreparedStatement pstmt = conn.prepareStatement(query)) {
+	        pstmt.setString(1, email);
+	        pstmt.setString(2, currentUser);
+	        int rowsAffected = pstmt.executeUpdate();
+	        if (rowsAffected > 0) {
+	            System.out.println("Email updated successfully.");
+	        } else {
+	            System.out.println("No rows affected.");
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("SQL Error: " + e.getMessage());
+	    }
 	}
+	
+	public void updatePoints(String currentUser) {
+	    Connect connector = new Connect();
+	    connector.connect();  
+	    String query = "UPDATE Users SET Points = ? WHERE UserName = ?";
+	    try (Connection conn = connector.connection;
+	         PreparedStatement pstmt = conn.prepareStatement(query)) {
+	        pstmt.setInt(1, 0);
+	        pstmt.setString(2, currentUser);
+
+	        int rowsAffected = pstmt.executeUpdate();
+	        if (rowsAffected > 0) {
+	            System.out.println("Points updated successfully.");
+	        } else {
+	            System.out.println("No rows affected. User may not exist.");
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("SQL Error: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
+
 	
 }

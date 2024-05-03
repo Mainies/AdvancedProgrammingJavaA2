@@ -6,25 +6,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import exceptions.*;
-import database.Connect;
-import database.User;
-import restaurant.Kitchen;
-import restaurant.Order;
-import restaurant.PointOfService;
-import service.ApplicationService;
-import service.POSService;
-import service.UserService; 
+//import service.POSService;
+//import service.UserService; 
 
 public class ManagerController {
-    private UserService userservice = UserService.getInstance();
-    private POSService posservice = POSService.getInstance();
+    //private UserService userservice = UserService.getInstance();
+    //private POSService posservice = POSService.getInstance();
     private Stage stage;
     private Scene scene;
     private String passkey = "1234";

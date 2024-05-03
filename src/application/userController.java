@@ -2,10 +2,6 @@ package application;
 
 import database.Connect;
 import database.User;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,51 +12,31 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import restaurant.Order;
 import service.*; 
 
 
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
-import java.sql.*;
 
 public class userController {
     private UserService userService = UserService.getInstance();
-    private POSService posService = POSService.getInstance();
-    private OrderService orderService = OrderService.getInstance();
-    private Stage stage;
-    private Scene scene;
+    
+    @FXML private TextField inputField;
+    @FXML private Label updateMessage;
+    @FXML private TextField emailTextInput;
+    @FXML private ChoiceBox<String> choices;
+    @FXML private CheckBox tickBox;
     
     @FXML
-    TextField inputField;
-    
-    @FXML
-    Label updateMessage;
-    
-    @FXML
-    TextField emailTextInput;
-    
-    @FXML
-    ChoiceBox choices;
-    
-    @FXML
-    CheckBox tickBox;
-    
-    
-    @FXML
-    public void intialize() {
-    	choices.getItems().addAll("First Name", "Last Name", "Password");
-    	choices.setValue("First Name");
-    	choices.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            System.out.println("Selected item: " + newValue);
-        }
-        });
+    public void initialize() {
+    	try {
+        choices.getItems().addAll("First Name", "Last Name", "Password");
+        choices.setValue("First Name");  // Set the default value
+        choices.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Selected item: " + newValue);});}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
-   
     
     public void backToLanding(ActionEvent event) {
     	try {
@@ -74,7 +50,6 @@ public class userController {
             e.printStackTrace(); 
         }
     }
-    
        
     public void becomeVIP(ActionEvent e) {
     	if (tickBox.isSelected()) {
@@ -82,6 +57,7 @@ public class userController {
     	String user = userService.getObject().getUsername();
     	Connect connector = new Connect();
     	connector.updateEmail(email, user);
+    	connector.updatePoints(user);
     	updateMessage.setText("Update Successful, please log in again for VIP benefits.");
     	} else {
     	updateMessage.setText("Please agree to terms and conditions to continue.");

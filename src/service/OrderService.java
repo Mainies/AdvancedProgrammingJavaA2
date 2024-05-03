@@ -1,8 +1,7 @@
 package service;
-import restaurant.Kitchen;
 import restaurant.Order;
 
-public class OrderService implements ApplicationService{
+public class OrderService implements ApplicationService<Order>{
     private static OrderService instance;
     private Order order;
     

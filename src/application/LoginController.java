@@ -94,20 +94,20 @@ public class LoginController {
     	connector.connect();
         boolean userExists = connector.isUser(newUserName.getText());
         if (!userExists) {
-            User newUser = null;
+        	User user = null;
             String username = newUserName.getText();
             String pass = newPassword.getText();
             String first = newFirstName.getText();
             String last = newLastName.getText();
             String email = newEmail.getText();
             if (email.isEmpty()) {
-                newUser = new NormalUser(username, pass, first, last);
+                user = new NormalUser(username, pass, first, last);
                 connector.createUser(username, pass, first, last);
             } else {
-                newUser = new VIPUser(username, pass, first, last, email, 0);
+                user = new VIPUser(username, pass, first, last, email, 0);
                 connector.createVIPUser(username, pass, first, last, email, 0);
             }
-            userService.setObject(newUser); 
+            userService.setObject(user); 
         } else {
             errorMessageNewUser.setText("Username is already in use. Try again");
         }

@@ -1,6 +1,5 @@
 package application;
 import database.Connect;
-import database.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,10 +22,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class orderExportController {
-	 private Stage stage;
+	private Stage stage;
     private Scene scene;
     
     @FXML
@@ -35,7 +33,7 @@ public class orderExportController {
     Label fullName;
         
     private UserService userService = UserService.getInstance();
-    private POSService posService = POSService.getInstance();
+    
     @FXML private TableView<Order> orders;
     @FXML private TableColumn<Order, String> date;
     @FXML private TableColumn<Order, Number> orderNum;
@@ -153,8 +151,9 @@ public class orderExportController {
         } else {
             warningMsg.setText("File path is valid and file exists.");
         }
-    	
+        exportToCSV();
     }
+    
     public void goBack(ActionEvent event) {
     	try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("LandingPage.fxml"));

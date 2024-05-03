@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 import exceptions.*;
 import database.Connect;
 import database.User;
+import database.VIPUser;
 import restaurant.Kitchen;
 import restaurant.Order;
 import restaurant.PointOfService;
@@ -31,44 +33,21 @@ import java.time.LocalDateTime;
 public class OrderPaneController {
 	
 	
-	@FXML
-	private TextField burrito;
-	
-	@FXML
-	private TextField fries;
-	
-	@FXML
-	private TextField sodas;
-	
-	@FXML
-	private TextField meals;
-	
-	@FXML
-	private Label errorMessage;
-	
-	@FXML
-	private Button make_order;
-	
-	@FXML
-	private Label currentUser;
-	
-	@FXML
-	private Label numBurritos;
-	
-	@FXML
-	private Label numSodas;
-	
-	@FXML
-	private Label numFries;
-	
-	@FXML
-	private Label mealDeals;
-	
-	@FXML
-	private Label totalPrice;
-	
-	@FXML
-	private Label waitTime;
+	@FXML private TextField burrito;
+	@FXML private TextField fries;
+	@FXML private TextField sodas;
+	@FXML private TextField meals;
+	@FXML private Label errorMessage;
+	@FXML private Button make_order;
+	@FXML private Label currentUser;
+	@FXML private Label numBurritos;
+	@FXML private Label numSodas;
+	@FXML private Label numFries;
+	@FXML private Label mealDeals;
+	@FXML private Label totalPrice;
+	@FXML private Label waitTime;
+	@FXML private TextField usedPoints;
+	@FXML private CheckBox usePointsButon;
 
     private UserService userService = UserService.getInstance();
     private POSService posService = POSService.getInstance();
@@ -82,17 +61,44 @@ public class OrderPaneController {
         	updateOrders();
         	updateWaitTime();
         }
-     
+        try{pointsVisibility();}
+        catch(Exception e) {
+        }
+    }
+    
+    public void pointsVisibility() {
+        User user = userService.getObject();
+        if (!(user instanceof VIPUser)) {  
+            usedPoints.setVisible(false); 
+            usePointsButton.setVisible(false); 
+        } else {
+            usedPoints.setVisible(true); 
+            usePointsButton.setVisible(true);
+        }
     }
     
     private void updateWaitTime() {
-    	Order order = orderService.getObject();
-    	Kitchen kitchen = kitchenService.getObject();
-    	int wait = kitchen.cookTime(order);
-    	String waitingTime = Integer.toString(wait);
-    	waitTime.setText(waitingTime + " minutes.");
+        Order order = orderService.getObject();
+        Kitchen kitchen = kitchenService.getObject();
+        int waitMinutes = kitchen.cookTime(order); 
+        LocalTime now = LocalTime.now();
+        LocalTime readyTime = now.plusMinutes(waitMinutes);      
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = readyTime.format(timeFormatter);
+        waitTime.setText("Expected ready time: " + formattedTime + " (" + waitMinutes + " minutes.)");
     }
-
+    
+    private String getPickUpTime() {
+    	Order order = orderService.getObject();
+        Kitchen kitchen = kitchenService.getObject();
+        int waitMinutes = kitchen.cookTime(order); 
+        LocalDateTime now = LocalDateTime.now(); 
+        LocalDateTime readyTime = now.plusMinutes(waitMinutes);      
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"); 
+        String formattedTime = readyTime.format(timeFormatter);
+        return formattedTime;
+    }
+    
     private void updateUserName() {
         User user = userService.getObject(); 
         if (user != null && currentUser != null) {
@@ -103,29 +109,33 @@ public class OrderPaneController {
             }
         }
     }
-    
     private void updateOrders() {
         Order order = orderService.getObject();
+        if (order == null) {
+            System.err.println("No order available to update.");
+            return;
+        }
         PointOfService pos = posService.getObject();
-        if (order != null) {
-        	boolean vipStatus = userService.getObject().isVIP();
-            double price = pos.calculateSale(order, vipStatus);
-            if (numBurritos != null) {
-                numBurritos.setText(Integer.toString(order.getBurritos()));
-            } 
-            if (numFries != null) numFries.setText(Integer.toString(order.getFries()));
-            if (numSodas != null) numSodas.setText(Integer.toString(order.getSodas()));
-            if (vipStatus) {
-            	if (mealDeals != null) {mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " VIP meal deal discounts.");}
-            	else {mealDeals.setText("");}
-            } else {
-            	if (mealDeals != null) {mealDeals.setText("Inclusive of " + Integer.toString(order.getMeals()) + " VIP meal deal discounts.");}
-        	else {mealDeals.setText("");};}
-            if (totalPrice != null) {totalPrice.setText("Total Price: $" + Double.toString(price));
-            }
-        }      
+        User user = userService.getObject();
+        boolean vipStatus = user.isVIP();
+        double price = pos.calculateSale(order, vipStatus);
+        System.out.println(price);
+        updateLabel(numBurritos, Integer.toString(order.getBurritos()));
+        updateLabel(numFries, Integer.toString(order.getFries()));
+        updateLabel(numSodas, Integer.toString(order.getSodas()));
+        updateLabel(totalPrice, "Total Price: $" + String.format("%.2f", price));
+        if (vipStatus && mealDeals != null) {
+            mealDeals.setText("Inclusive of " + order.getMeals() + " VIP meal deal discounts.");
+        } else if (mealDeals != null) {
+            mealDeals.setText(""); 
+        }
     }
-
+    
+    private void updateLabel(Label label, String text) {
+        if (label != null) {
+            label.setText(text);
+        }
+    }
 
     public void orderFood(ActionEvent event) throws Exception {
         try {
@@ -134,12 +144,10 @@ public class OrderPaneController {
             errorMessage.setText("Error: " + e.getMessage());
             return;
         }
-
         int numBurritos = Integer.parseInt(burrito.getText());
         int numFries = Integer.parseInt(fries.getText());
         int numSodas = Integer.parseInt(sodas.getText());
         int numMeals = Integer.parseInt(meals.getText());
-
         numBurritos += numMeals;
         numFries += numMeals;
         numSodas += numMeals;
@@ -148,7 +156,8 @@ public class OrderPaneController {
         this.changeToCheckout(event);
     }
 
-    public void validateOrderInput() throws Exception{
+	@SuppressWarnings("static-access")
+	public void validateOrderInput() throws Exception{
 		PointOfService pos = new PointOfService();
 		try{
 			pos.validateNumber(burrito.getText());
@@ -208,6 +217,7 @@ public class OrderPaneController {
     }
     
     public void backToOrder(ActionEvent event) {
+    	orderService.clearObject();
     	try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Orderer.fxml")); 
             Parent root = loader.load();
@@ -220,17 +230,11 @@ public class OrderPaneController {
         }
     }
 	
-	@FXML
-	TextField csv;
-	
-	@FXML
-	TextField expiry;
-	
-	@FXML
-	TextField cardNumber;
-	
-	@FXML
-	Label cardError;
+
+	@FXML private TextField csv;
+	@FXML private TextField expiry;
+	@FXML private TextField cardNumber;
+	@FXML private Label cardError;
 	
 	public boolean isValidCardNumber(String cardNumber) {
 	    return cardNumber.matches("\\d{16}");
@@ -248,7 +252,6 @@ public class OrderPaneController {
 	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
 	        YearMonth expiryDate = YearMonth.parse(expiry, formatter);
 	        YearMonth currentMonth = YearMonth.now();
-
 	        return expiryDate.isAfter(currentMonth);
 	    } catch (DateTimeParseException e) {
 	        return false; 
@@ -280,7 +283,6 @@ public class OrderPaneController {
 	    	return true;}
 	}
 	
-	
 	public void checkOut(ActionEvent e) {
 		if (!validatePaymentInfo()) {
 		} else {
@@ -290,6 +292,8 @@ public class OrderPaneController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 		String date = currentDateTime.format(formatter);
 		thisOrder.setDateCreated(date);
+		String pickupTime = getPickUpTime();
+		thisOrder.setDatePickedUp(pickupTime);
 		boolean vip = thisuser.isVIP();
 		double price = posService.getObject().calculateSale(thisOrder, vip);
 		thisOrder.setPrice(price);
@@ -306,11 +310,15 @@ public class OrderPaneController {
     	int sodas = order.getSodas(); 
     	int meals = order.getMeals();
     	double price = order.getPrice();
+    	double discount = pointsDiscount();
+    	price = price - discount;
     	connector.MaxValue();
     	int orderNumber = connector.getOrderNumber();
     	orderNumber++;
     	order.setOrderNum(orderNumber);
-    	String query = "INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+    	String pickuptime = getPickUpTime();
+    	order.setDatePickedUp(pickuptime);
+    	String query = "INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price, dateCollected) VALUES(?, ?, ?, ?, ?, ?, ?, ?,?)";
     	try (Connection conn = connector.make_connect();
     		PreparedStatement pstmt = conn.prepareStatement(query)) {
     		pstmt.setString(1, order.getDateCreated());
@@ -322,6 +330,7 @@ public class OrderPaneController {
             String collection = "await for collection";
             pstmt.setString(7, collection);
             pstmt.setDouble(8, price);
+            pstmt.setString(9, order.getDatePickedUp());
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Order added successfully.");
@@ -366,6 +375,30 @@ public class OrderPaneController {
         }
     }
     
+    @FXML private CheckBox usePointsButton;
+    
+    public double pointsDiscount() {
+    	if(usePointsButton == null) {
+    		return 0.00;
+    	}
+        if (usePointsButton.isSelected()) {
+            try {
+            	VIPUser user = (VIPUser) userService.getObject();
+                int points = Integer.parseInt(usedPoints.getText());
+                if (points > user.getLoyaltyPoints()) {
+                	points = user.getLoyaltyPoints();
+                }
+                user.setLoyaltyPoints(user.getLoyaltyPoints() - points);
+                double discount = Math.round((points / 100.0) * 100.0) / 100.0; 
+                return discount;
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid number format in points field.");
+                return 0.00;
+            }
+        } else {
+            return 0.00;
+        }
+    }
 }
 
 

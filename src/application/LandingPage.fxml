@@ -45,5 +45,8 @@
          </children>
       </FlowPane>
       <Button fx:id="logOutBt" layoutX="677.0" layoutY="541.0" mnemonicParsing="false" onAction="#logOut" text="Log Out" />
+      <Label fx:id="vipLabel" layoutX="61.0" layoutY="505.0" prefHeight="17.0" prefWidth="59.0" />
+      <Label fx:id="vipPoints" layoutX="157.0" layoutY="505.0" prefHeight="17.0" prefWidth="74.0" />
+      <Button fx:id="updatePointsButton" layoutX="51.0" layoutY="554.0" mnemonicParsing="false" onAction="#executePointsUpdate" text="Redeem Points" />
    </children>
 </AnchorPane>

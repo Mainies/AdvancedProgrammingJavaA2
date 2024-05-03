@@ -1,9 +1,6 @@
 package application;
 
 import database.Connect;
-import database.User;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,8 +9,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import restaurant.Order;
@@ -26,11 +21,7 @@ import java.sql.*;
 
 public class OrderManagerController {
 	private UserService userService = UserService.getInstance();
-    private POSService posService = POSService.getInstance();
-    private OrderService orderService = OrderService.getInstance();
-    private Stage stage;
-    private Scene scene;
-
+	
     @FXML private TableView<Order> orders;
     @FXML private TableColumn<Order, String> date;
     @FXML private TableColumn<Order, Number> orderNum;
@@ -139,12 +130,24 @@ public class OrderManagerController {
     }
     
     public void pickUpOrder(ActionEvent event) {
-    	if (checkIfValidOrder()) {
-    		Connect connection = new Connect();
-    		connection.pickUpOrder(Integer.parseInt(orderNo.getText()));
-    		backToLanding(event);
-    	}
+        try {
+            int orderNum = Integer.parseInt(orderNo.getText().trim());
+            Connect connection = new Connect();            
+            if (checkIfValidOrder()) {
+                if (connection.checkIfReadyForPickUp(orderNum)) {
+                    connection.pickUpOrder(orderNum);
+                    backToLanding(event);
+                } else {
+                    warningMsg.setText("Your meal is still being cooked. Please be patient.");
+                }
+            } else {
+                warningMsg.setText("Invalid order number. Please check and try again.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     
     public void cancelOrder(ActionEvent event) {
     	if (checkIfValidOrder()) {
