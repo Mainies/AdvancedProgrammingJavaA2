@@ -42,7 +42,7 @@ public class LandingController {
     
     @FXML private Label vipLabel;
     @FXML private Label vipPoints;
-    
+    @FXML private Label joinVIPmessage;
     
     @FXML
     public void initialize() {
@@ -50,6 +50,7 @@ public class LandingController {
         updateFullName();
         updateVipPointsLabels();
         updateButtonVisibility();
+        updateVIPmessageVisibility();        
         
         //user Orders initialise for uncollected orders for tableview
         date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
@@ -68,6 +69,12 @@ public class LandingController {
         User user = userService.getObject();
         updatePointsButton.setVisible(user instanceof VIPUser);  
     }
+    
+    private void updateVIPmessageVisibility() {
+        User user = userService.getObject();
+        joinVIPmessage.setVisible(user instanceof VIPUser);  
+    }
+    
     
     private void updateVipPointsLabels() {
         User user = userService.getObject();

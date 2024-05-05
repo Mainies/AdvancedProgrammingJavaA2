@@ -31,7 +31,7 @@
             <Label fx:id="numSodas" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
-      <Label fx:id="mealDeals" layoutX="209.0" layoutY="206.0" prefHeight="17.0" prefWidth="169.0" text="Inclusive of   meal deals." />
+      <Label fx:id="mealDeals" layoutX="154.0" layoutY="209.0" prefHeight="17.0" prefWidth="240.0" text="Inclusive of   meal deals." />
       <Button fx:id="checkout" layoutX="226.0" layoutY="553.0" mnemonicParsing="false" onAction="#checkOut" prefHeight="50.0" prefWidth="127.0" text="Confirm &amp; Pay" />
       <Button fx:id="backToOrder" layoutX="269.0" layoutY="642.0" mnemonicParsing="false" onAction="#backToOrder" text="Go Back" />
       <Label fx:id="totalPrice" layoutX="261.0" layoutY="236.0" text="Label" />

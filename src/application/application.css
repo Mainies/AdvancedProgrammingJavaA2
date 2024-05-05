@@ -1,1 +1,20 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+
+
+#container {
+    -fx-background-color: yellow;
+}
+
+
+.button {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}
+
+.anchor-pane {
+    -fx-background-color: yellow;
+}
+
+.root {
+    -fx-background-color: yellow;
+}
