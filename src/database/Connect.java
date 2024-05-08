@@ -407,33 +407,60 @@ public class Connect {
 	
 	
 	public void updateFirstName(String newName, String currentUser) {
-		String query = "UPDATE Users SET FirstName = ? WHERE UserName = ?";
-			try (PreparedStatement pstmt = connection.prepareStatement(query)){
-			pstmt.setString(1, newName);
-			pstmt.setString(2, currentUser);
-			pstmt.executeUpdate();
-		} catch (Exception e) {
-		}
+		Connect connector = new Connect();
+	    connector.connect();  
+	    String query = "UPDATE Users SET FirstName = ? WHERE UserName = ?";
+	    try (Connection conn = connector.connection; 
+	         PreparedStatement pstmt = conn.prepareStatement(query)) {
+	        pstmt.setString(1, newName);
+	        pstmt.setString(2, currentUser);
+	        int rowsAffected = pstmt.executeUpdate();
+	        if (rowsAffected > 0) {
+	            System.out.println("First name updated successfully.");
+	        } else {
+	            System.out.println("No rows affected.");
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("SQL Error: " + e.getMessage());
+	    }
 	}
-	
+
 	public void updateLastName(String newName, String currentUser) {
-		String query = "UPDATE Users SET LastName = ? WHERE UserName = ?";
-		try(PreparedStatement pstmt = connection.prepareStatement(query)){
-			pstmt.setString(1, newName);
-			pstmt.setString(2, currentUser);
-			pstmt.executeUpdate();
-		} catch (Exception e) {
-	}
+		Connect connector = new Connect();
+	    connector.connect();  
+	    String query = "UPDATE Users SET LastName = ? WHERE UserName = ?";
+	    try (Connection conn = connector.connection; 
+	         PreparedStatement pstmt = conn.prepareStatement(query)) {
+	        pstmt.setString(1, newName);
+	        pstmt.setString(2, currentUser);
+	        int rowsAffected = pstmt.executeUpdate();
+	        if (rowsAffected > 0) {
+	            System.out.println("Last name updated successfully.");
+	        } else {
+	            System.out.println("No rows affected.");
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("SQL Error: " + e.getMessage());
+	    }
 	}
 		
 	public void updatePassword(String newPass, String currentUser) {
-		String query = "UPDATE Users SET Password = ? WHERE UserName = ?";
-		try(PreparedStatement pstmt = connection.prepareStatement(query)){
-			pstmt.setString(1, newPass);
-			pstmt.setString(2, currentUser);
-			pstmt.executeUpdate();
-		} catch (Exception e) {
-	}
+		Connect connector = new Connect();
+	    connector.connect();  
+	    String query = "UPDATE Users SET Password = ? WHERE UserName = ?";
+	    try (Connection conn = connector.connection; 
+	         PreparedStatement pstmt = conn.prepareStatement(query)) {
+	        pstmt.setString(1, newPass);
+	        pstmt.setString(2, currentUser);
+	        int rowsAffected = pstmt.executeUpdate();
+	        if (rowsAffected > 0) {
+	            System.out.println("Password updated successfully.");
+	        } else {
+	            System.out.println("No rows affected.");
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("SQL Error: " + e.getMessage());
+	    }
 	}
 	
 	public void updateEmail(String email, String currentUser) {
