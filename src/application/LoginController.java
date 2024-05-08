@@ -126,6 +126,7 @@ public class LoginController {
 	}
 	
 	public void switchToNewUserPage(ActionEvent event) {
+		SceneChanger.changeScene(event, "CreateNewUser.fxml");/*
 		try {
 		Parent root = (Parent) FXMLLoader.load(getClass().getResource("CreateNewUser.fxml"));
 		stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
@@ -134,7 +135,7 @@ public class LoginController {
 		stage.show();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 }
