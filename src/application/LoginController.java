@@ -6,19 +6,12 @@ import database.User;
 import database.VIPUser;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import service.*; 
 
 public class LoginController {
-    private Stage stage;
-    private Scene scene;
     private Connect connector = new Connect();
     private UserService userService = UserService.getInstance(); 
 
@@ -56,16 +49,7 @@ public class LoginController {
         User currentUser = login();
         if (currentUser != null) {
             userService.setObject(currentUser);
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("LandingPage.fxml"));
-                Parent root = loader.load();
-                stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                scene = new Scene(root);
-                stage.setScene(scene);
-                stage.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            SceneChanger.changeScene(event, "LandingPage.fxml");
         } else {
             errorMessage.setText("Error: Wrong Password or User Doesn't Exist");
         }
@@ -114,28 +98,11 @@ public class LoginController {
     }
     
 	public void backtoLogin(ActionEvent event) {
-		try {
-		Parent root = (Parent) FXMLLoader.load(getClass().getResource("Login.fxml"));
-		stage = (Stage) ((Node)event.getSource()).getScene( ).getWindow();
-		scene = new Scene(root);
-		stage.setScene(scene);
-		stage.show();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		SceneChanger.changeScene(event, "Login.fxml");
 	}
 	
 	public void switchToNewUserPage(ActionEvent event) {
-		SceneChanger.changeScene(event, "CreateNewUser.fxml");/*
-		try {
-		Parent root = (Parent) FXMLLoader.load(getClass().getResource("CreateNewUser.fxml"));
-		stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-		scene = new Scene(root);
-		stage.setScene(scene);
-		stage.show();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
+		SceneChanger.changeScene(event, "CreateNewUser.fxml");
 	}
 	
 }

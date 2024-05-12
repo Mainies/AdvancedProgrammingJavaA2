@@ -4,12 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 import restaurant.Order;
 import service.*; 
 import javafx.scene.control.TableView;
@@ -24,8 +19,6 @@ import java.io.PrintWriter;
 import java.sql.*;
 
 public class orderExportController {
-	private Stage stage;
-    private Scene scene;
     
     @FXML
     Label userName; 
@@ -155,15 +148,6 @@ public class orderExportController {
     }
     
     public void goBack(ActionEvent event) {
-    	try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("LandingPage.fxml"));
-            Parent root = loader.load();
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	SceneChanger.changeScene(event, "LandingPage.fxml");
     }
 }
