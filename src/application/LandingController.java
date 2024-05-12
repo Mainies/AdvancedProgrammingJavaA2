@@ -7,13 +7,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 import restaurant.Order;
 import service.*; 
 
@@ -25,8 +20,6 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class LandingController {
-    private Stage stage;
-    private Scene scene;
     
     @FXML private Label userName; 
     @FXML private Label fullName;
@@ -108,57 +101,21 @@ public class LandingController {
     }
 
     public void openOrderPane(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Orderer.fxml")); 
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace(); 
-        }
+    	SceneChanger.changeScene(event, "Orderer.fxml");
     }
     
     
     public void managerLogin(ActionEvent event) {
-    	try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AccessControl.fxml"));
-            Parent root = loader.load();
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	SceneChanger.changeScene(event, "AccessControl.fxml");
     }
     
     public void goToPickup(ActionEvent event) {
-    	try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("CollectOrder.fxml"));
-            Parent root = loader.load();
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	SceneChanger.changeScene(event, "CollectOrder.fxml");
     }
     
 
     public void goToPast(ActionEvent event) {
-    	try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("PastOrders.fxml"));
-            Parent root = loader.load();
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	SceneChanger.changeScene(event, "PastOrders.fxml");
     }
     
     private ObservableList<Order> fetchDataForUser() {
@@ -201,43 +158,16 @@ public class LandingController {
     }
     
     public void goToUpdateDetails(ActionEvent event) {
-    	try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateDetails.fxml"));
-            Parent root = loader.load();
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	SceneChanger.changeScene(event, "UpdateDetails.fxml");
     }
     
     public void toVIPPortal(ActionEvent event) {
-    	try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("BecomeVIP.fxml"));
-            Parent root = loader.load();
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	SceneChanger.changeScene(event, "BecomeVIP.fxml");
     }
     
     public void logOut(ActionEvent event) {
     	userService.clearObject();
-    	try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
-            Parent root = loader.load();
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	SceneChanger.changeScene(event, "Login.fxml");
     }
     
     
