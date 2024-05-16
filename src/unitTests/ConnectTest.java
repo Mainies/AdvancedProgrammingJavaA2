@@ -42,6 +42,9 @@ public class ConnectTest {
 		assertEquals("user not deleted successfully", diddelete, true);
 		connector.closeConnection();
 	}
+	/*
+	 * Old Tests Prior to refactoring with more complex orders
+	 * 
 	@Test
 	public void addNewOrder() {
 		connector.connect();
@@ -86,6 +89,7 @@ public class ConnectTest {
 		connector.deleteOrders(delete);
 		connector.closeConnection();
 	}
+	*/
 	
 
 

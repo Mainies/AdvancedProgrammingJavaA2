@@ -8,9 +8,12 @@ import javafx.scene.Scene;
 
 
 public class Main extends Application {
-
+	/*main class to load application. 
+	 application loads to login page
+	 */
 	@Override
 	public void start(Stage primaryStage) {
+		//Scene Changer not used for first instatiation of view due to complexities with the application class
 		try {
 			Parent root = (Parent) FXMLLoader.load(getClass().getResource("Login.fxml"));
 			Scene scene = new Scene(root);

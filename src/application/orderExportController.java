@@ -41,7 +41,9 @@ public class orderExportController {
     public void initialize() {
     	orders.setEditable(true);
     	selected.setEditable(true);
-        date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
+    	
+    	
+    	//https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableColumn.html#:~:text=T%3E%3E%20value
         orderNum.setCellValueFactory(new PropertyValueFactory<>("orderNum"));
         burritos.setCellValueFactory(new PropertyValueFactory<>("burritos"));
         fries.setCellValueFactory(new PropertyValueFactory<>("fries"));
