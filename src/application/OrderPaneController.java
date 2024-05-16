@@ -1,11 +1,16 @@
 package application;
 
+import javafx.animation.Interpolator;
+import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import exceptions.*;
 import database.Connect;
 import database.User;
@@ -27,8 +32,7 @@ import java.time.LocalDateTime;
 public class OrderPaneController {
 	//Order Panel to handle orders. Linked to ConfirmOrder.fxml and Orderer.fxml;
 	
-	
-	
+		
 	//FXML labels for intaking user order values for Orderer.fxml
 	@FXML private TextField burrito;
 	@FXML private TextField fries;
@@ -363,9 +367,11 @@ public class OrderPaneController {
 		newOrder(thisOrder);
 		orderService.clearObject();
 		//clear the order object so further objects can be made
+		SceneChanger.popUp(e);
 		backToLanding(e);
 		}
 	}
+	
 	
     public void newOrder(Order order) {
     	
