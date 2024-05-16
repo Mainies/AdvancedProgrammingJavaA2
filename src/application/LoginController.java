@@ -9,9 +9,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import service.*; 
+import service.UserService; 
 
 public class LoginController {
+	/*Login controller linked to Login.fxml and CreateNewUser
+	 * Purpose is to authenticate username and login details to get a correct user from Connect
+	 * Also provides the ability to create a new user and password
+	 */
+	
     private Connect connector = new Connect();
     private UserService userService = UserService.getInstance(); 
 
@@ -24,37 +29,7 @@ public class LoginController {
 
     @FXML
     Label errorMessage;
- 
     
-    public LoginController() {
-        connector.connect(); 
-    }
-
-    private User login() {
-        boolean userExists = connector.isUser(userNameText.getText());
-        if (!userExists) {
-            return null;
-        } else {
-            boolean correctPassword = connector.checkPassword(userNameText.getText(), passwordText.getText());
-            if (correctPassword) {
-                return connector.getUserFromDatabase(userNameText.getText());
-            } else {
-                errorMessage.setText("Error: Wrong Password or User Doesn't Exist");
-                return null;
-            }
-        }
-    }
-
-    public void attemptLogin(ActionEvent event) {
-        User currentUser = login();
-        if (currentUser != null) {
-            userService.setObject(currentUser);
-            SceneChanger.changeScene(event, "LandingPage.fxml");
-        } else {
-            errorMessage.setText("Error: Wrong Password or User Doesn't Exist");
-        }
-    }
-
     // New User Interface
     @FXML
     TextField newUserName;
@@ -73,10 +48,59 @@ public class LoginController {
 
     @FXML
     Label errorMessageNewUser;
+ 
+    //Login Page ActionEvents
+    
+    public LoginController() {
+        connector.connect(); 
+        //connect to db
+    }
 
+    private User login() {
+        boolean userExists = connector.isUser(userNameText.getText());
+        //check if user is a valid user
+        if (!userExists) {
+        	//Invalid User
+        	errorMessage.setText("Error: User Does Not Exist");
+            return null;
+        } else {
+        	//Very poor cybersecurity but it does check if the two strings are the same
+            boolean correctPassword = connector.checkPassword(userNameText.getText(), passwordText.getText());
+            if (correctPassword) {
+            	//If correct return correct user from database
+                return connector.getUserFromDatabase(userNameText.getText());
+            } else {
+                errorMessage.setText("Error: Wrong Password");
+                return null;
+            }
+        }
+    }
+
+    public void attemptLogin(ActionEvent event) {
+        User currentUser = login();
+        //use of User as abstract has methods to return a normal or VIP user
+        if (currentUser != null) {
+            userService.setObject(currentUser);
+            //Update singleton Userservice
+            SceneChanger.changeScene(event, "LandingPage.fxml");
+            //Change view
+        } else {
+        	return;
+        }
+    }
+    
+
+	public void switchToNewUserPage(ActionEvent event) {
+		SceneChanger.changeScene(event, "CreateNewUser.fxml");
+	}
+
+    //Create new user action events
+    
     public void createNewUser(ActionEvent event) {
     	connector.connect();
+    	//Connect to db
         boolean userExists = connector.isUser(newUserName.getText());
+        //check if user exists before trying to insert the same primary key
         if (!userExists) {
         	User user = null;
             String username = newUserName.getText();
@@ -84,6 +108,7 @@ public class LoginController {
             String first = newFirstName.getText();
             String last = newLastName.getText();
             String email = newEmail.getText();
+            //current implentation handles both regular and VIP users
             if (email.isEmpty()) {
                 user = new NormalUser(username, pass, first, last);
                 connector.createUser(username, pass, first, last);
@@ -93,16 +118,15 @@ public class LoginController {
             }
             userService.setObject(user); 
         } else {
+        	//error message to inform user if the username is avaiable
             errorMessageNewUser.setText("Username is already in use. Try again");
         }
     }
     
+   
 	public void backtoLogin(ActionEvent event) {
 		SceneChanger.changeScene(event, "Login.fxml");
 	}
 	
-	public void switchToNewUserPage(ActionEvent event) {
-		SceneChanger.changeScene(event, "CreateNewUser.fxml");
-	}
 	
 }
