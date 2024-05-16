@@ -47,6 +47,7 @@ public class orderExportController {
     	
     	//Used factory method from Tableview and Property Value Factory to get values from the ObservableList<Order>
     	//https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableColumn.html#:~:text=T%3E%3E%20value
+    	date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
         orderNum.setCellValueFactory(new PropertyValueFactory<>("orderNum"));
         burritos.setCellValueFactory(new PropertyValueFactory<>("burritos"));
         fries.setCellValueFactory(new PropertyValueFactory<>("fries"));
