@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 
 public class PointOfService {
-	// Core class used to interface with the user. Holds methods to take input and send to kitchen class for cooking
+	// Core class used to maintain pricing for a user. Holds methods to take input and send to kitchen class for cooking as per functionality in assignment 1
 	
 	// Instantiates a new food item on opening to access attributes for sales
 	

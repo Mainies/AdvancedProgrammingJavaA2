@@ -3,6 +3,7 @@ package service;
 import restaurant.PointOfService;
 
 public class POSService implements ApplicationService<PointOfService> {
+	/* application service for PointOfService*/
 
        private static POSService instance;
        private PointOfService pos;

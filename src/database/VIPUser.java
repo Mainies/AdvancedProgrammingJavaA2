@@ -9,7 +9,9 @@ public class VIPUser extends User{
 		this.loyaltyPoints = points;
 	}
 
+	//getter and setter for loyalty points within the program model
 	public int getLoyaltyPoints() {
+	
 		return loyaltyPoints;
 	}
 

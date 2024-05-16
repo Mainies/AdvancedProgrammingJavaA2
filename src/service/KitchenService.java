@@ -3,14 +3,15 @@ package service;
 import restaurant.Kitchen;
 
 public class KitchenService implements ApplicationService<Kitchen> {
-
-       private static KitchenService instance;
-       private Kitchen kitchen;
-       
-       private KitchenService() {
-    	   this.kitchen = new Kitchen();
-       }
-       
+	  /* Application Service for Kitchen*/
+	
+	  private static KitchenService instance;
+	  private Kitchen kitchen;
+	   
+	  private KitchenService() {
+		   this.kitchen = new Kitchen();
+	   }
+	   
 	   public static KitchenService getInstance() {
 	        if (instance == null) {
 	            instance = new KitchenService();
@@ -21,7 +22,7 @@ public class KitchenService implements ApplicationService<Kitchen> {
 	   public void setObject(Kitchen newKitchen) {
 	    	this.kitchen = newKitchen;
 	    }
-
+	
 	    public Kitchen getObject() {
 	    	return this.kitchen;
 	    }

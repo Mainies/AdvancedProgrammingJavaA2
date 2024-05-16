@@ -1,6 +1,9 @@
 package database;
 
 public abstract class User {
+	/* Abstract class for handling generic user arguments*/
+	
+	//user details
 	private String username;
 	private String password;
 	private String firstName;
@@ -8,6 +11,7 @@ public abstract class User {
 	private String email;
 	protected boolean isVIP;
 	
+	//Constructor for basic user
 	public User(String user, String pass, String first, String last) {
 		this.setUsername(user);
 		this.setPassword(pass);
@@ -15,6 +19,7 @@ public abstract class User {
 		this.setLastName(last);
 	}
 	
+	//constructor for basic user with an email
 	public User(String user, String pass, String first, String last, String email) {
 		this.setUsername(user);
 		this.setPassword(pass);
@@ -23,6 +28,8 @@ public abstract class User {
 		this.setEmail(email);
 	}
 	
+	
+	//Getters and setters
 	public boolean isVIP() {
 		return isVIP;
 	}

@@ -1,6 +1,7 @@
 package application;
 
 import database.Connect;
+import database.NormalUser;
 import database.User;
 import database.VIPUser;
 import javafx.collections.FXCollections;
@@ -76,9 +77,9 @@ public class LandingController {
     }
     
     private void updateVIPmessageVisibility() {
-    	//Hides vip points if not a vip user
+    	//Shows vip message if not a vip user
         User user = userService.getObject();
-        joinVIPmessage.setVisible(user instanceof VIPUser);  
+        joinVIPmessage.setVisible(user instanceof NormalUser);  
     }
     
     

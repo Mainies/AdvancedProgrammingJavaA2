@@ -117,6 +117,8 @@ public class LoginController {
                 connector.createVIPUser(username, pass, first, last, email, 0);
             }
             userService.setObject(user); 
+            // update message to inform user created succesfully
+            errorMessageNewUser.setText("User Added Successfully. Return to Login Page");
         } else {
         	//error message to inform user if the username is avaiable
             errorMessageNewUser.setText("Username is already in use. Try again");

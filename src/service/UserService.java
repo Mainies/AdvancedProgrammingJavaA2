@@ -3,8 +3,10 @@ package service;
 import database.User;
 
 public class UserService implements ApplicationService<User> {
+	/* applciation service for user service*/
        private static UserService instance;
-       private volatile User user;
+       
+       private User user;
        
        private UserService() {}
        

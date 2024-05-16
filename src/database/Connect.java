@@ -12,10 +12,15 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class Connect {
+	/* Major class to implement connection via the JDBC
+	allows various other objects to communicate and interact with the sql lite database
+	methods to update values in tables, get values from tables and execute queries from other objects
+	*/
 	
     public Connection connection; // Made it a class member so it's accessible in listTables()
     private String dbURL = "jdbc:sqlite:C:\\Users\\Sam\\eclipse-workspace\\A2_s3939120\\src\\Restaurant.db";
     private int orderNumber;
+    
     
     public void connect() {
         try {
@@ -49,6 +54,7 @@ public class Connect {
     }
     
     public void MaxValue() {
+    	//returns the highest value in the database so that the number can be incremented to create a unique order number as the primary key
         try (Connection conn = DriverManager.getConnection(dbURL)) {
             // Query to find the maximum value in the numbers column
             String query = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
@@ -70,14 +76,18 @@ public class Connect {
     }
     
     public void nextOrderNumber() {
+    	//order number incremented so that the next order number is unique
     	this.orderNumber++;
     }
 
     public void listTables() {
+    	/* method initially created to test connection to database and get information regarding the database without performing manipulation*/
         if (connection == null) {
+        	//print debugging 
             System.out.println("No connection to the database. Please connect first.");
             return;
         }
+        //returns all tables
         String query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -92,6 +102,7 @@ public class Connect {
     }
 
     public void closeConnection() {
+    	//closes connection for stability
         if (connection != null) {
             try {
                 connection.close();
@@ -103,6 +114,7 @@ public class Connect {
     }
 
     public static void main(String[] args) {
+    	// main method used for debugging and testing
         Connect connector = new Connect();
         connector.connect();
         connector.listTables();
@@ -110,11 +122,13 @@ public class Connect {
     }
     
     public boolean createUser(String userName, String password, String firstName, String lastName) {
+    	//creates user, returns true if successful
         if (connection == null) {
             System.out.println("No connection to the database. Please connect first.");
             return false;
         }
         
+        //query to create new simple user
         String query = "INSERT INTO Users (userName, password, firstName, lastName) VALUES (?, ?, ?, ?)";
         
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -136,13 +150,16 @@ public class Connect {
     }
     
     public boolean deleteUser(String userName){
+    	//method to delete user by looking up user name
         if (connection == null) {
             System.out.println("No connection to the database. Please connect first.");
             return false;
         }
         
+        //deleting query
         String query = "DELETE FROM Users WHERE userName = ?";
         
+        //connection and execution of query
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, userName);
             
@@ -158,12 +175,14 @@ public class Connect {
         return true; 
     }
     
+    //create user if the user is a vip separate method for handling extra input fields
     public boolean createVIPUser(String userName, String password, String firstName, String lastName, String email, int points) {
         if (connection == null) {
             System.out.println("No connection to the database. Please connect first.");
             return false;
         }
         
+        //separates from normal user by points and email
         String query = "INSERT INTO Users (userName, password, firstName, lastName, email, points) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, userName);
@@ -173,6 +192,7 @@ public class Connect {
             pstmt.setString(5, email);
             pstmt.setInt(6, points);
             
+            //execute query
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("User added successfully.");
@@ -187,6 +207,7 @@ public class Connect {
     }
     
     public boolean isVIP(String userName) {
+    	//simple boolean query to check if user is VIP or not by email look up.
     	String query = "SELECT email FROM users WHERE userName = ?";
     	try(PreparedStatement pstmt = connection.prepareStatement(query)){
     		pstmt.setString(1, userName);
@@ -206,14 +227,21 @@ public class Connect {
     }
     
     public void newOrder(Order order, PointOfService pos, String userName) {
+    	/* Major method to put a new order in the database. Called on finaliation of an order*/
+    	
+    	//Get order values
     	int burritos = order.getBurritos();
     	int fries = order.getFries();
     	int sodas = order.getSodas(); 
     	int meals = order.getMeals();
     	boolean vipStatus = this.isVIP(userName);
     	double price = pos.calculateSale(order, vipStatus);
+    	
+    	//get unique order number
     	this.MaxValue();
-    	this.orderNumber++; 
+    	this.orderNumber++;
+    	
+    	//query to insert into order table
     	String query = "INSERT INTO Orders(OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price) VALUES(?, ?, ?, ?, ?, ?, ?)";
     	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, this.orderNumber);
@@ -237,6 +265,7 @@ public class Connect {
     }
     
     public void addUserOrder(String userName) {
+    	//adds user and current order number into the userorders table to maintain relationship
     	String query = "INSERT INTO UserOrders(Username, OrderNumber) VALUES (?, ?)";
     	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, userName);
@@ -248,17 +277,26 @@ public class Connect {
     
     
     public boolean checkIfReadyForPickUp(int orderNumber) {
+    	/* back end method that checks if a user order is ready. Called in order manager controller*/
+    	
+    	//connect ot db
         connect();
+        
+        //query to return ready date and time
         String orderQuery = "SELECT dateCollected FROM Orders WHERE OrderNumber = ?";
+        
+        //current date and time
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-
+        
+        //execute statement
         try (PreparedStatement pstmt = connection.prepareStatement(orderQuery)) {
             pstmt.setInt(1, orderNumber);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 String pickUpTime = rs.getString("dateCollected");
                 LocalDateTime pickUpDateTime = LocalDateTime.parse(pickUpTime, formatter);
+                //return condtion for whether the order is ready
                 return currentDateTime.isAfter(pickUpDateTime) || currentDateTime.isEqual(pickUpDateTime);
             }
         } catch (SQLException e) {
@@ -271,13 +309,18 @@ public class Connect {
     	
     	
     public void pickUpOrder(int orderNumber) {
+    	/*Method to update an order to picked up. Called in OrderManager. 
+    	 * Sets an orders picked up time and collected status to collected if ready to be collected
+    	 */
     	connect();
         String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
         
+        //current time
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
         String formattedDate = currentDateTime.format(formatter);
         
+        //execute query
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, "collected");  
             pstmt.setString(2, formattedDate); 
@@ -294,23 +337,25 @@ public class Connect {
     }
     
     public void cancelOrder(int orderNumber) {
+    	// Method to cancel an order if user want to cancel.
         Connect connector = new Connect();
-        connector.connect();  // Make sure this setup is appropriate and that resources are managed properly.
+        connector.connect();  
 
+        //no need to check for valid pick up time if cancelling
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
         String formattedDate = currentDateTime.format(formatter);
 
-        // Fixed SQL statement by removing the extraneous comma
+        //query to update cancelled
         String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
         String cancelledStatus = "cancelled";
-
-        try (Connection conn = connector.connection;  // Assuming this connection is properly managed
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        
+        //execute query
+        try (Connection conn = connector.connection;  
+        	PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, cancelledStatus);
             pstmt.setString(2, formattedDate);
             pstmt.setInt(3, orderNumber);
-
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Order cancelled successfully.");
@@ -318,12 +363,14 @@ public class Connect {
                 System.out.println("No rows affected. Check if the order number exists and is correct.");
             }
         } catch (SQLException e) {
-            System.err.println("SQL Error during order cancellation: " + e.getMessage());
-            e.printStackTrace();  // Print the full stack trace to diagnose the error
+            System.err.println("SQL Error: " + e.getMessage());
+            e.printStackTrace();  
         }
     }
 
     public void deleteOrders(int OrderNumber) {
+    	 /* method implemented for testing purposes to connect to the database*/
+    	
 		String removeTestOrder = "DELETE FROM Orders WHERE orderNumber = ?";
 		String removeFromUserOrders = "DELETE FROM UserOrders WHERE orderNumber = ?";
 		try(PreparedStatement pstmt = connection.prepareStatement(removeFromUserOrders)){
@@ -340,8 +387,12 @@ public class Connect {
     
 
 	public boolean isUser(String user) {
+		/*validation that a user exists in the database*/
+		
 		Connect connector = new Connect();
 		connector.connect();
+		
+		//username is unique so user should be returned at position 1 if found
 	    String query = "SELECT 1 FROM Users WHERE UserName = ?"; 
 	    try {
 	        connect(); 
@@ -351,13 +402,18 @@ public class Connect {
 	            return results.next(); 
 	        } 
 	    } catch (SQLException e) {
-	        System.err.println("Database error: " + e.getMessage());
+	        System.err.println("SQL Error: " + e.getMessage());
 	        return false;          	
 	    } 
 	} 
 
 	public boolean checkPassword(String user, String inputPassword) {
+		/* check if password is the same as input string. Return true if correct. 
+		 * called in login for authnetication
+		 */
 		System.out.println(inputPassword);
+		
+		// return password
 	    String query = "SELECT Password FROM Users WHERE UserName = ?";
 	    try {
 	        connect(); 
@@ -372,16 +428,20 @@ public class Connect {
 	            return false; 
 	        } 
 	    } catch (SQLException e) {
-	        System.err.println("Database error: " + e.getMessage());
+	        System.err.println("SQL Error: " + e.getMessage());
 	        return false;
 	    }
 	}
 
 	public User getUserFromDatabase(String username) {
+		/* gets a user from a database based on username. Returns a VIP user if there is an email otherwise a regular user*/
+		
 		User user = null;
         String query = "SELECT UserName, Password, FirstName, LastName, Email, Points FROM Users WHERE UserName = ?";
         try {
             connect(); 
+            
+            //SQL update
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setString(1, username);
                 ResultSet results = stmt.executeQuery();
@@ -393,6 +453,7 @@ public class Connect {
                     String email = results.getString("Email");
                     int points =  results.getInt("Points");
                     if (email != null) {
+                    	//if an email exists it is a VIp user
                         return new VIPUser(user1, pass, first, last, email, points); 
                     } else {
                         return new NormalUser(user1, pass, first, last); 
@@ -400,13 +461,14 @@ public class Connect {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Database error: " + e.getMessage());
+            System.err.println("SQL Error: " + e.getMessage());
         }
         return user;
     }
 	
 	
 	public void updateFirstName(String newName, String currentUser) {
+		// database connection to update first name for user. Performed as programming is running for stability
 		Connect connector = new Connect();
 	    connector.connect();  
 	    String query = "UPDATE Users SET FirstName = ? WHERE UserName = ?";
@@ -426,6 +488,7 @@ public class Connect {
 	}
 
 	public void updateLastName(String newName, String currentUser) {
+		// database connection to update last name for user. Performed as programming is running for stability
 		Connect connector = new Connect();
 	    connector.connect();  
 	    String query = "UPDATE Users SET LastName = ? WHERE UserName = ?";
@@ -435,6 +498,7 @@ public class Connect {
 	        pstmt.setString(2, currentUser);
 	        int rowsAffected = pstmt.executeUpdate();
 	        if (rowsAffected > 0) {
+	        	//execute update
 	            System.out.println("Last name updated successfully.");
 	        } else {
 	            System.out.println("No rows affected.");
@@ -445,14 +509,18 @@ public class Connect {
 	}
 		
 	public void updatePassword(String newPass, String currentUser) {
+		// database connection to update password for user. Performed as programming is running for stability
 		Connect connector = new Connect();
 	    connector.connect();  
+	    
+	    //change password to new string
 	    String query = "UPDATE Users SET Password = ? WHERE UserName = ?";
 	    try (Connection conn = connector.connection; 
 	         PreparedStatement pstmt = conn.prepareStatement(query)) {
 	        pstmt.setString(1, newPass);
 	        pstmt.setString(2, currentUser);
 	        int rowsAffected = pstmt.executeUpdate();
+	        //execute update
 	        if (rowsAffected > 0) {
 	            System.out.println("Password updated successfully.");
 	        } else {
@@ -464,6 +532,7 @@ public class Connect {
 	}
 	
 	public void updateEmail(String email, String currentUser) {
+		// database connection to update email for user. Performed as programming is running for stability. Called for when creating a VIP user
 		Connect connector = new Connect();
 	    connector.connect();  
 	    String query = "UPDATE Users SET Email = ? WHERE UserName = ?";
@@ -483,14 +552,16 @@ public class Connect {
 	}
 	
 	public void updatePoints(String currentUser) {
+		// database connection to update Points for user. Called when creating a normal user to not have a null field
 	    Connect connector = new Connect();
 	    connector.connect();  
+	    //Query to set points
 	    String query = "UPDATE Users SET Points = ? WHERE UserName = ?";
 	    try (Connection conn = connector.connection;
 	         PreparedStatement pstmt = conn.prepareStatement(query)) {
+	    	//sets points to 0
 	        pstmt.setInt(1, 0);
 	        pstmt.setString(2, currentUser);
-
 	        int rowsAffected = pstmt.executeUpdate();
 	        if (rowsAffected > 0) {
 	            System.out.println("Points updated successfully.");
