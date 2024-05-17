@@ -39,6 +39,7 @@ public class SceneChanger {
 				FXMLLoader loader = new FXMLLoader(SceneChanger.class.getResource("Popup.fxml"));
 				Parent root = loader.load();
 				Stage stage = new Stage();
+				//This doesn't override the root node hence difference in code to changeScene()
 				String css = SceneChanger.class.getResource("application.css").toExternalForm();
 	            //update view
 				Scene scene = new Scene(root);
