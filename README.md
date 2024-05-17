@@ -6,6 +6,8 @@ All major functionality. Minor Adjustments from Specifications
 Usage:
 application run from main.java
 
+Created using Eclipse IDE
+
 Requirements
 - JDK 17
 - JavaFx
