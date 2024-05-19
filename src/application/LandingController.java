@@ -140,40 +140,10 @@ public class LandingController {
     private ObservableList<Order> fetchDataForUser() {
     	//creating an observable list as per https://docs.oracle.com/javafx/2/ui_controls/table-view.htm
     	//Interacts with connector to return a list of all order data that the user in the current UserSerivice has active
+    	//Facade pattern keeping databse connectivity in database
     	String username = userService.getObject().getUsername();
     	Connect connector = new Connect();
-    	
-    	//Observable list allows for iteration through the tableview
-        ObservableList<Order> ordersList = FXCollections.observableArrayList();
-        
-        //query that filters for orders that are awaiting collection
-        String query = "SELECT dateCreated, OrderNumber, Burritos, Fries, Sodas, Price FROM Orders WHERE Status = 'await for collection' AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?) ORDER BY dateCreated DESC";
-        try (Connection conn = connector.make_connect();
-            PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, username);
-            
-            //execute update
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-            	int orderNum = rs.getInt("OrderNumber");
-                int burritos = rs.getInt("Burritos");
-                int fries = rs.getInt("Fries");
-                int sodas = rs.getInt("Sodas");
-                double price = rs.getDouble("Price");
-                Order order = new Order(
-                    burritos,
-                    fries,
-                    sodas);
-                order.setDateCreated(rs.getString("dateCreated"));
-                order.setOrderNum(orderNum);
-                order.setPrice(price); 
-                ordersList.add(order);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error fetching orders: " + e.getMessage());
-        }
+    	ObservableList<Order> ordersList = connector.getActiveOrders(username);
         return ordersList;
     }
     

@@ -66,42 +66,10 @@ public class orderExportController {
     Label warningMsg;
 
     private ObservableList<Order> fetchOrdersForUser() {
-    	//Same as landing page, logic to return orders based on 
+    	//Facade Pattern and separating database connectivity
     	String username = userService.getObject().getUsername();
     	Connect connector = new Connect();
-    	
-    	//create observable list for property value factory and cell value factory
-        ObservableList<Order> ordersList = FXCollections.observableArrayList();
-        
-        //Query to return ALL orders
-        String query = "SELECT dateCreated, OrderNumber, Burritos, Fries, Sodas, Price, status FROM Orders WHERE OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?) ORDER BY dateCreated DESC";
-
-        try (Connection conn = connector.make_connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-            	int orderNum = rs.getInt("OrderNumber");
-                int burritos = rs.getInt("Burritos");
-                int fries = rs.getInt("Fries");
-                int sodas = rs.getInt("Sodas");
-                double price = rs.getDouble("Price");
-                String status = rs.getString("Status");
-                Order order = new Order(
-                    burritos,
-                    fries,
-                    sodas);
-                order.setDateCreated(rs.getString("dateCreated"));
-                order.setOrderNum(orderNum);
-                order.setPrice(price); 
-                order.setStatus(status);
-                ordersList.add(order);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error fetching orders: " + e.getMessage());
-        }
+    	ObservableList<Order> ordersList = connector.getOrdersForExport(username);
         return ordersList;
     }
     

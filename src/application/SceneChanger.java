@@ -1,7 +1,5 @@
 package application;
 
-import javafx.animation.Interpolator;
-import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class SceneChanger {
 	/*Static object that handles view changing. static method(s) for readability and Facade pattern*/
@@ -28,6 +25,7 @@ public class SceneChanger {
             //update view
             scene.getStylesheets().add(css);
             stage.setScene(scene);
+            stage.setTitle("Burrito King");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
