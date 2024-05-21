@@ -102,7 +102,12 @@ public class userController {
             	//default for programming safety
                 System.out.println("Invalid option selected");
                 break;
-        }
-    }
-    
+        	}
+    	}
+	
+    /*Attempted test creating a non-public class as a separate controller for the VIP landing page which was notsuccesful.
+     *  Seems to be that the class needs to be a public to be recognised as a controller to be recognised/usable in Scenebuilder*/
+   
 }
+
+
