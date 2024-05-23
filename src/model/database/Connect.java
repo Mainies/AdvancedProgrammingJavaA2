@@ -23,8 +23,16 @@ public class Connect {
     private Connection connection; // Made it a class member so it's accessible in listTables()
     private String dbURL = "jdbc:sqlite:src/Restaurant.db";
     private int orderNumber;
+    
+    public static void main(String[] args) {
+    	// main method used for debugging and testing
+        Connect connector = new Connect();
+        connector.connect();
+        //connector.listTables();
+        connector.closeConnection(); 
+    }
         
-    public void connect() {
+    private void connect() {
         try {
             // db parameters - fixed path for stability
             // create a connection to the database
@@ -36,6 +44,8 @@ public class Connect {
         } 
     }
     
+    
+    //this method might be void due to encapsulation within the connection class. connect() does the same thing
     public Connection make_connect() {
         try {
             // db parameters - fixed path for stability
@@ -56,24 +66,21 @@ public class Connect {
     }
     
     public void MaxValue() {
+    	connect();
+        String query = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
     	//returns the highest value in the database so that the number can be incremented to create a unique order number as the primary key
-        try (Connection conn = DriverManager.getConnection(dbURL)) {
-            // Query to find the maximum value in the numbers column
-            String query = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(query);
             
-            try (Statement stmt = conn.createStatement()) {
-                ResultSet rs = stmt.executeQuery(query);
-                
-                if (rs.next()) {
-                    this.orderNumber = rs.getInt("max_number");
-                    System.out.println(this.orderNumber);
-                    System.out.println("order number updated");
-                } else {
-                    System.out.println("No data found.");
-                }
+            if (rs.next()) {
+                this.orderNumber = rs.getInt("max_number");
+                System.out.println(this.orderNumber);
+                System.out.println("order number updated");
+            } else {
+                System.out.println("No data found.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+        	System.out.println(e.getMessage());
         }
     }
     
@@ -81,9 +88,9 @@ public class Connect {
     	//order number incremented so that the next order number is unique
     	this.orderNumber++;
     }
-
+    /*
     public void listTables() {
-    	/* method initially created to test connection to database and get information regarding the database without performing manipulation*/
+    	///* method initially created to test connection to database and get information regarding the database without performing manipulation/
         if (connection == null) {
         	//print debugging 
             System.out.println("No connection to the database. Please connect first.");
@@ -102,6 +109,8 @@ public class Connect {
             System.out.println(e.getMessage());
         }
     }
+     */
+
 
     public void closeConnection() {
     	//closes connection for stability
@@ -114,15 +123,7 @@ public class Connect {
             }
         }
     }
-
-    public static void main(String[] args) {
-    	// main method used for debugging and testing
-        Connect connector = new Connect();
-        connector.connect();
-        connector.listTables();
-        connector.closeConnection(); 
-    }
-    
+   
     public boolean createUser(String userName, String password, String firstName, String lastName) {
     	//creates user, returns true if successful
         connect();
@@ -320,12 +321,9 @@ public class Connect {
     	 */
     	connect();
         String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
-        
         //current time
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-        String formattedDate = currentDateTime.format(formatter);
-        
+        String formattedDate = getStringNow();
+           
         //execute query
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, "collected");  
@@ -345,22 +343,17 @@ public class Connect {
     public void cancelOrder(int orderNumber) {
     	connect();
     	// Method to cancel an order if user want to cancel.
-
         //no need to check for valid pick up time if cancelling
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-        String formattedDate = currentDateTime.format(formatter);
-
+    	String formattedDate = getStringNow();
         //query to update cancelled
-        String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
+        String cancelQuery = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
         String cancelledStatus = "cancelled";
-        
         //execute query
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, cancelledStatus);
-            pstmt.setString(2, formattedDate);
-            pstmt.setInt(3, orderNumber);
-            int rowsAffected = pstmt.executeUpdate();
+        try (PreparedStatement cancelOrder = connection.prepareStatement(cancelQuery)) {
+            cancelOrder.setString(1, cancelledStatus);
+            cancelOrder.setString(2, formattedDate);
+            cancelOrder.setInt(3, orderNumber);
+            int rowsAffected = cancelOrder.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Order cancelled successfully.");
             } else {
@@ -371,7 +364,15 @@ public class Connect {
             e.printStackTrace();  
         }
     }
-
+    
+    private String getStringNow() {
+    	//Method for returning the current date and time to put into the database
+    	LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+        String formattedDate = currentDateTime.format(formatter);
+        return formattedDate;
+    }
+    
     public void deleteOrders(int OrderNumber) {
     	connect();
     	 /* method implemented for testing purposes to connect to the database*/
@@ -454,6 +455,8 @@ public class Connect {
                     int points =  results.getInt("Points");
                     if (email != null) {
                     	//if an email exists it is a VIp user
+                    	
+                    	//use factory?
                         return new VIPUser(user1, pass, first, last, email, points); 
                     } else {
                         return new NormalUser(user1, pass, first, last); 
