@@ -6,8 +6,8 @@ import org.junit.*;
 import exceptions.*;
 import exceptions.MenuSelectException;
 import exceptions.NotANumberException;
-import restaurant.Order;
-import restaurant.PointOfService;
+import model.restaurant.Order;
+import model.restaurant.PointOfService;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,8 +1,9 @@
 package unitTests;
 
-import restaurant.*;
-
 import org.junit.*;
+
+import model.restaurant.*;
+
 import static org.junit.Assert.*;
 
 public class KitchenTest{

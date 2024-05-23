@@ -3,7 +3,7 @@ package unitTests;
 import static org.junit.Assert.*;
 import org.junit.*;
 
-import restaurant.Order;
+import model.restaurant.Order;
 
 public class OrderTest {
 	private Order order;

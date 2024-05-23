@@ -15,9 +15,9 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		//Scene Changer not used for first instatiation of view due to complexities with the application class
 		try {
-			Parent root = (Parent) FXMLLoader.load(getClass().getResource("Login.fxml"));
+			Parent root = (Parent) FXMLLoader.load(getClass().getResource("/view/Login.fxml"));
 			Scene scene = new Scene(root);
-			String css = this.getClass().getResource("application.css").toExternalForm();
+			String css = this.getClass().getResource("/view/application.css").toExternalForm();
 			scene.getStylesheets().add(css);
 			primaryStage.setScene(scene);
 			primaryStage.show();

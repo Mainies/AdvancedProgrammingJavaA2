@@ -5,11 +5,10 @@ import static org.junit.Assert.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import restaurant.*;
-
 import org.junit.Test;
 
-import database.Connect;
+import model.database.Connect;
+import model.restaurant.*;
 
 public class ConnectTest {
 	private Connect connector = new Connect();
