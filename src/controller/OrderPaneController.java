@@ -90,26 +90,32 @@ public class OrderPaneController {
     private void updateWaitTime() {
     	//Usage to update for View
     	//Use kitchen instance to calculate waittime. Use java inbuilt ios to add that to wait time.
-        Order order = orderService.getObject();
+        int waitMinutes = getWaitTime(); 
+        updateWaitLabel(waitminutes);
+    }
+
+    private int getWaitTime(){
+	Order order = orderService.getObject();
         Kitchen kitchen = kitchenService.getObject();
         int waitMinutes = kitchen.cookTime(order); 
-        
-        //get local time
+	return waitMinutes;
+    }
+
+    private void updateWaitLabel(int waitMinutes){
+	//get local time
         LocalTime now = LocalTime.now();
         LocalTime readyTime = now.plusMinutes(waitMinutes);      
         //Format to hh:mm
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         String formattedTime = readyTime.format(timeFormatter);
-        
         //set time and show expected pickup time with minutes till pick up time.
         waitTime.setText("Expected ready time: " + formattedTime + " (" + waitMinutes + " minutes.)");
     }
+	    
     
     private String getPickUpTime() {
     	//Similar to update wait time. Usage to return value for updaing 
-    	Order order = orderService.getObject();
-        Kitchen kitchen = kitchenService.getObject();
-        int waitMinutes = kitchen.cookTime(order); 
+        int waitMinutes = getWaitTime();
         LocalDateTime now = LocalDateTime.now(); 
         LocalDateTime readyTime = now.plusMinutes(waitMinutes);      
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"); 
@@ -130,28 +136,19 @@ public class OrderPaneController {
     }
     private void updateOrders() {
     	//Updates the order for the ConfirmOrder view.
-        
     	//Get order from service instance
     	Order order = orderService.getObject();
-        
         if (order == null) {
             System.err.println("No order available to update.");
             return;
         }
-        
         //get pos and user from service instances
         PointOfService pos = posService.getObject();
         User user = userService.getObject();
         boolean vipStatus = user.isVIP();
-        
         //pos to return price
         double price = pos.calculateSale(order, vipStatus);
-        
-        System.out.println(price);
-        updateLabel(numBurritos, Integer.toString(order.getBurritos()));
-        updateLabel(numFries, Integer.toString(order.getFries()));
-        updateLabel(numSodas, Integer.toString(order.getSodas()));
-        updateLabel(totalPrice, "Total Price: $" + String.format("%.2f", price));
+        updateOrderLabels(order);
         //Checks for meals. Allows normal users to order meals but no discounts
         if (vipStatus && mealDeals != null) {
         	//reminds user of discounts if they are vip
@@ -159,6 +156,13 @@ public class OrderPaneController {
         } else if (mealDeals != null) {
             mealDeals.setText(""); 
         }
+    }
+
+    private void updateOrderLabels(Order order){
+	updateLabel(numBurritos, Integer.toString(order.getBurritos()));
+        updateLabel(numFries, Integer.toString(order.getFries()));
+        updateLabel(numSodas, Integer.toString(order.getSodas()));
+        updateLabel(totalPrice, "Total Price: $" + String.format("%.2f", price));
     }
     
     private void updateLabel(Label label, String text) {
