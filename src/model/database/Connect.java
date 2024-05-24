@@ -67,11 +67,11 @@ public class Connect {
     
     public void MaxValue() {
     	connect();
-        String query = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
+        String maxQuery = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
     	//returns the highest value in the database so that the number can be incremented to create a unique order number as the primary key
         try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
-            
+            ResultSet rs = stmt.executeQuery(maxQuery);
+            // ResultSet returns a list type object not a stream
             if (rs.next()) {
                 this.orderNumber = rs.getInt("max_number");
                 System.out.println(this.orderNumber);
@@ -228,57 +228,7 @@ public class Connect {
     	}
     	return false;
     }
-    
-    public void newOrder(Order order, PointOfService pos, String userName) {
-    	connect();
-    	/* Major method to put a new order in the database. Called on finaliation of an order*/
-    	
-    	//Get order values
-    	int burritos = order.getBurritos();
-    	int fries = order.getFries();
-    	int sodas = order.getSodas(); 
-    	int meals = order.getMeals();
-    	boolean vipStatus = this.isVIP(userName);
-    	double price = pos.calculateSale(order, vipStatus);
-    	
-    	//get unique order number
-    	this.MaxValue();
-    	this.orderNumber++;
-    	
-    	//query to insert into order table
-    	String query = "INSERT INTO Orders(OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price) VALUES(?, ?, ?, ?, ?, ?, ?)";
-    	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setInt(1, this.orderNumber);
-            pstmt.setInt(2, burritos);
-            pstmt.setInt(3, fries);
-            pstmt.setInt(4, sodas);
-            pstmt.setInt(5, meals);
-            String collection = "await for collection";
-            pstmt.setString(6, collection);
-            pstmt.setDouble(7, price);
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("User added successfully.");
-            } else {
-                System.out.println("No rows affected.");
-            }
-        } catch (SQLException e) {
-            System.out.println("SQL Error: " + e.getMessage());
-        } 
-    	addUserOrder(userName);
-    }
-    
-    public void addUserOrder(String userName) {
-    	connect();
-    	//adds user and current order number into the userorders table to maintain relationship
-    	String query = "INSERT INTO UserOrders(Username, OrderNumber) VALUES (?, ?)";
-    	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, userName);
-            pstmt.setInt(2, this.orderNumber);
-    	} catch (SQLException e) {
-    		e.printStackTrace();
-    	}
-    }
+   
     
     
     public boolean checkIfReadyForPickUp(int orderNumber) {
@@ -343,15 +293,13 @@ public class Connect {
     public void cancelOrder(int orderNumber) {
     	connect();
     	// Method to cancel an order if user want to cancel.
-        //no need to check for valid pick up time if cancelling
-    	String formattedDate = getStringNow();
         //query to update cancelled
         String cancelQuery = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
         String cancelledStatus = "cancelled";
         //execute query
         try (PreparedStatement cancelOrder = connection.prepareStatement(cancelQuery)) {
             cancelOrder.setString(1, cancelledStatus);
-            cancelOrder.setString(2, formattedDate);
+            cancelOrder.setString(2, getStringNow());
             cancelOrder.setInt(3, orderNumber);
             int rowsAffected = cancelOrder.executeUpdate();
             if (rowsAffected > 0) {
@@ -473,7 +421,6 @@ public class Connect {
 	public void updateFirstName(String newName, String currentUser) {
 		// database connection to update first name for user. Performed as programming is running for stability
 		connect();  
-		
 	    String query = "UPDATE Users SET FirstName = ? WHERE UserName = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, newName);
@@ -639,5 +586,58 @@ public class Connect {
         }
         return ordersList;
 	}
+	
+	public void processOrder(String userName, Order order) {
+		newOrder(userName, order);
+		addUserOrder(userName, this.getOrderNumber());
+	}
+	
+	public void newOrder(String userName, Order order) {
+			connect();
+	    	//Use connector to get the next unique order number
+	    	MaxValue();
+	    	int orderNumber = getOrderNumber();
+	    	orderNumber++;
+	    	//query to insert full order into database
+	    	String query = "INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price, dateCollected) VALUES(?, ?, ?, ?, ?, ?, ?, ?,?)";
+	    	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	    		pstmt.setString(1, order.getDateCreated());
+	            pstmt.setInt(2, orderNumber);
+	            pstmt.setInt(3, order.getBurritos());
+	            pstmt.setInt(4, order.getFries());
+	            pstmt.setInt(5, order.getSodas());
+	            pstmt.setInt(6, order.getMeals());
+	            String collection = "await for collection";
+	            pstmt.setString(7, collection);
+	            pstmt.setDouble(8, order.getPrice());
+	            pstmt.setString(9, order.getDatePickedUp());
+	            int rowsAffected = pstmt.executeUpdate();
+	            if (rowsAffected > 0) {
+	                System.out.println("Order added successfully.");
+	            } else {
+	                System.out.println("No rows affected.");
+	            }
+	        } catch (SQLException e) {
+	            System.out.println("SQL Error: " + e.getMessage());
+	        } 
+	    }
+
+    public void addUserOrder(String userName, int orderNumber) {
+    	connect();
+    	//adds user and current order number into the userorders table to maintain relationship
+    	String query = "INSERT INTO UserOrders(Username, OrderNumber) VALUES (?, ?)";
+    	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, userName);
+            pstmt.setInt(2, orderNumber);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Order added successfully.");
+            } else {
+                System.out.println("No rows affected.");
+            }
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    }
 	
 }

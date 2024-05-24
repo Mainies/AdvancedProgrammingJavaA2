@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 
 public class OrderPaneController {
 	//Order Panel to handle orders. Linked to ConfirmOrder.fxml and Orderer.fxml;
-	
+	private Connect connect = new Connect();
 		
 	//FXML labels for intaking user order values for Orderer.fxml
 	@FXML private TextField burrito;
@@ -129,6 +129,7 @@ public class OrderPaneController {
             }
         }
     }
+    
     private void updateOrders() {
     	//Updates the order for the ConfirmOrder view.
     	//Get order from service instance
@@ -142,8 +143,8 @@ public class OrderPaneController {
         User user = userService.getObject();
         boolean vipStatus = user.isVIP();
         //pos to return price
-        double price = pos.calculateSale(order, vipStatus);
-        updateOrderLabels(order, price);
+        order.setPrice(pos.calculateSale(order, vipStatus));
+        updateOrderLabels(order, order.getPrice());
         //Checks for meals. Allows normal users to order meals but no discounts
         if (vipStatus && mealDeals != null) {
         	//reminds user of discounts if they are vip
@@ -177,7 +178,6 @@ public class OrderPaneController {
             errorMessage.setText("Error: " + e.getMessage());
             return;
         }
-        
         //Initially just handle orders value quantities. Send to confirmorder view for further order manipulation
         int numBurritos = Integer.parseInt(burrito.getText());
         int numFries = Integer.parseInt(fries.getText());
@@ -322,28 +322,26 @@ public class OrderPaneController {
 		/* format that takes multiple elements to ensure a order is valid, payment details pass and updates order with the pick up time*/
 		
 		//valid payment info
-		if (!validatePaymentInfo()) {
+		if (!validatePaymentInfo()) {//validate payment stops this code block if false
 		} else {
 		//get order and user
 		Order thisOrder = orderService.getObject();
-		User thisuser = userService.getObject();
+		
+		/*
+		 * Can this next part be broken down into a separate method
+		 */
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 		String date = currentDateTime.format(formatter);
+				
 		//set order placement date
 		thisOrder.setDateCreated(date);
 		String pickupTime = getPickUpTime();
 		//set pick up time based on cooking time
 		thisOrder.setDatePickedUp(pickupTime);
-		boolean vip = thisuser.isVIP();
-		// if vip user add discount, else full price
-		double price = posService.getObject().calculateSale(thisOrder, vip);
-		
-		//add price to order
-		thisOrder.setPrice(price);
-		
+	
 		//send this order to newOrder method to be added to database
-		newOrder(thisOrder);
+		sendOrderToDB(thisOrder);
 		orderService.clearObject();
 		//clear the order object so further objects can be made
 		SceneChanger.popUp(e);
@@ -352,79 +350,14 @@ public class OrderPaneController {
 	}
 	
 	
-    public void newOrder(Order order) {
-    	
-    	//use Connect class to send order to database
-    	Connect connector = new Connect();
-    	
+    public void sendOrderToDB(Order order) {
     	//get values from order
-    	int burritos = order.getBurritos();
-    	int fries = order.getFries();
-    	int sodas = order.getSodas(); 
-    	int meals = order.getMeals();
     	double price = order.getPrice();
     	double discount = pointsDiscount();
     	price = price - discount;
-    	
-    	//Use connector to get the next unique order number
-    	connector.MaxValue();
-    	int orderNumber = connector.getOrderNumber();
-    	orderNumber++;
-    	
-    	order.setOrderNum(orderNumber);
-    	String pickuptime = getPickUpTime();
-    	order.setDatePickedUp(pickuptime);
-    	//create pick up time for when order is ready at a minimum
-    	
-    	//query to insert full order into database
-    	String query = "INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price, dateCollected) VALUES(?, ?, ?, ?, ?, ?, ?, ?,?)";
-    	try (Connection conn = connector.make_connect();
-    		PreparedStatement pstmt = conn.prepareStatement(query)) {
-    		pstmt.setString(1, order.getDateCreated());
-            pstmt.setInt(2, orderNumber);
-            pstmt.setInt(3, burritos);
-            pstmt.setInt(4, fries);
-            pstmt.setInt(5, sodas);
-            pstmt.setInt(6, meals);
-            String collection = "await for collection";
-            pstmt.setString(7, collection);
-            pstmt.setDouble(8, price);
-            pstmt.setString(9, order.getDatePickedUp());
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Order added successfully.");
-            } else {
-                System.out.println("No rows affected.");
-            }
-        } catch (SQLException e) {
-            System.out.println("SQL Error: " + e.getMessage());
-        } 
+    	order.setPrice(price);
     	String userName = userService.getObject().getUsername();
-    	addUserOrder(userName, orderNumber);
-    }
-    
-    public void addUserOrder(String userName, int orderNumber) {
-    	/* Adds order to user database to link order to current user
-    	 */
-    	Connect connector = new Connect();
-    	
-    	//Query that adds order number and user to user orders
-    	String query = "INSERT INTO UserOrders(Username, OrderNumber) VALUES (?, ?)";
-    	try (Connection connect = connector.make_connect();
-    		PreparedStatement pstmt = connect.prepareStatement(query)) {
-            pstmt.setString(1, userName);
-            pstmt.setInt(2, orderNumber);
-            
-            //executes query
-            int result = pstmt.executeUpdate();
-            if (result > 0) {
-                System.out.println("Order successfully added to UserOrders.");
-            } else {
-                System.out.println("No rows affected.");
-            }
-    	} catch (SQLException e) {
-    		e.printStackTrace();
-    	}
+    	connect.processOrder(userName, order);
     }
     
     public void backToLanding(ActionEvent event) {
@@ -450,8 +383,7 @@ public class OrderPaneController {
                 }
                 //update loyalty points
                 user.setLoyaltyPoints(user.getLoyaltyPoints() - points);
-                
-                
+                  
                 //discount for actual price. Prevents infinite points
                 double discount = Math.round((points / 100.0) * 100.0) / 100.0; 
                 return discount;

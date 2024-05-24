@@ -10,7 +10,7 @@ import model.database.Connect;
 import model.database.User;
 import model.service.*;
 
-public class userController {
+public class UserController {
 	/* controller that manages BecomeVIP and UpdateDetails
 	 * Allows users to become VIP, update user details
 	 */
@@ -33,9 +33,7 @@ public class userController {
     	//Implements choice box for options to control user input
     	try {
         choices.getItems().addAll("First Name", "Last Name", "Password");
-        choices.setValue("First Name");  // Set the default value
-        choices.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Selected item: " + newValue);});}
+        choices.setValue("First Name");}  // Set the default value
     	catch (Exception e) {
     	}
     }

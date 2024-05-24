@@ -1,5 +1,4 @@
 package controller;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,9 +16,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.*;
 
-public class orderExportController {
+public class OrderExportController {
     
     @FXML private Label userName; 
     @FXML private Label fullName;

@@ -13,7 +13,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
-		//Scene Changer not used for first instatiation of view due to complexities with the application class
+		//Scene Changer not used for first instatiation due to no action event object.
 		try {
 			Parent root = (Parent) FXMLLoader.load(getClass().getResource("/view/Login.fxml"));
 			Scene scene = new Scene(root);
