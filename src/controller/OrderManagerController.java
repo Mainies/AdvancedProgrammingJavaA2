@@ -20,7 +20,7 @@ public class OrderManagerController {
 	 * 
 	 */
 	private UserService userService = UserService.getInstance();
-	
+	private Connect connector = new Connect();
 	
 	//Column attributes for table view
     @FXML private TableView<Order> orders;
@@ -51,7 +51,6 @@ public class OrderManagerController {
 
     private ObservableList<Order> fetchDataForUser() {
     	String username = userService.getObject().getUsername();
-    	Connect connector = new Connect();
     	//Observable list for setCellValueFacotry and Property Value factory
         ObservableList<Order> ordersList = connector.getActiveOrders(username);
         return ordersList;
@@ -61,6 +60,10 @@ public class OrderManagerController {
     	SceneChanger.changeScene(event, "LandingPage.fxml");
     }
     
+    
+    /*
+     * This needs to be moved to the connector database
+     */
     public boolean checkIfValidOrder() {
     	//Checks if the order number is correct for orders to be collected
         int orderNumber;
@@ -101,13 +104,12 @@ public class OrderManagerController {
     	 */
         try {
             int orderNum = Integer.parseInt(orderNo.getText().trim());
-            Connect connection = new Connect(); 
             //check order number
             if (checkIfValidOrder()) {
             	//checking ready to pick up
-                if (connection.checkIfReadyForPickUp(orderNum)) {
+                if (connector.checkIfReadyForPickUp(orderNum)) {
                 	// change status to collected
-                    connection.pickUpOrder(orderNum);
+                    connector.pickUpOrder(orderNum);
                     backToLanding(event);
                 } else {
                     warningMsg.setText("Your meal is still being cooked. Please be patient.");

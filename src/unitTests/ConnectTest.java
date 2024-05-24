@@ -2,20 +2,17 @@ package unitTests;
 
 import static org.junit.Assert.*;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
+import java.sql.Connection;
 import org.junit.Test;
 
 import model.database.Connect;
-import model.restaurant.*;
 
 public class ConnectTest {
 	private Connect connector = new Connect();
 
 	@Test
 	public void checkConnectionDrivers() {
-		connector.connect();
+		//connector.connect();
 		if (connector != null) {
             connector.closeConnection();
 			System.out.println("Connection closed.");
@@ -24,22 +21,23 @@ public class ConnectTest {
 	
 	@Test
 	public void insertNewUser() {
-		connector.connect();
+		Connect connect = new Connect();
+		Connection connector = connect.make_connect(); 
 		boolean didconnect = false;
 		boolean diddelete = false;
 		try {
-		didconnect = connector.createUser("username", "password", "user", "lastname");
+		didconnect = connect.createUser("username", "password", "user", "lastname");
 		} catch (Exception e) {
 			fail("User not successfully created.");
 		}
 		assertEquals("user not added successfully", didconnect, true);
 		try {
-		diddelete = connector.deleteUser("username");
+		diddelete = connect.deleteUser("username");
 		} catch (Exception e) {
 			fail("User not successfully deleted.");
 		}
 		assertEquals("user not deleted successfully", diddelete, true);
-		connector.closeConnection();
+		connect.closeConnection();
 	}
 	/*
 	 * Old Tests Prior to refactoring with more complex orders

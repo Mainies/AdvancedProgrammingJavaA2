@@ -2,7 +2,6 @@ package model.restaurant;
 
 import exceptions.*;
 import java.util.HashMap;
-import java.util.Scanner;
 
 
 public class PointOfService {
@@ -94,48 +93,48 @@ public class PointOfService {
 	}
 	
 	
-	public static void validateMenuInput(String input) throws MenuSelectException{
+	public void validateMenuInput(String input) throws MenuSelectException{
 	    if (!input.matches("[abcdeABCDE]")) {
 	        throw new MenuSelectException(input);
 	    }
 	}
 	
-	public static void validateFoodInput(String input) throws FoodSelectException{
+	public void validateFoodInput(String input) throws FoodSelectException{
 		if (!input.matches("[12345]")) {
 			throw new FoodSelectException(input);
 		}
 	}
 	
-	public static void validateFoodUpdate(String input) throws NotAFoodItem{
+	public void validateFoodUpdate(String input) throws NotAFoodItem{
 		if (!input.matches("[123]")) {
 			throw new NotAFoodItem(input);
 		}
 	}
 	
-	public static void negativeInput(int input) throws InvalidNegativeNumber{
+	public void negativeInput(int input) throws InvalidNegativeNumber{
 		if (input < 0) {
 			throw new InvalidNegativeNumber(input);
 		}
 	}
 	
-	public static void negativeInput(double input) throws InvalidNegativeNumber{
+	public void negativeInput(double input) throws InvalidNegativeNumber{
 		if (input < 0) {
 			throw new InvalidNegativeNumber(input);
 		}
 	}
 	
-	public static void wholeNumber(double input) throws NotWholeNumber {
+	public void wholeNumber(double input) throws NotWholeNumber {
 	    int intPart = (int) input;
 	    if (input != intPart) { throw new NotWholeNumber(input);}
 	}
 	
-	public static void wholeNumber(int input) throws NotWholeNumber {
+	public void wholeNumber(int input) throws NotWholeNumber {
 	    int intPart = (int) input;
 	    if (input != intPart) {throw new NotWholeNumber(input);
 	    }
 	}
 	
-	public static void validateNumber(String input) throws NotANumberException {
+	public void validateNumber(String input) throws NotANumberException {
 	    try {
 	        Double.parseDouble(input);
 	    } catch (NumberFormatException e) {throw new NotANumberException(input);}

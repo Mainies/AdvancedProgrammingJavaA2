@@ -65,7 +65,7 @@ public class PointOfServiceTest {
 	
 	@Test (expected = NotANumberException.class)
     public void testValidateNumberThrowsException() throws Exception{
-        PointOfService.validateNumber("not a number");
+        pos.validateNumber("not a number");
     }
 	
 	
@@ -73,14 +73,14 @@ public class PointOfServiceTest {
     public void testValidateMenuInput() throws Exception{
 		//validate the menu input for 3 different cases
         assertThrows(MenuSelectException.class, () -> {
-            PointOfService.validateMenuInput("not a number");
+            pos.validateMenuInput("not a number");
         });
         assertThrows(MenuSelectException.class, () -> {
-            PointOfService.validateMenuInput("f");
+            pos.validateMenuInput("f");
         });
         assertThrows(MenuSelectException.class, () -> {
         	//number not in a menu range
-            PointOfService.validateMenuInput("7");
+            pos.validateMenuInput("7");
         });
 	}
 	/*

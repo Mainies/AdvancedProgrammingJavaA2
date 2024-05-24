@@ -21,13 +21,13 @@ import java.sql.*;
 
 public class orderExportController {
     
-    @FXML
-    Label userName; 
-    @FXML
-    Label fullName;
+    @FXML private Label userName; 
+    @FXML private Label fullName;
+    @FXML private TextField csvFileLocation;
+    @FXML private Label warningMsg;
         
     private UserService userService = UserService.getInstance();
-    
+    private Connect connector = new Connect();
     
     //Tableview columns to show orders
     @FXML private TableView<Order> orders;
@@ -45,8 +45,7 @@ public class orderExportController {
     	//Editable to change selected to be true or false
     	orders.setEditable(true);
     	selected.setEditable(true);
-    	
-    	//Used factory method from Tableview and Property Value Factory to get values from the ObservableList<Order>
+    	//Used factory method from Tableview and Property Value Factory to get values from the ObservableList<Order> documentation
     	//https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableColumn.html#:~:text=T%3E%3E%20value
     	date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
         orderNum.setCellValueFactory(new PropertyValueFactory<>("orderNum"));
@@ -60,16 +59,9 @@ public class orderExportController {
         orders.setItems(fetchOrdersForUser());
     }
     
-    @FXML
-    TextField csvFileLocation;
-    
-    @FXML
-    Label warningMsg;
-
     private ObservableList<Order> fetchOrdersForUser() {
     	//Facade Pattern and separating database connectivity
     	String username = userService.getObject().getUsername();
-    	Connect connector = new Connect();
     	ObservableList<Order> ordersList = connector.getOrdersForExport(username);
         return ordersList;
     }
@@ -98,7 +90,6 @@ public class orderExportController {
     }
     
     public void checkCSVfield(ActionEvent e) {
-    	
     	//checks that the CSV field is valid, creates a new file if not and overwrites old file if exists
     	String filePath = csvFileLocation.getText(); 
         if (filePath.isEmpty()) {

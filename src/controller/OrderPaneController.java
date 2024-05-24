@@ -1,16 +1,11 @@
 package controller;
 
-import javafx.animation.Interpolator;
-import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import javafx.util.Duration;
 import model.database.Connect;
 import model.database.User;
 import model.database.VIPUser;
@@ -91,7 +86,7 @@ public class OrderPaneController {
     	//Usage to update for View
     	//Use kitchen instance to calculate waittime. Use java inbuilt ios to add that to wait time.
         int waitMinutes = getWaitTime(); 
-        updateWaitLabel(waitminutes);
+        updateWaitLabel(waitMinutes);
     }
 
     private int getWaitTime(){
@@ -148,7 +143,7 @@ public class OrderPaneController {
         boolean vipStatus = user.isVIP();
         //pos to return price
         double price = pos.calculateSale(order, vipStatus);
-        updateOrderLabels(order);
+        updateOrderLabels(order, price);
         //Checks for meals. Allows normal users to order meals but no discounts
         if (vipStatus && mealDeals != null) {
         	//reminds user of discounts if they are vip
@@ -158,7 +153,7 @@ public class OrderPaneController {
         }
     }
 
-    private void updateOrderLabels(Order order){
+    private void updateOrderLabels(Order order, double price){
 	updateLabel(numBurritos, Integer.toString(order.getBurritos()));
         updateLabel(numFries, Integer.toString(order.getFries()));
         updateLabel(numSodas, Integer.toString(order.getSodas()));
@@ -234,25 +229,7 @@ public class OrderPaneController {
 			throw e;
 		}
 	}
-
-    @FXML
-    public void initializeListeners() {
-    	//Listeners for intaking order quantiites. Validates their input
-        burrito.textProperty().addListener((observable) -> validateInput());
-        fries.textProperty().addListener((observable) -> validateInput());
-        sodas.textProperty().addListener((observable) -> validateInput());
-        meals.textProperty().addListener((observable) -> validateInput());
-    }
-
-    private void validateInput() {
-    	//method to call valid input and update error messages if input validation fails
-        try {
-            validateOrderInput();
-        } catch (Exception e) {
-            errorMessage.setText("Input Error: " + e.getMessage());
-        }
-    }
-    
+   
     public void changeToCheckout(ActionEvent event) {
     	SceneChanger.changeScene(event, "ConfirmOrder.fxml");
     }
@@ -264,11 +241,9 @@ public class OrderPaneController {
     	orderService.clearObject();
     	SceneChanger.changeScene(event, "Orderer.fxml");
     }
-	
-    
+	    
     //Further validation for confirm order
-    
-    
+        
     //Credit card fields
 	@FXML private TextField csv;
 	@FXML private TextField expiry;

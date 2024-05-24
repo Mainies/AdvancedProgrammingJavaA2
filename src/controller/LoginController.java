@@ -50,12 +50,6 @@ public class LoginController {
     Label errorMessageNewUser;
  
     //Login Page ActionEvents
-    
-    public LoginController() {
-        connector.connect(); 
-        //connect to db
-    }
-
     private User login() {
         boolean userExists = connector.isUser(userNameText.getText());
         //check if user is a valid user
@@ -97,7 +91,6 @@ public class LoginController {
     //Create new user action events
     
     public void createNewUser(ActionEvent event) {
-    	connector.connect();
     	//Connect to db
         boolean userExists = connector.isUser(newUserName.getText());
         //check if user exists before trying to insert the same primary key
@@ -125,7 +118,6 @@ public class LoginController {
         }
     }
     
-   
 	public void backtoLogin(ActionEvent event) {
 		SceneChanger.changeScene(event, "Login.fxml");
 	}
