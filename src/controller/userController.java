@@ -76,21 +76,18 @@ public class UserController {
         //switch logic for updating detils
         switch (option) {
             case "First Name":
-            	
             	//use connector to update user first name
                 connector.updateFirstName(text, username);
                 user.setFirstName(text);
                 updateMessage.setText("First Name Updated Successfully");
                 break;
             case "Last Name":
-
             	//use connector to update user last name
                 connector.updateLastName(text, username);
                 user.setLastName(text);
                 updateMessage.setText("Last Name Updated Successfully");
                 break;
             case "Password":
-
             	//use connector to update user password
                 connector.updatePassword(text, username);
                 user.setPassword(text);

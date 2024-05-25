@@ -32,6 +32,7 @@ public class LandingController {
     @FXML private Label joinVIPmessage;
         
     private UserService userService = UserService.getInstance();
+    private Connect connection = new Connect();
     
     
     //Table Attributes to See Current ORders
@@ -42,8 +43,6 @@ public class LandingController {
     @FXML private TableColumn<Order, Number> fries;
     @FXML private TableColumn<Order, Number> sodas;
     @FXML private TableColumn<Order, Number> price;
-    
-    
     
     @FXML
     public void initialize() {
@@ -140,8 +139,7 @@ public class LandingController {
     	//Interacts with connector to return a list of all order data that the user in the current UserSerivice has active
     	//Facade pattern keeping databse connectivity in database
     	String username = userService.getObject().getUsername();
-    	Connect connector = new Connect();
-    	ObservableList<Order> ordersList = connector.getActiveOrders(username);
+    	ObservableList<Order> ordersList = connection.getActiveOrders(username);
         return ordersList;
     }
     

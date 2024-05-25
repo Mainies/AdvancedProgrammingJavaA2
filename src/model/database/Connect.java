@@ -88,29 +88,6 @@ public class Connect {
     	//order number incremented so that the next order number is unique
     	this.orderNumber++;
     }
-    /*
-    public void listTables() {
-    	///* method initially created to test connection to database and get information regarding the database without performing manipulation/
-        if (connection == null) {
-        	//print debugging 
-            System.out.println("No connection to the database. Please connect first.");
-            return;
-        }
-        //returns all tables
-        String query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-             
-            System.out.println("List of tables:");
-            while (rs.next()) {
-                System.out.println(rs.getString("name"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-     */
-
 
     public void closeConnection() {
     	//closes connection for stability
@@ -229,15 +206,10 @@ public class Connect {
     	return false;
     }
    
-    
-    
+        
     public boolean checkIfReadyForPickUp(int orderNumber) {
     	connect();
-    	/* back end method that checks if a user order is ready. Called in order manager controller*/
-    	
-    	//connect ot db
-        connect();
-        
+    	/* back end method that checks if a user order is ready. Called in order manager controller*/      
         //query to return ready date and time
         String orderQuery = "SELECT dateCollected FROM Orders WHERE OrderNumber = ?";
         
@@ -265,7 +237,6 @@ public class Connect {
     	
     	
     public void pickUpOrder(int orderNumber) {
-    	connect();
     	/*Method to update an order to picked up. Called in OrderManager. 
     	 * Sets an orders picked up time and collected status to collected if ready to be collected
     	 */
@@ -309,7 +280,6 @@ public class Connect {
             }
         } catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
-            e.printStackTrace();  
         }
     }
     
@@ -384,7 +354,6 @@ public class Connect {
 	public User getUserFromDatabase(String username) {
 		connect();
 		/* gets a user from a database based on username. Returns a VIP user if there is an email otherwise a regular user*/
-		
 		User user = null;
         String query = "SELECT UserName, Password, FirstName, LastName, Email, Points FROM Users WHERE UserName = ?";
         try {
@@ -417,83 +386,45 @@ public class Connect {
         return user;
     }
 	
-	
 	public void updateFirstName(String newName, String currentUser) {
 		// database connection to update first name for user. Performed as programming is running for stability
-		connect();  
-	    String query = "UPDATE Users SET FirstName = ? WHERE UserName = ?";
-	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, newName);
-	        pstmt.setString(2, currentUser);
-	        int rowsAffected = pstmt.executeUpdate();
-	        if (rowsAffected > 0) {
-	            System.out.println("First name updated successfully.");
-	        } else {
-	            System.out.println("No rows affected.");
-	        }
-	    } catch (SQLException e) {
-	        System.err.println("SQL Error: " + e.getMessage());
-	    }
+		updateDetails("FirstName", newName, currentUser); 
 	}
 
 	public void updateLastName(String newName, String currentUser) {
 		// database connection to update last name for user. Performed as programming is running for stability
-		connect();  
-	    String query = "UPDATE Users SET LastName = ? WHERE UserName = ?";
-	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, newName);
-	        pstmt.setString(2, currentUser);
-	        int rowsAffected = pstmt.executeUpdate();
-	        if (rowsAffected > 0) {
-	        	//execute update
-	            System.out.println("Last name updated successfully.");
-	        } else {
-	            System.out.println("No rows affected.");
-	        }
-	    } catch (SQLException e) {
-	        System.err.println("SQL Error: " + e.getMessage());
-	    }
+		updateDetails("LastName", newName, currentUser); 
 	}
 		
 	public void updatePassword(String newPass, String currentUser) {
 		// database connection to update password for user. Performed as programming is running for stability
-		connect();  
-	    
-	    //change password to new string
-	    String query = "UPDATE Users SET Password = ? WHERE UserName = ?";
-	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, newPass);
-	        pstmt.setString(2, currentUser);
-	        int rowsAffected = pstmt.executeUpdate();
-	        //execute update
-	        if (rowsAffected > 0) {
-	            System.out.println("Password updated successfully.");
-	        } else {
-	            System.out.println("No rows affected.");
-	        }
-	    } catch (SQLException e) {
-	        System.err.println("SQL Error: " + e.getMessage());
-	    }
+		updateDetails("Password", newPass, currentUser);
 	}
 	
 	public void updateEmail(String email, String currentUser) {
 		// database connection to update email for user. Performed as programming is running for stability. Called for when creating a VIP user
+		updateDetails("Email", email, currentUser);
+	}
+	
+	private void updateDetails(String condition, String newValue, String currentUser) {
 		connect();  
-	    String query = "UPDATE Users SET Email = ? WHERE UserName = ?";
-	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, email);
+	    String detailsQuery = "UPDATE Users SET " + condition + " = ? WHERE UserName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(detailsQuery)) {
+	    	pstmt.setString(1, newValue);
 	        pstmt.setString(2, currentUser);
+	        System.out.println("success fully set up details");
 	        int rowsAffected = pstmt.executeUpdate();
 	        if (rowsAffected > 0) {
-	            System.out.println("Email updated successfully.");
+	        	System.out.println("made it here");
+	            System.out.println(condition + " updated successfully.");
 	        } else {
 	            System.out.println("No rows affected.");
 	        }
 	    } catch (SQLException e) {
-	        System.err.println("SQL Error: " + e.getMessage());
+	        System.err.println("SQLException: " + e.getMessage());
 	    }
 	}
-	
+		
 	public void updatePoints(String currentUser) {
 		// database connection to update Points for user. Called when creating a normal user to not have a null field
 	    connect();  
@@ -535,10 +466,7 @@ public class Connect {
                 int sodas = rs.getInt("Sodas");
                 double price = rs.getDouble("Price");
                 String status = rs.getString("Status");
-                Order order = new Order(
-                    burritos,
-                    fries,
-                    sodas);
+                Order order = new Order(burritos, fries, sodas);
                 order.setDateCreated(rs.getString("dateCreated"));
                 order.setOrderNum(orderNum);
                 order.setPrice(price); 
@@ -557,24 +485,19 @@ public class Connect {
 		connect();
         ObservableList<Order> ordersList = FXCollections.observableArrayList();
         //query that filters for orders that are awaiting collection
-        String query = "SELECT dateCreated, OrderNumber, Burritos, Fries, Sodas, Price FROM Orders WHERE Status = 'await for collection' AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?) ORDER BY dateCreated DESC";
+        String activeOrdersQuery = "SELECT dateCreated, OrderNumber, Burritos, Fries, Sodas, Price FROM Orders WHERE Status = 'await for collection' AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?) ORDER BY dateCreated DESC";
         try (
-            PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, username);
-            
+            PreparedStatement orderStatement = connection.prepareStatement(activeOrdersQuery)) {
+        	orderStatement.setString(1, username);
             //execute update
-            ResultSet rs = pstmt.executeQuery();
-
+            ResultSet rs = orderStatement.executeQuery();
             while (rs.next()) {
             	int orderNum = rs.getInt("OrderNumber");
                 int burritos = rs.getInt("Burritos");
                 int fries = rs.getInt("Fries");
                 int sodas = rs.getInt("Sodas");
                 double price = rs.getDouble("Price");
-                Order order = new Order(
-                    burritos,
-                    fries,
-                    sodas);
+                Order order = new Order(burritos, fries, sodas);
                 order.setDateCreated(rs.getString("dateCreated"));
                 order.setOrderNum(orderNum);
                 order.setPrice(price); 
