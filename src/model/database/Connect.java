@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -562,5 +563,167 @@ public class Connect {
     		e.printStackTrace();
     	}
     }
+    
+    public ArrayList<Integer> getListOfUserOrderNumbers(String userName) {
+    	//returns a list of order numbers that a user has ordered to be checked if they have already been claimed
+        connect();
+        //Query to return all ordernumbers by username
+        String query = "SELECT OrderNumber FROM UserOrders WHERE UserName = ?";
+        ArrayList<Integer> orderNumbers = new ArrayList<>();
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, userName);
+            //executing query
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                orderNumbers.add(rs.getInt("OrderNumber"));
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
+        return orderNumbers;
+    }
+    
+    private ArrayList<Integer> fetchVipOrders() {
+    	//Query database and return list of orders
+    	connect();
+        ArrayList<Integer> vipOrders = new ArrayList<>();
+        String query = "SELECT OrderNumber FROM VIPPoints";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                vipOrders.add(rs.getInt("OrderNumber"));
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
+        return vipOrders;
+    }
+    
+    private ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders) {
+    	//Compare user orders with vip list of orders. Return those that havent' been added to VIP points table
+        ArrayList<Integer> numsToPopulate = new ArrayList<>();
+        for (Integer orderNum : orderNumbersList) {
+            if (!vipOrders.contains(orderNum)) {
+                numsToPopulate.add(orderNum);
+            }
+        }
+        return numsToPopulate;
+    }
+    
+    private void insertMissingVipOrders(ArrayList<Integer> numsToPopulate) {
+    	connect();
+    	//Put missing orders into VIP orders and set their collected value to false
+        String query = "INSERT INTO VIPPoints (OrderNumber, Collected) VALUES (?, false)";
+        for (Integer missingOrder : numsToPopulate) {
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                pstmt.setInt(1, missingOrder);
+                //execute query
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("SQL Error: " + e.getMessage());
+            }
+        }
+    }
+    public void checkIfPopulated(ArrayList<Integer> orderNumbersList) {
+    	//Get list of VIP user orders
+        ArrayList<Integer> vipOrders = fetchVipOrders();
+        //Compare VIP orders to all orders
+        ArrayList<Integer> numsToPopulate = getMissingVipOrders(orderNumbersList, vipOrders);
+        //Populate VIP list with orders that are not in VIPUser Table
+        insertMissingVipOrders(numsToPopulate);
+    }
+    
+    public void updatePointsInDB(VIPUser vipUser) {
+    	String query = "SELECT ord.OrderNumber, ord.Price, v.Collected " +
+                "FROM Orders ord " +
+                "JOIN UserOrders uo ON ord.OrderNumber = uo.OrderNumber " +
+                "JOIN VipPoints v ON ord.OrderNumber = v.OrderNumber " +
+                "WHERE ord.Status = 'collected' AND v.Collected = false " +
+                "AND uo.UserName = ?";
+        //Connect to DB and execute query
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, vipUser.getUsername());
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+            	//Getting variables for interaction with program
+                double price = rs.getDouble("Price");
+                boolean collected = rs.getBoolean("Collected");
+                int orderNumber = rs.getInt("OrderNumber");
+                if (!collected) {
+                	//Floor per dollar spent
+                    int pointsToAdd = (int) Math.floor(price);
+                    //update current loyalty points
+                    vipUser.setLoyaltyPoints(vipUser.getLoyaltyPoints() + pointsToAdd);
+                    //change collected to true in VIP points so it cannot be redeemed again
+                    collectPoints(orderNumber);
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
+    }
+    
+    private void collectPoints(int orderNumber) {
+    	String updateQuery = "UPDATE VipPoints SET Collected = true WHERE OrderNumber = ?";
+        try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+            updateStmt.setInt(1, orderNumber);
+            updateStmt.executeUpdate();
+        } catch(SQLException e) {
+        	System.err.println("SQL Error: " + e.getMessage());
+        }
+        
+    }
+    
+    public void updatePointsFull(VIPUser vipUser) {
+    	String username = vipUser.getUsername();
+    	ArrayList<Integer> userOrderNumbers = getListOfUserOrderNumbers(username);
+    	checkIfPopulated(userOrderNumbers);
+    	updatePointsInDB(vipUser);
+    }
+    
+    public void logoutPoints(String username, int points) {
+    	connect();
+    	String updateQuery = "UPDATE Users SET Points = ? WHERE username = ?";
+        // update points in database for next log in time
+        try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+            updateStmt.setInt(1, points);
+            updateStmt.setString(2, username);
+            updateStmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 	
 }

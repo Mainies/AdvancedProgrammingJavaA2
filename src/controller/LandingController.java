@@ -45,6 +45,9 @@ public class LandingController {
     @FXML private TableColumn<Order, Number> price;
     
     @FXML
+    private Button updatePointsButton;
+    
+    @FXML
     public void initialize() {
         updateUserName();
         updateFullName();
@@ -63,9 +66,6 @@ public class LandingController {
         price.setCellValueFactory(new PropertyValueFactory<>("price"));  
         orders.setItems(fetchDataForUser());
     }
-    
-    @FXML
-    private Button updatePointsButton;
     
     private void updateButtonVisibility() {
     	//hides vip points if not a VIP user
@@ -161,169 +161,35 @@ public class LandingController {
     	SceneChanger.changeScene(event, "Login.fxml");
     }
     
-    //UPDATING VIP POINTS 
-    public ArrayList<Integer> getListOfUserOrderNumbers() {
-    	//returns a list of order numbers that a user has ordered to be checked if they have already been claimed
-        Connect conn = new Connect();
-        String currUser = userService.getObject().getUsername();
-        //Query to return all ordernumbers by username
-        String query = "SELECT OrderNumber FROM UserOrders WHERE UserName = ?";
-        ArrayList<Integer> orderNumbers = new ArrayList<>();
-        try (Connection connector = conn.make_connect();
-             PreparedStatement pstmt = connector.prepareStatement(query)) {
-            pstmt.setString(1, currUser);
-            //executing query
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                orderNumbers.add(rs.getInt("OrderNumber"));
-            }
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-        }
-        return orderNumbers;
-    }
-
-    public void checkIfPopulated(ArrayList<Integer> orderNumbersList) {
-    	//Get list of VIP user orders
-        ArrayList<Integer> vipOrders = fetchVipOrders();
-        //Compare VIP orders to all orders
-        ArrayList<Integer> numsToPopulate = getMissingVipOrders(orderNumbersList, vipOrders);
-        //Populate VIP list with orders that are not in VIPUser Table
-        insertMissingVipOrders(numsToPopulate);
-    }
-
-    private ArrayList<Integer> fetchVipOrders() {
-    	//Query database and return list of orders
-    	Connect conn = new Connect();
-        String query = "SELECT OrderNumber FROM VIPPoints";
-        ArrayList<Integer> vipOrders = new ArrayList<>();
-        try (Connection connector = conn.make_connect();
-             PreparedStatement pstmt = connector.prepareStatement(query)) {
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                vipOrders.add(rs.getInt("OrderNumber"));
-            }
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-        }
-        return vipOrders;
-    }
-
-    private ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders) {
-    	//Compare user orders with vip list of orders. Return those that havent' been added to VIP points table
-        ArrayList<Integer> numsToPopulate = new ArrayList<>();
-        for (Integer orderNum : orderNumbersList) {
-            if (!vipOrders.contains(orderNum)) {
-                numsToPopulate.add(orderNum);
-            }
-        }
-        return numsToPopulate;
-    }
-
-    private void insertMissingVipOrders(ArrayList<Integer> numsToPopulate) {
-    	Connect conn = new Connect();
-    	
-    	//Put missing orders into VIP orders and set their collected value to false
-        String query = "INSERT INTO VIPPoints (OrderNumber, Collected) VALUES (?, false)";
-        for (Integer missingOrder : numsToPopulate) {
-            try (Connection connector = conn.make_connect();
-                 PreparedStatement pstmt = connector.prepareStatement(query)) {
-                pstmt.setInt(1, missingOrder);
-                //execute query
-                pstmt.executeUpdate();
-            } catch (SQLException e) {
-                System.err.println("SQL Error: " + e.getMessage());
-            }
-        }
-    }
+    //UPDATING VIP POINTS   
     
-    public void updatePoints(ActionEvent event) {
-        Connect conn = new Connect();
+    public void updatePoints() {
         User user = userService.getObject(); 
         if (!(user instanceof VIPUser)) {
             System.err.println("User is not a VIPUser");
             return;
         }
         VIPUser vipUser = (VIPUser) user; //Casting user from DB to VIP user
-        
-        //Query that returns all the orders in VIP orders that haven't been collected yet for the current user
-        String query = "SELECT ord.OrderNumber, ord.Price, v.Collected " +
-                "FROM Orders ord " +
-                "JOIN UserOrders uo ON ord.OrderNumber = uo.OrderNumber " +
-                "JOIN VipPoints v ON ord.OrderNumber = v.OrderNumber " +
-                "WHERE ord.Status = 'collected' AND v.Collected = false " +
-                "AND uo.UserName = ?";
-        
-        //Connect to DB and execute query
-        try (Connection connector = conn.make_connect();
-            PreparedStatement pstmt = connector.prepareStatement(query)) {
-            pstmt.setString(1, vipUser.getUsername());
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-            	//Getting variables for interaction with program
-                double price = rs.getDouble("Price");
-                boolean collected = rs.getBoolean("Collected");
-                int orderNumber = rs.getInt("OrderNumber");
-
-                if (!collected) {
-                	//Floor per dollar spent
-                    int pointsToAdd = (int) Math.floor(price);
-                    //update current loyalty points
-                    vipUser.setLoyaltyPoints(vipUser.getLoyaltyPoints() + pointsToAdd);
-                    //change collected to true in VIP points so it cannot be redeemed again
-                    String updateQuery = "UPDATE VipPoints SET Collected = true WHERE OrderNumber = ?";
-                    try (PreparedStatement updateStmt = connector.prepareStatement(updateQuery)) {
-                        updateStmt.setInt(1, orderNumber);
-                        updateStmt.executeUpdate();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-        }
+        connection.updatePointsFull(vipUser); 
     }
     
     public void executePointsUpdate(ActionEvent e) {
     	//method that listens for action event to update points
-    	
-    	//get order numbers
-        ArrayList<Integer> userOrderNumbers = getListOfUserOrderNumbers();
-        
-        //get unpopulated and add to table
-        checkIfPopulated(userOrderNumbers);
-        
         //collect all points from unclaimed orders and update VIP points
-        updatePoints(e);
-        
+        updatePoints();
         //update view
         updateVipPointsLabels();
-    }
-    
-    
+    } 
     
     public void vipUserLogoutPoints() {
-        Connect connect = new Connect();
         User user = userService.getObject();
         String username = user.getUsername();
         int points = 0; // Initialize points to 0.
-
         // Check if VIPUserand get loyalty points if VIP
         if (user instanceof VIPUser) {
             points = ((VIPUser) user).getLoyaltyPoints();
         }
-
-        // query to update user points.
-        String updateQuery = "UPDATE Users SET Points = ? WHERE username = ?";
-        
-        // update points in database for next log in time
-        try (Connection conn = connect.make_connect();
-             PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
-            updateStmt.setInt(1, points);
-            updateStmt.setString(2, username);
-            updateStmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-        }
+        connection.logoutPoints(username, points);
     }
 
 }
