@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class LandingController {
     /* Landing Class Controller. 
      * Central Controller that provides access to all other parts of the program
+     * 
      */
 	
 	//View of User Details
@@ -45,19 +46,23 @@ public class LandingController {
     @FXML private TableColumn<Order, Number> price;
     
     @FXML
+    //only visible to VIP users
     private Button updatePointsButton;
     
     @FXML
     public void initialize() {
+    	//display details per assignment specs
         updateUserName();
         updateFullName();
+        //update points for VIP users
         updateVipPointsLabels();
+        //hides/shows buttons depending on user type
         updateButtonVisibility();
         updateVIPmessageVisibility();        
         
         //user Orders initialise for uncollected orders for tableview
-        //Technically factory design pattern but documentation taken from
-        //https://docs.oracle.com/javafx/2/ui_controls/table-view.htm
+        //ordering managed by SQL query in Connect class
+        //factory method standard for Table column in fxml
         date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
         orderNum.setCellValueFactory(new PropertyValueFactory<>("orderNum"));
         burritos.setCellValueFactory(new PropertyValueFactory<>("burritos"));
@@ -91,8 +96,7 @@ public class LandingController {
     }
 
     private void updateUserName() {
-    	
-    	//updates username on view
+    	//updates username on view instantiation
         User user = userService.getObject(); 
         if (user != null && userName != null) {
             userName.setText(user.getUsername()); 
@@ -104,7 +108,6 @@ public class LandingController {
     }
     
     private void updateFullName() {
-    	
     	//updates first and last name to show user details on view
     	User user = userService.getObject(); 
         if (user != null && userName != null) {
@@ -115,7 +118,11 @@ public class LandingController {
             }
         }
     }
-
+    
+    
+    //collection of action events that instantiatiate the relevant view
+    //uses the scene changer class to avoid repeated code between all control changes
+    
     public void openOrderPane(ActionEvent event) {
     	SceneChanger.changeScene(event, "Orderer.fxml");
     }
@@ -135,10 +142,11 @@ public class LandingController {
     }
     
     private ObservableList<Order> fetchDataForUser() {
-    	//creating an observable list as per https://docs.oracle.com/javafx/2/ui_controls/table-view.htm
+    	//creating an observable list for population of table
     	//Interacts with connector to return a list of all order data that the user in the current UserSerivice has active
     	//Facade pattern keeping databse connectivity in database
     	String username = userService.getObject().getUsername();
+    	//active orders handled by sql query
     	ObservableList<Order> ordersList = connection.getActiveOrders(username);
         return ordersList;
     }
@@ -161,8 +169,7 @@ public class LandingController {
     	SceneChanger.changeScene(event, "Login.fxml");
     }
     
-    //UPDATING VIP POINTS   
-    
+    //UPDATING VIP POINTS
     public void updatePoints() {
         User user = userService.getObject(); 
         if (!(user instanceof VIPUser)) {

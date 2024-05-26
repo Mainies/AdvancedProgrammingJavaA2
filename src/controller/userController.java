@@ -16,6 +16,7 @@ public class UserController {
 	 */
     
 	private UserService userService = UserService.getInstance();
+    private Connect connection = new Connect();
     
 	//Fxml fields
     @FXML private TextField inputField;
@@ -48,14 +49,9 @@ public class UserController {
     	if (tickBox.isSelected()) {
     	String email = emailTextInput.getText();
     	String user = userService.getObject().getUsername();
-    	
-    	//use Connect object to update database
-    	Connect connector = new Connect();
-    	
     	//puts user email in database to be able to be user
-    	connector.updateEmail(email, user);
-    	connector.updatePoints(user);
-    	
+    	connection.updateEmail(email, user);
+    	connection.updatePoints(user);
     	updateMessage.setText("Update Successful, please log in again for VIP benefits.");
     	} else {
     		//lets user know error
@@ -71,25 +67,24 @@ public class UserController {
         String username = user.getUsername();
         //get detail to be changed
         String option = (String) choices.getValue(); 
-        String text = inputField.getText();          
-        Connect connector = new Connect();
+        String text = inputField.getText();   
         //switch logic for updating detils
         switch (option) {
             case "First Name":
             	//use connector to update user first name
-                connector.updateFirstName(text, username);
+                connection.updateFirstName(text, username);
                 user.setFirstName(text);
                 updateMessage.setText("First Name Updated Successfully");
                 break;
             case "Last Name":
             	//use connector to update user last name
-                connector.updateLastName(text, username);
+                connection.updateLastName(text, username);
                 user.setLastName(text);
                 updateMessage.setText("Last Name Updated Successfully");
                 break;
             case "Password":
             	//use connector to update user password
-                connector.updatePassword(text, username);
+                connection.updatePassword(text, username);
                 user.setPassword(text);
                 updateMessage.setText("Password Updated Successfully");
                 break;
@@ -100,9 +95,6 @@ public class UserController {
         	}
     	}
 	
-    /*Attempted test creating a non-public class as a separate controller for the VIP landing page which was notsuccesful.
-     *  Seems to be that the class needs to be a public to be recognised as a controller to be recognised/usable in Scenebuilder*/
-   
 }
 
 

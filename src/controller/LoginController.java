@@ -21,33 +21,16 @@ public class LoginController {
     private UserService userService = UserService.getInstance(); 
 
     // User Login Interface
-    @FXML
-    TextField userNameText;
-
-    @FXML
-    PasswordField passwordText;
-
-    @FXML
-    Label errorMessage;
-    
+    private @FXML TextField userNameText;
+    private @FXML PasswordField passwordText;
+    private @FXML Label errorMessage;
     // New User Interface
-    @FXML
-    TextField newUserName;
-
-    @FXML
-    TextField newPassword;
-
-    @FXML
-    TextField newFirstName;
-
-    @FXML
-    TextField newLastName;
-
-    @FXML
-    TextField newEmail;
-
-    @FXML
-    Label errorMessageNewUser;
+    private @FXML TextField newUserName;
+    private @FXML TextField newPassword;
+    private @FXML TextField newFirstName;
+    private @FXML TextField newLastName;
+    private @FXML TextField newEmail;
+    private @FXML Label errorMessageNewUser;
  
     //Login Page ActionEvents
     private User login() {
@@ -88,8 +71,7 @@ public class LoginController {
 		SceneChanger.changeScene(event, "CreateNewUser.fxml");
 	}
 
-    //Create new user action events
-    
+    //Create new user action event
     public void createNewUser(ActionEvent event) {
     	//Connect to db
         boolean userExists = connector.isUser(newUserName.getText());
@@ -103,6 +85,9 @@ public class LoginController {
             String email = newEmail.getText();
             //current implentation handles both regular and VIP users
             if (email.isEmpty()) {
+            	/*me-to-me: change to factory if you have time
+            	 * 
+            	 */
                 user = new NormalUser(username, pass, first, last);
                 connector.createUser(username, pass, first, last);
             } else {

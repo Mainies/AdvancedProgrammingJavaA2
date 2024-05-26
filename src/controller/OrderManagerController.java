@@ -103,8 +103,7 @@ public class OrderManagerController {
     public void cancelOrder(ActionEvent event) {
     	//option to also cancel number if collected. Important to change to cancelled so that the user cannot claim VIP points
     	if (checkIfValidOrder()) {
-    		Connect connection = new Connect();
-    		connection.cancelOrder(Integer.parseInt(orderNo.getText()));
+    		connector.cancelOrder(Integer.parseInt(orderNo.getText()));
     		backToLanding(event);
     	}
     }

@@ -19,11 +19,8 @@ public class ManagerController {
     
 	private String passkey = "1234";
     
-    @FXML 
-    PasswordField passWord;
-    
-    @FXML
-    Label errorMessage;
+    private @FXML PasswordField passWord;
+    private @FXML Label errorMessage;
     
     
     //Interface and Password Section

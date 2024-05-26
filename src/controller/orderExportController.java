@@ -18,7 +18,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class OrderExportController {
-    
+    /*missing for submission
+     * need to implement ability to select different parts the order for export
+     * planning to implement via more editable buttons
+     */
+	
     @FXML private Label userName; 
     @FXML private Label fullName;
     @FXML private TextField csvFileLocation;

@@ -106,7 +106,6 @@ public class OrderPaneController {
         //set time and show expected pickup time with minutes till pick up time.
         waitTime.setText("Expected ready time: " + formattedTime + " (" + waitMinutes + " minutes.)");
     }
-	    
     
     private String getPickUpTime() {
     	//Similar to update wait time. Usage to return value for updaing 
@@ -186,12 +185,9 @@ public class OrderPaneController {
         numBurritos += numMeals;
         numFries += numMeals;
         numSodas += numMeals;
-       
         Order order = new Order(numBurritos, numFries, numSodas, numMeals);
-        
         //Set orderservice singleton to current order
         orderService.setObject(order); 
-        
         //Change view
         this.changeToCheckout(event);
     }

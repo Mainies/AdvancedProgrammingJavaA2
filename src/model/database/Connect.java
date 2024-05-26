@@ -57,7 +57,6 @@ public class Connect {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } 
-        
         return connection;
     }
     
@@ -245,7 +244,6 @@ public class Connect {
         String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
         //current time
         String formattedDate = getStringNow();
-           
         //execute query
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, "collected");  
