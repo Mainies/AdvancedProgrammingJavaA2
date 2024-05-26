@@ -1,34 +1,35 @@
 Assignment 2 - Advanced Programming
 
-This assignment contains the repository for assignment 2. The last commit to this repository should be considered my submission for assginment and following the submission and succesful completion of this course I will also port this code to my own personal GitHub repository.
+This assignment contains the repository for assignment 2. The last commit to this repository before the due date should be considered my submission for assignment. Following this course's submission and successful completion, I will also port this code to my own personal GitHub repository.
 
 Tech-Stack:
-- Program Developped using Eclipse IDE
-- Java Development Kit Version: 17.0.x
-- JavaFX version:
-- SQLite Database
-- JDBC driver version:
-- GUI developed using SceneBuilder (fxml files)
-- Minor CSS styling in application.css
+- Program Developed using Eclipse IDE
+- Java Development Kit Version: 17
+- JavaFX version: 22.0.1
+- Database: SQLite
+- JDBC driver version: 3.27.21.1 from https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+- GUI developed using SceneBuilder and FXML files
+- Very minor CSS styling in "/src/application.css"
 
-Functionality:
-All major functionality. Minor Adjustments from Specifications
-- Time for Picking up orders is specfied by using the systems date and time instead of the user (user has to wait till order is ready in real time)
-- Users can select which specific orders they want to report instead of which information.
+Functionality/Choices:
+All major functionality and exception handling per assignment specifications.
+Exception handling is managed through the view/controller. This keeps the model safe from user volatility.
+The time for Picking up orders is specified by using the system date and time instead of the user's (the user has to wait until the order is ready in real-time (instead of inputting a pickup time). I thought learning about the Java system date and time was a bit more interesting than another string error-handling task.
 
 Usage:
-Application run from 
-'./application/src/main.java'
-
+Application run in Eclipse IDE from file:
+'/src/application/main.java' 
 
 Design:
 "programDesign.pdf" contains a visual guide for the Model-View-Controller architecture.
-"databaseDesign.pdf" shows the SQLite database structure and the SQL queries used to create these tables in SQLite3 can be seen in program files.
+"databaseDesign.pdf" shows the SQLite database structure, and the SQL queries used to create these tables in SQLite3 can be seen in program files.
 
 OOP design highlights:
-- singleton design for AppService interface that is implemented by fetches one recurrent User, Order, Kitchen and PointOfService as required.
-- (TO EDIT) make Restaurant Interface that implements a PointOfService, and Kitchen??? PointOfService demonstrates the Facade pattern by hiding complexities of getting food prices from food class, cooking times, calculating the prices and discounts.
-- Connect is all handled through a single class that provides simple methods for making connections and sending/receiving data from the SQL-lite database. Data is send received as it is finalised (i.e. order fully confirmed). This was made for stability.
+The application follows the Model-View-Controller design pattern. Relevant controllers handle data sent to and from the model. Due to the constraints of FXML, separate controllers were made across different files as the FXML files cannot access non-public classes.
+- A singleton design for the AppService interface is implemented by fetching one recurrent User, Order, Kitchen, and PointOfService as required. 
+The connection to the database is handled through a single Connect class that provides simple methods for making connections and sending/receiving data from the SQL-lite database. Data is sent and received as it is finalised (i.e., the order is fully confirmed). This was made for stability and allows for returning to a state after the program crashes.
+- Food -> {Burrito, Fries and Soda} and User -> {NormalUser, VIPUser} demonstrate use of abstract data types and polymorphism.
+- Note: While I recognise that the factory pattern is used in creating a TableColumn in FXML, this is implemented by the Java libraries (PropertyValueFactory and setCellValueFactory), which are standard methods in the FX library and thus do not contribute towards my OO choices.
 
 
 
