@@ -15,7 +15,72 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.restaurant.*;
 
-public class Connect {
+interface IOrderInput {
+	boolean checkValidOrder(int orderNumber, String username);
+	
+	void pickUpOrder(int orderNumber);
+	
+	void cancelOrder(int orderNumber);
+	
+	void deleteOrders(int OrderNumber);
+	
+	void newOrder(String userName, Order order);
+}
+
+interface IOrderOutput{
+	ArrayList<Integer> fetchVipOrders();
+	
+	boolean checkIfReadyForPickUp(int orderNumber);
+	
+	ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders);
+	
+	ArrayList<Integer> getListOfUserOrderNumbers(String userName);
+	
+	ObservableList<Order> getActiveOrders(String username);
+	
+	ObservableList<Order> getOrdersForExport(String username);
+	
+	void MaxValue();
+}
+
+interface IUserInput{
+	void logoutPoints(String username, int points);
+	
+	boolean createUser(String userName, String password, String firstName, String lastName);
+	
+	boolean createVIPUser(String userName, String password, String firstName, String lastName, String email, int points);
+	
+	boolean deleteUser(String userName);
+	
+	void addUserOrder(String userName, int orderNumber);
+	
+	void updateDetails(String condition, String newValue, String currentUser);
+}
+
+interface IVIPUserInput{
+	void updatePointsInDB(VIPUser vipUser);
+	
+	void insertMissingVipOrders(ArrayList<Integer> numsToPopulate);
+	
+	void updatePoints(String currentUser);
+}
+
+interface IVIPUserOutput{
+	void collectPoints(int orderNumber);
+}
+
+interface IUserOutput{
+	boolean isVIP(String userName);
+	
+	boolean checkPassword(String user, String inputPassword);
+	
+	boolean isUser(String user);
+	
+	User getUserFromDatabase(String username);
+}
+
+
+public class Connect implements IUserInput, IUserOutput, IOrderInput, IOrderOutput, IVIPUserInput, IVIPUserOutput{
 	/* Major class to implement connection via the JDBC
 	allows various other objects to communicate and interact with the sql lite database
 	methods to update values in tables, get values from tables and execute queries from other objects
@@ -65,6 +130,7 @@ public class Connect {
     	return this.orderNumber;
     }
     
+    @Override
     public void MaxValue() {
     	connect();
         String maxQuery = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
@@ -100,7 +166,8 @@ public class Connect {
             }
         }
     }
-   
+    
+    @Override
     public boolean createUser(String userName, String password, String firstName, String lastName) {
     	//creates user, returns true if successful
         connect();
@@ -126,6 +193,7 @@ public class Connect {
         return true; 
     }
     
+    @Override
     public boolean deleteUser(String userName){
     	connect();
     	//method to delete user by looking up user name
@@ -154,6 +222,7 @@ public class Connect {
     }
     
     //create user if the user is a vip separate method for handling extra input fields
+    @Override
     public boolean createVIPUser(String userName, String password, String firstName, String lastName, String email, int points) {
     	connect();
         if (connection == null) {
@@ -185,6 +254,7 @@ public class Connect {
         return false; 
     }
     
+    @Override
     public boolean isVIP(String userName) {
     	connect();
     	//simple boolean query to check if user is VIP or not by email look up.
@@ -206,7 +276,7 @@ public class Connect {
     	return false;
     }
    
-        
+    @Override    
     public boolean checkIfReadyForPickUp(int orderNumber) {
     	connect();
     	/* back end method that checks if a user order is ready. Called in order manager controller*/      
@@ -235,7 +305,7 @@ public class Connect {
         return false;
     }
     	
-    	
+    @Override	
     public void pickUpOrder(int orderNumber) {
     	/*Method to update an order to picked up. Called in OrderManager. 
     	 * Sets an orders picked up time and collected status to collected if ready to be collected
@@ -260,6 +330,7 @@ public class Connect {
         }
     }
     
+    @Override
     public void cancelOrder(int orderNumber) {
     	connect();
     	// Method to cancel an order if user want to cancel.
@@ -290,6 +361,7 @@ public class Connect {
         return formattedDate;
     }
     
+    @Override
     public void deleteOrders(int OrderNumber) {
     	connect();
     	 /* method implemented for testing purposes to connect to the database*/
@@ -307,7 +379,7 @@ public class Connect {
 		}
     }
     
-
+    @Override
 	public boolean isUser(String user) {
 		/*validation that a user exists in the database*/
 		connect();		
@@ -322,7 +394,8 @@ public class Connect {
 	        return false;          	
 	    } 
 	} 
-
+    
+    @Override
 	public boolean checkPassword(String user, String inputPassword) {
 		connect();
 		/* check if password is the same as input string. Return true if correct. 
@@ -349,7 +422,8 @@ public class Connect {
 	        return false;
 	    }
 	}
-
+    
+    @Override
 	public User getUserFromDatabase(String username) {
 		connect();
 		/* gets a user from a database based on username. Returns a VIP user if there is an email otherwise a regular user*/
@@ -405,7 +479,8 @@ public class Connect {
 		updateDetails("Email", email, currentUser);
 	}
 	
-	private void updateDetails(String condition, String newValue, String currentUser) {
+	@Override
+	public void updateDetails(String condition, String newValue, String currentUser) {
 		connect();  
 	    String detailsQuery = "UPDATE Users SET " + condition + " = ? WHERE UserName = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(detailsQuery)) {
@@ -423,7 +498,8 @@ public class Connect {
 	        System.err.println("SQLException: " + e.getMessage());
 	    }
 	}
-		
+	
+	@Override
 	public void updatePoints(String currentUser) {
 		// database connection to update Points for user. Called when creating a normal user to not have a null field
 	    connect();  
@@ -445,6 +521,7 @@ public class Connect {
 	    }
 	}
 	
+	@Override
 	public ObservableList<Order> getOrdersForExport(String username){
 		//Same as landing page, logic to return orders based on 
     	connect();
@@ -479,6 +556,7 @@ public class Connect {
         return ordersList;
 	}
 	
+	@Override
 	public ObservableList<Order> getActiveOrders(String username){
     	//Observable list allows for iteration through the tableview
 		connect();
@@ -514,6 +592,7 @@ public class Connect {
 		addUserOrder(userName, this.getOrderNumber());
 	}
 	
+	@Override
 	public void newOrder(String userName, Order order) {
 			connect();
 	    	//Use connector to get the next unique order number
@@ -543,7 +622,8 @@ public class Connect {
 	            System.out.println("SQL Error: " + e.getMessage());
 	        } 
 	    }
-
+	
+	@Override
     public void addUserOrder(String userName, int orderNumber) {
     	connect();
     	//adds user and current order number into the userorders table to maintain relationship
@@ -562,6 +642,7 @@ public class Connect {
     	}
     }
     
+    @Override
     public ArrayList<Integer> getListOfUserOrderNumbers(String userName) {
     	//returns a list of order numbers that a user has ordered to be checked if they have already been claimed
         connect();
@@ -581,7 +662,8 @@ public class Connect {
         return orderNumbers;
     }
     
-    private ArrayList<Integer> fetchVipOrders() {
+    @Override
+    public ArrayList<Integer> fetchVipOrders() {
     	//Query database and return list of orders
     	connect();
         ArrayList<Integer> vipOrders = new ArrayList<>();
@@ -597,7 +679,8 @@ public class Connect {
         return vipOrders;
     }
     
-    private ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders) {
+    @Override
+    public ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders) {
     	//Compare user orders with vip list of orders. Return those that havent' been added to VIP points table
         ArrayList<Integer> numsToPopulate = new ArrayList<>();
         for (Integer orderNum : orderNumbersList) {
@@ -608,7 +691,9 @@ public class Connect {
         return numsToPopulate;
     }
     
-    private void insertMissingVipOrders(ArrayList<Integer> numsToPopulate) {
+    
+    @Override
+    public void insertMissingVipOrders(ArrayList<Integer> numsToPopulate) {
     	connect();
     	//Put missing orders into VIP orders and set their collected value to false
         String query = "INSERT INTO VIPPoints (OrderNumber, Collected) VALUES (?, false)";
@@ -622,6 +707,7 @@ public class Connect {
             }
         }
     }
+    
     public void checkIfPopulated(ArrayList<Integer> orderNumbersList) {
     	//Get list of VIP user orders
         ArrayList<Integer> vipOrders = fetchVipOrders();
@@ -631,6 +717,8 @@ public class Connect {
         insertMissingVipOrders(numsToPopulate);
     }
     
+    
+    @Override
     public void updatePointsInDB(VIPUser vipUser) {
     	String query = "SELECT ord.OrderNumber, ord.Price, v.Collected " +
                 "FROM Orders ord " +
@@ -662,7 +750,8 @@ public class Connect {
         }
     }
     
-    private void collectPoints(int orderNumber) {
+    @Override
+    public void collectPoints(int orderNumber) {
     	String updateQuery = "UPDATE VipPoints SET Collected = true WHERE OrderNumber = ?";
         try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
             updateStmt.setInt(1, orderNumber);
@@ -680,6 +769,7 @@ public class Connect {
     	updatePointsInDB(vipUser);
     }
     
+    @Override
     public void logoutPoints(String username, int points) {
     	connect();
     	String updateQuery = "UPDATE Users SET Points = ? WHERE username = ?";
@@ -693,6 +783,7 @@ public class Connect {
         }
     }  
     
+    @Override
     public boolean checkValidOrder(int orderNumber, String username) {
     	connect();
         String query = "SELECT OrderNumber FROM Orders WHERE Status = 'await for collection' AND OrderNumber = ? AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?)";
@@ -710,6 +801,12 @@ public class Connect {
             return false;
         }
     }
-    
-	
 }
+
+
+
+
+
+
+
+

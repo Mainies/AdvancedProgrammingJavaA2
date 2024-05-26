@@ -83,7 +83,7 @@ public class OrderExportController {
             writer.println(header);
 
             for (String order : ordersList) {
-                  writer.printf(order);
+                  writer.printf(order + "\n");
                 }
         } catch (FileNotFoundException e) {
             System.err.println("Error writing to CSV: " + e.getMessage());
@@ -106,7 +106,7 @@ public class OrderExportController {
 	        		newString = newString + Integer.toString(order.getSodas()) + ",";
 	        	}
 	        	if(priceSelect.isSelected()) {
-	        		newString = newString + Double.toString(order.getSodas()) + ",";
+	        		newString = newString + Double.toString(order.getPrice()) + ",";
 	        	}
 	        	orderString.add(newString);
     		}
