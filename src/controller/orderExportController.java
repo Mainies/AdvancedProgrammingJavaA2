@@ -2,6 +2,7 @@ package controller;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -14,8 +15,8 @@ import model.service.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class OrderExportController {
     /*missing for submission
@@ -27,6 +28,12 @@ public class OrderExportController {
     @FXML private Label fullName;
     @FXML private TextField csvFileLocation;
     @FXML private Label warningMsg;
+    
+    
+    @FXML private CheckBox dateSelect;
+    @FXML private CheckBox foodSelect;
+    @FXML private CheckBox priceSelect;
+    
         
     private UserService userService = UserService.getInstance();
     private Connect connector = new Connect();
@@ -47,6 +54,7 @@ public class OrderExportController {
     	//Editable to change selected to be true or false
     	orders.setEditable(true);
     	selected.setEditable(true);
+    	
     	//Used factory method from Tableview and Property Value Factory to get values from the ObservableList<Order> documentation
     	//https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableColumn.html#:~:text=T%3E%3E%20value
     	date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
@@ -68,60 +76,86 @@ public class OrderExportController {
         return ordersList;
     }
     
-    public void exportToCSV() {
+    public void exportToCSV(ArrayList<String> ordersList, String header) {
     	//Function to write to csv
         File csvFile = new File(csvFileLocation.getText());
         try (PrintWriter writer = new PrintWriter(csvFile)) {
-            writer.println("DateCreated,OrderNumber,Burritos,Fries,Sodas,Price");
+            writer.println(header);
 
-            for (Order order : orders.getItems()) {
-                if (order.getSelected()) {
-                	//if the order has been selected using the CheckBox then it is added to the csv
-                    writer.printf("%s,%d,%d,%d,%d,%.2f%n",
-                        order.getDateCreated(),
-                        order.getOrderNum(),
-                        order.getBurritos(),
-                        order.getFries(),
-                        order.getSodas(),
-                        order.getPrice());
+            for (String order : ordersList) {
+                  writer.printf(order);
                 }
-            }
         } catch (FileNotFoundException e) {
             System.err.println("Error writing to CSV: " + e.getMessage());
         }
     }
     
-    public void checkCSVfield(ActionEvent e) {
+    private ArrayList<String> trimOrderSelection(){
+    	ArrayList<String> orderString = new ArrayList<String>();
+   
+    	for (Order order: orders.getItems()) {
+    		if (order.getSelected()) {
+	    		String newString = "";
+	    		if(dateSelect.isSelected()) {
+	        		newString = newString + order.getDateCreated() + ",";
+	        	}
+	    		newString = newString + Integer.toString(order.getOrderNum()) + ",";
+	        	if(foodSelect.isSelected()) {
+	        		newString = newString + Integer.toString(order.getBurritos()) + ",";
+	        		newString = newString + Integer.toString(order.getFries()) + ",";
+	        		newString = newString + Integer.toString(order.getSodas()) + ",";
+	        	}
+	        	if(priceSelect.isSelected()) {
+	        		newString = newString + Double.toString(order.getSodas()) + ",";
+	        	}
+	        	orderString.add(newString);
+    		}
+    	}
+    	
+    	return orderString;
+    }
+    
+    private String getHeaderString() {
+    	String headerString = "";
+    	if(dateSelect.isSelected()) {
+    		headerString = headerString + "Date,";
+    	}
+    	headerString = headerString + "OrderNumber,";
+    	if(foodSelect.isSelected()) {
+    		headerString = headerString + "Burritos,Fries,Sodas,";
+    	}
+    	if(priceSelect.isSelected()) {
+    		headerString = headerString + "Price,";
+    	}
+    	
+    	return headerString;
+    }
+    
+        
+    public boolean checkCSVfield() {
     	//checks that the CSV field is valid, creates a new file if not and overwrites old file if exists
     	String filePath = csvFileLocation.getText(); 
         if (filePath.isEmpty()) {
         	//warns user of empty file path
             warningMsg.setText("File path cannot be empty."); 
-            return;
+            return false;
         }
-        File file = new File(filePath);
         if (!filePath.toLowerCase().endsWith(".csv")) {
         	//checks that file is of CSV type for safety
             warningMsg.setText("File must be a CSV file.");
-            return;
+            return false;
         }
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-                file.delete(); 
-                //checks if the file path is safe to create and removes it if new file
-                warningMsg.setText("File path is valid. You can proceed to export.");
-            } catch (IOException ex) {
-            	//if error, warn user of invalid file path
-                warningMsg.setText("Invalid file path. Please check the permissions and path validity.");
-                System.err.println("IO Error: " + ex.getMessage());
-            }
-        } else {
-        	//If all checks pass then user can proceed to export
-            warningMsg.setText("File path is valid and file exists.");
-        }
-        // call export method
-        exportToCSV();
+        return true;
+        
+    }
+    
+    public void export(ActionEvent e) {
+    	if (checkCSVfield()) {
+	    	ArrayList<String> orders = trimOrderSelection();
+	        String header = getHeaderString();
+	        exportToCSV(orders, header);
+	        warningMsg.setText("File exported!");
+    	}
     }
     
     public void goBack(ActionEvent event) {

@@ -58,7 +58,6 @@ public class OrderPaneController {
     public void initialize() {
     	//Initalise loading of FXML page, if order available then update wait times
         updateUserName();
-        
         //Orderservice should only have object on ConfirmOrder.fxml
         if (orderService.getObject() != null) {
         	updateOrders();
@@ -189,7 +188,7 @@ public class OrderPaneController {
         //Set orderservice singleton to current order
         orderService.setObject(order); 
         //Change view
-        this.changeToCheckout(event);
+        changeToCheckout(event);
     }
 
 	public void validateOrderInput() throws Exception{
