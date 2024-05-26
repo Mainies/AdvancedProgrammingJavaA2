@@ -59,39 +59,18 @@ public class OrderManagerController {
     	SceneChanger.changeScene(event, "LandingPage.fxml");
     }
     
-    
     /*
      * This needs to be moved to the connector database
      */
     public boolean checkIfValidOrder() {
     	//Checks if the order number is correct for orders to be collected
-        int orderNumber;
-        try {
-            orderNumber = Integer.parseInt(orderNo.getText()); 
-        } catch (NumberFormatException e) {
+        int orderNumber = Integer.parseInt(orderNo.getText());
+        String userName = userService.getObject().getUsername();
+        boolean validOrder = connector.checkValidOrder(orderNumber, userName);
+        if(validOrder) {
+        	return true;
+        } else {
             warningMsg.setText("Entered order number is not valid");
-            return false;
-        }
-        //Query to return order numbers
-        
-        //Current design maintains stability by updating database instead of immediate state
-        String query = "SELECT OrderNumber FROM Orders WHERE Status = 'await for collection' AND OrderNumber = ? AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?)";
-        Connect connector = new Connect();
-        try (Connection conn = connector.make_connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, orderNumber);
-            pstmt.setString(2, userService.getObject().getUsername());
-            ResultSet rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return true;
-            } else {
-                warningMsg.setText("Please enter an active order");
-                return false;
-            }
-        } catch (SQLException e) {
-            System.err.println("Database error: " + e.getMessage());
-            warningMsg.setText("Error checking order status");
             return false;
         }
     }
@@ -121,7 +100,6 @@ public class OrderManagerController {
         }
     }
 
-    
     public void cancelOrder(ActionEvent event) {
     	//option to also cancel number if collected. Important to change to cancelled so that the user cannot claim VIP points
     	if (checkIfValidOrder()) {

@@ -1,0 +1,68 @@
+CREATE TABLE Users(
+UserName TEXT PRIMARY KEY NOT NULL,
+FirstName TEXT,
+LastName TEXT,
+Password TEXT NOT NULL,
+Email Text,
+Points INT
+) WITHOUT ROWID;
+
+CREATE TABLE Orders(
+dateCreated TEXT,
+OrderNumber INTEGER PRIMARY KEY NOT NULL,
+Burritos INTEGER,
+Fries INTEGER,
+Sodas INTEGER,
+Meals INTEGER,
+Status TEXT,
+Price REAL,
+dateCollected TEXT
+) WITHOUT ROWID;
+
+CREATE TABLE UserOrders(
+UserName TEXT,
+OrderNumber INTEGER,
+PRIMARY KEY (UserName, OrderNumber),
+FOREIGN KEY (UserName) REFERENCES Users(UserName),
+FOREIGN KEY (OrderNumber) REFERENCES Orders(OrderNumber)
+) WITHOUT ROWID;
+
+CREATE TABLE VipPoints(
+OrderNumber INTEGER NOT NULL,
+Collected BOOLEAN,
+PRIMARY KEY (OrderNumber),
+FOREIGN KEY (OrderNumber) REFERENCES Orders(OrderNumber)
+) WITHOUT ROWID;
+
+INSERT INTO Users (UserName, FirstName, LastName, Password)
+VALUES ("Mainies", "Sam", "Mainwood", "1234");
+
+INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price, dateCollected)
+VALUES ("2024/05/02 13:50", 1, 1, 1, 1, 0, "await for collection", 30.50, "2024/05/02 13:50");
+
+INSERT INTO UserOrders(UserName, OrderNumber)
+VALUES("Mainies", 1);
+
+
+
+SELECT * FROM Users;
+SELECT * FROM Orders;
+SELECT * FROM UserOrders;
+
+SELECT dateCreated, OrderNumber, Burritos, Sodas, Price 
+FROM Orders 
+WHERE Status = 'await for collection'
+  AND OrderNumber IN (
+      SELECT OrderNumber FROM UserOrders WHERE Username = ?
+  );
+
+
+SELECT ord.OrderNumber, ord.Price, v.Collected
+FROM Orders ord
+JOIN (SELECT OrderNumber FROM UserOrders WHERE UserName = ?) uo ON ord.OrderNumber = uo.OrderNumber
+JOIN VipPoints v ON ord.OrderNumber = v.OrderNumber;
+
+INSERT INTO VIPPOINTS(OrderNumber, Collected)
+VALUES (?, FALSE);
+
+SELECT OrderNumber FROM VIPPoints WHERE UserName = ?;

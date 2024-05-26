@@ -83,17 +83,8 @@ public class PointOfServiceTest {
             pos.validateMenuInput("7");
         });
 	}
-	/*
-	@Test
-	public void testGetQuantity() {
-        String simulatedUserInput = "5\n"; // User inputs '5' as the quantity
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out)); //avoid the output printing statement pausing at the next function
-        System.setIn(new ByteArrayInputStream(simulatedUserInput.getBytes()));
-        int result = pos.getQuantity();
-        assertEquals(5, result);
-    }
-    */
+	
+	
 	
 	@After
 	public void tearDown() {
