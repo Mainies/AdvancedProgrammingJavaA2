@@ -45,7 +45,13 @@ public class Connect implements IConnect{
 	private VIPUserDB vipDB;
 	
 	/* This class is intended to be a facade to make connection with program easier to understand*/
-
+	public Connect(){
+		orderInput = new OrderInput();
+		userInput = new UserInput();
+		userOutput = new UserOutput();
+		orderOutput = new OrderOutput();
+		vipDB = new VIPUserDB();
+	}
 	@Override
 	public void updateFirstName(String newName, String currentUser) {
 		// database connection to update first name for user. Performed as programming is running for stability
@@ -88,9 +94,10 @@ public class Connect implements IConnect{
     	updatePointsInDB(vipUser);
     }
     
+	@Override
 	public void processOrder(String userName, Order order) {
-		newOrder(userName, order);
-		addUserOrder(userName, orderInput.getOrderNumber());
+		orderInput.newOrder(userName, order);
+		userInput.addUserOrder(userName, orderInput.getOrderNumber());
 	}
 		   
 	
@@ -108,7 +115,6 @@ public class Connect implements IConnect{
 	@Override
 	public void newOrder(String userName, Order order) {
 		orderInput.newOrder(userName, order);
-		
 	}
 
 	@Override
@@ -296,7 +302,7 @@ class OrderInput extends DBConnect implements IOrderInput{
 	
 	@Override
     public boolean checkValidOrder(int orderNumber, String username) {
-    	connect();
+    	super.connect();
         String query = "SELECT OrderNumber FROM Orders WHERE Status = 'await for collection' AND OrderNumber = ? AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, orderNumber);
@@ -318,7 +324,7 @@ class OrderInput extends DBConnect implements IOrderInput{
     	/*Method to update an order to picked up. Called in OrderManager. 
     	 * Sets an orders picked up time and collected status to collected if ready to be collected
     	 */
-    	connect();
+    	super.connect();
         String query = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
         //execute query
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -338,7 +344,7 @@ class OrderInput extends DBConnect implements IOrderInput{
 	
 	@Override
     public void cancelOrder(int orderNumber, String formattedDate) {
-    	connect();
+    	super.connect();
     	// Method to cancel an order if user want to cancel.
         //query to update cancelled
         String cancelQuery = "UPDATE Orders SET Status = ?, dateCollected = ? WHERE OrderNumber = ?";
@@ -361,7 +367,7 @@ class OrderInput extends DBConnect implements IOrderInput{
 	
 	@Override
     public void deleteOrders(int OrderNumber) {
-    	connect();
+    	super.connect();
     	 /* method implemented for testing purposes to connect to the database*/
 		String removeTestOrder = "DELETE FROM Orders WHERE orderNumber = ?";
 		String removeFromUserOrders = "DELETE FROM UserOrders WHERE orderNumber = ?";
@@ -379,7 +385,7 @@ class OrderInput extends DBConnect implements IOrderInput{
 	
 	@Override
 	public void newOrder(String userName, Order order) {
-			connect();
+			super.connect();
 	    	//Use connector to get the next unique order number
 	    	MaxValue();
 	    	int orderNumber = getOrderNumber();
@@ -410,7 +416,7 @@ class OrderInput extends DBConnect implements IOrderInput{
 	
 	 @Override
 	    public void MaxValue() {
-	    	connect();
+	    	super.connect();
 	        String maxQuery = "SELECT MAX(OrderNumber) AS max_number FROM Orders";
 	    	//returns the highest value in the database so that the number can be incremented to create a unique order number as the primary key
 	        try (Statement stmt = connection.createStatement()) {
@@ -450,7 +456,7 @@ class OrderOutput extends DBConnect implements IOrderOutput{
 	@Override
     public ArrayList<Integer> fetchVipOrders() {
     	//Query database and return list of orders
-    	connect();
+    	super.connect();
         ArrayList<Integer> vipOrders = new ArrayList<>();
         String query = "SELECT OrderNumber FROM VIPPoints";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -478,7 +484,7 @@ class OrderOutput extends DBConnect implements IOrderOutput{
 
     @Override    
     public boolean checkIfReadyForPickUp(int orderNumber) {
-    	connect();
+    	super.connect();
     	/* back end method that checks if a user order is ready. Called in order manager controller*/      
         //query to return ready date and time
         String orderQuery = "SELECT dateCollected FROM Orders WHERE OrderNumber = ?";
@@ -508,7 +514,7 @@ class OrderOutput extends DBConnect implements IOrderOutput{
     @Override
     public ArrayList<Integer> getListOfUserOrderNumbers(String userName) {
     	//returns a list of order numbers that a user has ordered to be checked if they have already been claimed
-        connect();
+        super.connect();
         //Query to return all ordernumbers by username
         String query = "SELECT OrderNumber FROM UserOrders WHERE UserName = ?";
         ArrayList<Integer> orderNumbers = new ArrayList<>();
@@ -528,7 +534,7 @@ class OrderOutput extends DBConnect implements IOrderOutput{
     @Override
 	public ObservableList<Order> getActiveOrders(String username){
     	//Observable list allows for iteration through the tableview
-		connect();
+		super.connect();
         ObservableList<Order> ordersList = FXCollections.observableArrayList();
         //query that filters for orders that are awaiting collection
         String activeOrdersQuery = "SELECT dateCreated, OrderNumber, Burritos, Fries, Sodas, Price FROM Orders WHERE Status = 'await for collection' AND OrderNumber IN (SELECT OrderNumber FROM UserOrders WHERE Username = ?) ORDER BY dateCreated DESC";
@@ -559,7 +565,7 @@ class OrderOutput extends DBConnect implements IOrderOutput{
     @Override
 	public ObservableList<Order> getOrdersForExport(String username){
 		//Same as landing page, logic to return orders based on 
-    	connect();
+    	super.connect();
     	//create observable list for property value factory and cell value factory
         ObservableList<Order> ordersList = FXCollections.observableArrayList();
         
@@ -622,10 +628,6 @@ interface IVIPUser{
 }
 
 
-
-
-
-
 //Done
 interface IUserOutput{
 	boolean isVIP(String userName);
@@ -672,7 +674,7 @@ class VIPUserDB extends DBConnect implements IVIPUser{
 	
 	 @Override
 	    public void insertMissingVipOrders(ArrayList<Integer> numsToPopulate) {
-	    	connect();
+	    	super.connect();
 	    	//Put missing orders into VIP orders and set their collected value to false
 	        String query = "INSERT INTO VIPPoints (OrderNumber, Collected) VALUES (?, false)";
 	        for (Integer missingOrder : numsToPopulate) {
@@ -689,7 +691,7 @@ class VIPUserDB extends DBConnect implements IVIPUser{
 	 @Override
 		public void updatePoints(String currentUser) {
 			// database connection to update Points for user. Called when creating a normal user to not have a null field
-		    connect();  
+		    super.connect();  
 		    //Query to set points
 		    String query = "UPDATE Users SET Points = ? WHERE UserName = ?";
 		    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -724,7 +726,7 @@ class VIPUserDB extends DBConnect implements IVIPUser{
 class UserInput extends DBConnect implements IUserInput{
 	@Override
 	public void logoutPoints(String username, int points) {
-		connect();
+		super.connect();
 		String updateQuery = "UPDATE Users SET Points = ? WHERE username = ?";
         // update points in database for next log in time
         try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
@@ -738,7 +740,7 @@ class UserInput extends DBConnect implements IUserInput{
 	
 	@Override
 	public boolean createUser(String userName, String password, String firstName, String lastName) {
-		connect();
+		super.connect();
 		 //query to create new simple user
         String query = "INSERT INTO Users (userName, password, firstName, lastName) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -761,7 +763,7 @@ class UserInput extends DBConnect implements IUserInput{
 	
 	@Override
 	public boolean createVIPUser(String userName, String password, String firstName, String lastName, String email, int points) {
-		connect();
+		super.connect();
 		if (connection == null) {
             System.out.println("No connection to the database. Please connect first.");
             return false;
@@ -792,7 +794,7 @@ class UserInput extends DBConnect implements IUserInput{
 	
 	@Override
 	public boolean deleteUser(String userName) {
-		connect();
+		super.connect();
     	//method to delete user by looking up user name
         if (connection == null) {
             System.out.println("No connection to the database. Please connect first.");
@@ -819,7 +821,7 @@ class UserInput extends DBConnect implements IUserInput{
 	
 	@Override
 	public void addUserOrder(String userName, int orderNumber) {
-		connect();
+		super.connect();
     	//adds user and current order number into the userorders table to maintain relationship
     	String query = "INSERT INTO UserOrders(Username, OrderNumber) VALUES (?, ?)";
     	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -839,6 +841,7 @@ class UserInput extends DBConnect implements IUserInput{
 	@Override
 	public
 	void updateDetails(String condition, String newValue, String currentUser) {
+		super.connect();
 		String detailsQuery = "UPDATE Users SET " + condition + " = ? WHERE UserName = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(detailsQuery)) {
 	    	pstmt.setString(1, newValue);
@@ -858,10 +861,9 @@ class UserInput extends DBConnect implements IUserInput{
 }
 
 class UserOutput extends DBConnect implements IUserOutput{
-	
 	@Override
 	public boolean isVIP(String userName) {
-    	connect();
+    	super.connect();
     	//simple boolean query to check if user is VIP or not by email look up.
     	String query = "SELECT email FROM users WHERE userName = ?";
     	try(PreparedStatement pstmt = connection.prepareStatement(query)){
@@ -883,7 +885,7 @@ class UserOutput extends DBConnect implements IUserOutput{
 	
     @Override
 	public boolean checkPassword(String user, String inputPassword) {
-		connect();
+		super.connect();
 		/* check if password is the same as input string. Return true if correct. 
 		 * called in login for authnetication
 		 */
@@ -892,7 +894,7 @@ class UserOutput extends DBConnect implements IUserOutput{
 		// return password
 	    String query = "SELECT Password FROM Users WHERE UserName = ?";
 	    try {
-	        connect(); 
+	        super.connect(); 
 	        try (PreparedStatement stmt = connection.prepareStatement(query)) {
 	            stmt.setString(1, user);
 	            ResultSet results = stmt.executeQuery();
@@ -912,7 +914,7 @@ class UserOutput extends DBConnect implements IUserOutput{
     @Override
    	public boolean isUser(String user) {
    		/*validation that a user exists in the database*/
-   		connect();		
+   		super.connect();		
    		//username is unique so user should be returned at position 1 if found
    	    String query = "SELECT 1 FROM Users WHERE UserName = ?"; 
    	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -927,13 +929,11 @@ class UserOutput extends DBConnect implements IUserOutput{
     
     @Override
 	public User getUserFromDatabase(String username) {
-		connect();
+		super.connect();
 		/* gets a user from a database based on username. Returns a VIP user if there is an email otherwise a regular user*/
 		User user = null;
         String query = "SELECT UserName, Password, FirstName, LastName, Email, Points FROM Users WHERE UserName = ?";
-        try {
-            connect(); 
-            //SQL update
+        try {//SQL update
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setString(1, username);
                 ResultSet results = stmt.executeQuery();
@@ -968,7 +968,7 @@ abstract class DBConnect {
 	*/
 	
     protected Connection connection; // Made it a class member so it's accessible in listTables()
-    private String dbURL = "jdbc:sqlite:src/Restaurant.db";
+    protected String dbURL = "jdbc:sqlite:src/Restaurant.db";
                 
     protected void connect() {
         try {
@@ -982,7 +982,7 @@ abstract class DBConnect {
         } 
     }
         
-    //this method might be void due to encapsulation within the connection class. connect() does the same thing
+    //this method might be void due to encapsulation within the connection class. super.connect() does the same thing
     public Connection make_connect() {
         try {
             // db parameters - fixed path for stability
