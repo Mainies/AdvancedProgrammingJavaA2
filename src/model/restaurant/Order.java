@@ -5,7 +5,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 public class Order {
 	/* Public class used to hold various food quantities
- 	Order is used to retrieve quantities of food to be cooked or processed for sales
+ 	* Order is used to retrieve quantities of food to be cooked or processed for sales
+ 	* Implemention based on Order data type in assignment 1
+	* https://github.com/Mainies/AdvProgA1
+	* Some changes, extra attributes, dates, prices linked the order and order status
  	*/
 	
 	
@@ -47,7 +50,8 @@ public class Order {
 	}
 	
 	public String getOrder() {
-		//Printing method for order.
+		//Method for returning string form of order. Useful for implmenting information to users
+		//Creation of method for view controller
 		String order = String.format("Your order is %d Burritos, %d Fries and %d Sodas.%n", 
 				this.numBurritos, this.numFries, this.numSoda);
 		if (this.numMeals > 0) {
@@ -56,6 +60,7 @@ public class Order {
 		return order;
 	}
 	
+	//Section for Getters and Setters of Interactive Attributes
 	public int getBurritos() {
 		return numBurritos;
 	}
@@ -131,6 +136,11 @@ public class Order {
 		this.status = status;
 	}
 	
+	/*Section was implemented for allowing orders to be selected or not for the
+	 * use of printing only selected orders per the assignment 2 specifications
+	 */
+	
+	//BooleanProperty and Simple Boolean property are part of JavaFX Library
 	private BooleanProperty selected = new SimpleBooleanProperty(false);
 
     public BooleanProperty selectedProperty() {

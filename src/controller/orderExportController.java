@@ -9,27 +9,27 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.database.Connect;
 import model.restaurant.Order;
-import model.service.*;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class OrderExportController extends AppController{
-    /*missing for submission
-     * need to implement ability to select different parts the order for export
-     * planning to implement via more editable buttons
+    /* Order pane that allows the user to select which orders and which parts of the order (date, food items and price)
+     * to export to a file. Shows functionality for file writing
+     * Linked to PastOrders.fxml
+     * 
      */
 	
+	//Labels to display user information and take in information for file writing
     @FXML private Label userName; 
     @FXML private Label fullName;
     @FXML private TextField csvFileLocation;
     @FXML private Label warningMsg;
     
     
+    //Check boxes to determine information selection
     @FXML private CheckBox dateSelect;
     @FXML private CheckBox foodSelect;
     @FXML private CheckBox priceSelect;
@@ -87,6 +87,10 @@ public class OrderExportController extends AppController{
     }
     
     private ArrayList<String> trimOrderSelection(){
+    	/*Takes in the list of orders and saves the orders
+    	 * that are required to be printed as an array of strings
+    	 * method is called privately in the export method only
+    	 */
     	ArrayList<String> orderString = new ArrayList<String>();
    
     	for (Order order: orders.getItems()) {
@@ -112,6 +116,9 @@ public class OrderExportController extends AppController{
     }
     
     private String getHeaderString() {
+    	/*Allows a customiseable header that 
+    	 * can more clearly differentiate a csv field
+    	 */
     	String headerString = "";
     	if(dateSelect.isSelected()) {
     		headerString = headerString + "Date,";
@@ -146,6 +153,7 @@ public class OrderExportController extends AppController{
     }
     
     public void export(ActionEvent e) {
+    	//Full method to validate a csv field, retrieve export information and write to csv file
     	if (checkCSVfield()) {
 	    	ArrayList<String> orders = trimOrderSelection();
 	        String header = getHeaderString();

@@ -3,7 +3,9 @@ package model.restaurant;
 
 public abstract class Food {
 	
-	/* Parent class for food items. Holds the base methods and data*/
+	/* Parent class for food items. Holds the base methods and data
+	 * Implemention the same as assignment 1
+	 *https://github.com/Mainies/AdvProgA1*/
 	
 	//Attributes
     private double _price;

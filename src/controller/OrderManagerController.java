@@ -8,15 +8,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.database.Connect;
 import model.restaurant.Order;
-import model.service.*;
-
-import java.sql.*;
 
 public class OrderManagerController extends AppController{
 	/*Controller for managing the ability to collect or cancel orders, Linked to CollectOrder.fxml"
-	 * 
+	 * Provides the data and interface for a user to collect or cancel active orders
+	 * by inputting a valid number and waiting until their order is ready.
+	 * Order information handled by the Connection class in database
 	 */
 	
 	//Column attributes for table view

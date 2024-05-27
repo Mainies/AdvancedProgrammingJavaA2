@@ -9,12 +9,10 @@ import javafx.scene.control.PasswordField;
 public class ManagerController extends AppController{
 	/* Further functionality that is not required from assignment 2
 	 * Had a password portal.
+	 * Linked to AccessControl.fxml and ManagerOptions.fxml
 	 * Plans beyond assignment to implement functionality to change items
 	 */
 	
-    //private UserService userservice = UserService.getInstance();
-    //private POSService posservice = POSService.getInstance();
-    
 	private String passkey = "1234";
     
     private @FXML PasswordField passWord;

@@ -3,16 +3,9 @@ package unitTests;
 import static org.junit.Assert.*;
 
 import org.junit.*;
-import exceptions.*;
-import exceptions.MenuSelectException;
 import exceptions.NotANumberException;
 import model.restaurant.Order;
 import model.restaurant.PointOfService;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
 
 public class PointOfServiceTest {
 	private PointOfService pos = new PointOfService();
@@ -67,24 +60,6 @@ public class PointOfServiceTest {
     public void testValidateNumberThrowsException() throws Exception{
         pos.validateNumber("not a number");
     }
-	
-	
-	@Test
-    public void testValidateMenuInput() throws Exception{
-		//validate the menu input for 3 different cases
-        assertThrows(MenuSelectException.class, () -> {
-            pos.validateMenuInput("not a number");
-        });
-        assertThrows(MenuSelectException.class, () -> {
-            pos.validateMenuInput("f");
-        });
-        assertThrows(MenuSelectException.class, () -> {
-        	//number not in a menu range
-            pos.validateMenuInput("7");
-        });
-	}
-	
-	
 	
 	@After
 	public void tearDown() {

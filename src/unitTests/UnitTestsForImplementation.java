@@ -48,17 +48,25 @@ public class UnitTestsForImplementation {
 
 	@Test
 	public void logOut() {
-		//test to see that object is cleared on logout
-		fail("Not yet implemented");
+		userService.setObject(user);
+		userService.clearObject();
+		assertNull(userService.getObject());
 	}
 
 	@Test
 	public void updateDetails() {
-		//run a test to determine that details are updated correctly
-		//make a dummy user in DB
-		//create a dummy user
-		//check that it updates in model and db
-		fail("Not yet implemented");
+		connection.createUser("testUsername", "TestPassword", "TestFirstName", "TestLastName");
+		User user = connection.getUserFromDatabase("testUsername");
+		if (user instanceof VIPUser){
+			fail("User should not be vip due to no email");//run a test to determine that details are updated correctly
+		}
+		connection.deleteUser("testUsername");
+		connection.createVIPUser("testUsername", "TestPassword", "TestFirstName", "TestLastName", "email@test", 100);
+		user = connection.getUserFromDatabase("testUsername");
+		if (!(user instanceof VIPUser)) {
+			fail("VIPUser should be returned as a VIP Object");
+		}
+		connection.deleteUser("testUsername");
 	}
 	
 	@Test

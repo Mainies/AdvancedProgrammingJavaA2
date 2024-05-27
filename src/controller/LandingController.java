@@ -15,14 +15,14 @@ import model.database.VIPUser;
 import model.restaurant.Order;
 import model.service.*;
 
-import java.sql.*;
-import java.util.ArrayList;
-
 public class LandingController extends AppController implements ILandingControllerViewChanger, ILandingControllerDataFetcher{
     /* Landing Class Controller. 
+     * Connected to LandingPage.fxml
      * Central Controller that provides access to all other parts of the program
-     * 
+     * Implements 2 interfaces for methods retrieving user data 
+     * and changing the view as required
      */
+	
 	//View of User Details
     @FXML private Label userName; 
     @FXML private Label fullName;
@@ -196,20 +196,40 @@ public class LandingController extends AppController implements ILandingControll
 }
 
 
-abstract class AppController{
+abstract class AppController implements InitializeFXML{
+	/* Parent class for all controller 
+	 * subclasses. Implements services and a connection
+	 * across the database
+	 */
+	//Database Connection
 	protected final Connect connection = new Connect();
+	
+	//Singletonservice classes. GetInstance instantiates the first time and then calls the instance concurrently
 	protected final UserService userService = UserService.getInstance();
     protected final POSService posService = POSService.getInstance();
     protected final KitchenService kitchenService = KitchenService.getInstance();
     protected final OrderService orderService = OrderService.getInstance();
 		
 	@FXML
+	@Override
 	public void initialize() {
+		/* Initalize method to be overridden where relevant by classes
+		 */
 	}
-	
+}
+
+
+interface InitializeFXML {
+	//Attempt at abstracting initalize from classes
+	@FXML
+	void initialize();
 }
 
 interface ILandingControllerViewChanger{
+	/* Collection of methods for the landing controller to 
+	 * change views to the relevant fxml files where required
+	 * in the program
+	 */
 	
     public default void openOrderPane(ActionEvent event) {
     }
@@ -234,6 +254,9 @@ interface ILandingControllerViewChanger{
 }
 
 interface ILandingControllerDataFetcher{
+	/* Interface to retrieve data required to be displayed in
+	 * the landing page
+	 */
 	public void updatePoints();
 	
 	public ObservableList<Order> fetchDataForUser();

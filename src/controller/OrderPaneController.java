@@ -21,7 +21,13 @@ import java.time.LocalTime;
 import java.time.LocalDateTime;
 
 public class OrderPaneController extends AppController{
-	//Order Panel to handle orders. Linked to ConfirmOrder.fxml and Orderer.fxml;
+	/*Order Panel to handle orders. Linked to ConfirmOrder.fxml and Orderer.fxml;
+	 * Contains methods to create a new order and validate order
+	 * handles user input as it is entered so that only safe information makes it to the database
+	 * and allows for better stabilty in the use of the order class
+	 * 
+	 * displays order details and validates credit card information per the assignment specifications
+	 */
 		
 	//FXML labels for intaking user order values for Orderer.fxml
 	@FXML private TextField burrito;
@@ -130,7 +136,7 @@ public class OrderPaneController extends AppController{
         User user = userService.getObject();
         boolean vipStatus = user.isVIP();
         //pos to return price
-        order.setPrice(pos.calculateSale(order, vipStatus));
+        order.setPrice(pos.checkout(order, vipStatus));
         updateOrderLabels(order, order.getPrice());
         //Checks for meals. Allows normal users to order meals but no discounts
         if (vipStatus && mealDeals != null) {

@@ -9,8 +9,9 @@ import javafx.scene.control.TextField;
 import model.database.User;
 
 public class UserController extends AppController{
-	/* controller that manages BecomeVIP and UpdateDetails
-	 * Allows users to become VIP, update user details
+	/* controller that manages BecomeVIP.fxml and UpdateDetails.fxml
+	 * Allows users to become VIP, update user details in both the application and 
+	 * sends data to the database for validation
 	 */
         
 	//Fxml fields

@@ -8,7 +8,11 @@ interface IKitchenCapacity{
 	int calculateBurritosCookTime(int numBurritos); 
 }
 public class Kitchen implements IKitchenCapacity{
-		/* Main class to hold currently cooked fries and calculate cooking time*/
+		/* Main class to hold currently cooked fries and calculate cooking time
+		 * Implemention similar to assignment 1
+		 * https://github.com/Mainies/AdvProgA1
+		 * Small changes: some methods abtracted to an interface. 
+		 */
 		
 		public HashMap<String, Integer> cooked = new HashMap<String, Integer>();
 	    

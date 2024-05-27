@@ -16,7 +16,9 @@ import javafx.collections.ObservableList;
 import model.restaurant.*;
 
 interface IConnect extends IUserInput, IUserOutput, IOrderInput, IOrderOutput, IVIPUser{
-
+	/*Interface methods for the mediation of input data to child classes of DB Connect
+	 * Implemented by Connect which is instantiated by all controllers
+	 */
 	void updateFirstName(String newName, String currentUser);
 	
 	void collectOrder(int orderNumber);
@@ -38,6 +40,12 @@ interface IConnect extends IUserInput, IUserOutput, IOrderInput, IOrderOutput, I
 }
 
 public class Connect implements IConnect{
+	/*Mediator class that contains a child class for all DB connect classes
+	 * Calls their methods where relevant and shares information.
+	 * All retrieving and sending information to the Controller classes is handled by the connect class
+	 */
+	
+	//Private DBConnectors
 	private OrderInput orderInput;
 	private UserInput userInput;
 	private UserOutput userOutput;
@@ -89,6 +97,9 @@ public class Connect implements IConnect{
     
 	@Override
     public void updatePointsFull(VIPUser vipUser) {
+		//Full method to implement a points update for the user
+		// only method that doesn't update DB in place for the user points due to updating the user valid orders
+		// vipUser only method
     	String username = vipUser.getUsername();
     	ArrayList<Integer> userOrderNumbers = getListOfUserOrderNumbers(username);
     	checkIfPopulated(userOrderNumbers);
@@ -97,6 +108,8 @@ public class Connect implements IConnect{
     
 	@Override
 	public void processOrder(String userName, Order order) {
+		//uses Orderinput to add order to DB
+		// then adds the order to the list of user's orders
 		orderInput.newOrder(userName, order);
 		userInput.addUserOrder(userName, orderInput.getOrderNumber());
 	}

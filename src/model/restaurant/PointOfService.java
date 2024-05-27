@@ -8,16 +8,23 @@ interface priceCalculator{
 }
 
 public class PointOfService implements priceCalculator {
-	// Core class used to maintain pricing for a user. Holds methods to take input and send to kitchen class for cooking as per functionality in assignment 1
+	/* Core class used to maintain pricing for a user. Holds methods to take input and send to kitchen class for cooking as per functionality in assignment 1
+	 * https://github.com/Mainies/AdvProgA1
+	 * Instantiates a new food item on opening to access attributes for sales
+	 * Changes from Assignment 1 to methods take in arguments directly to their relevant methods
+	 * In place of 
+	 */
 	
-	// Instantiates a new food item on opening to access attributes for sales
-	
+	//accessing Burrito,fries and soda attributes encapsulated in class
 	private Burrito burrito = new Burrito();
 	private Fries fries = new Fries();
 	private Soda soda = new Soda();
 	public double totalSales = 0.00;
 	
+	
+	//Not relevant for assginment 2 directly, but may allow further functionality from a manager perspective
 	public HashMap<String, Integer> soldItems = new HashMap<String, Integer>();
+	
 	
 	public PointOfService() {
 		//At instantiation, no items are sold.
@@ -91,28 +98,11 @@ public class PointOfService implements priceCalculator {
 		return sale;
 	}
 	
-	public double calculateSale(Order order, boolean vip) {
-		return this.checkout(order, vip);
-	}
-	
-	
-	public void validateMenuInput(String input) throws MenuSelectException{
-	    if (!input.matches("[abcdeABCDE]")) {
-	        throw new MenuSelectException(input);
-	    }
-	}
-	
-	public void validateFoodInput(String input) throws FoodSelectException{
-		if (!input.matches("[12345]")) {
-			throw new FoodSelectException(input);
-		}
-	}
-	
-	public void validateFoodUpdate(String input) throws NotAFoodItem{
-		if (!input.matches("[123]")) {
-			throw new NotAFoodItem(input);
-		}
-	}
+	/* Exception Handling makes it easy to access custom
+	 * exceptions from src/exceptions.
+	 * Custom extensions the same as in assignment 1
+	 */
+
 	
 	public void negativeInput(int input) throws InvalidNegativeNumber{
 		if (input < 0) {
