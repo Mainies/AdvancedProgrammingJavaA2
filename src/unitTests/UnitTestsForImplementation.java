@@ -2,9 +2,49 @@ package unitTests;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import controller.OrderPaneController;
+import exceptions.InvalidNegativeNumber;
+import exceptions.NotANumberException;
+import exceptions.NotWholeNumber;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import model.database.Connect;
+import model.database.NormalUser;
+import model.database.User;
+import model.database.VIPUser;
+import model.restaurant.Order;
+import model.restaurant.PointOfService;
+import model.service.KitchenService;
+import model.service.OrderService;
+import model.service.POSService;
+import model.service.UserService;
+
 public class UnitTestsForImplementation {
+	NormalUser user;
+	VIPUser vipUser;
+	UserService userService;
+	POSService posService;
+	KitchenService kitchenService;
+	OrderService orderService;
+	Connect connection;
+	Order order;
+	
+	String burrito;
+	
+	@Before
+	public void setUp() {
+		user = new NormalUser("testUsername", "TestPassword", "TestFirstName", "TestLastName"); 
+		vipUser = new VIPUser("testUsername", "TestPassword", "TestFirstName", "TestLastName", "email@test", 100);
+		userService = UserService.getInstance();
+		posService = POSService.getInstance();
+		kitchenService = KitchenService.getInstance();
+		orderService = OrderService.getInstance();
+		Connect connection = new Connect();
+	}
 
 	@Test
 	public void logOut() {
@@ -41,6 +81,7 @@ public class UnitTestsForImplementation {
 	
 	@Test
 	public void checkPointsDiscount() {
+		fail("Not yet implemented");
 		//check that the discount is being applied correctly for vip and non-vip
 	}
 	
@@ -54,6 +95,27 @@ public class UnitTestsForImplementation {
 	public void testAppService() {
 		//test the right user gets brought in/out or other class
 		fail("not yet implemented");
+	}
+	
+	@Test (expected = NotANumberException.class)
+	public void validateNumberInput() throws Exception{
+		burrito = "three";
+		PointOfService pos = POSService.getInstance().getObject();
+		pos.validateNumber(burrito);
+	}
+	
+	@Test (expected = NotWholeNumber.class)
+	public void validateWholeNumberInput() throws Exception{
+		burrito = "1.2";
+		PointOfService pos = POSService.getInstance().getObject();
+		pos.wholeNumber(Double.parseDouble(burrito));
+	}
+	
+	@Test (expected = InvalidNegativeNumber.class)
+	public void InvalidNegativeNumber() throws Exception{
+		burrito = "-1";
+		PointOfService pos = POSService.getInstance().getObject();
+		pos.negativeInput(Integer.parseInt(burrito));
 	}
 
 }
