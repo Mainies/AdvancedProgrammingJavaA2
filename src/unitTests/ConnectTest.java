@@ -6,14 +6,15 @@ import java.sql.Connection;
 import org.junit.Test;
 
 import model.database.Connect;
+import model.database.DBConnectTestMethods;
 
 public class ConnectTest {
-	private Connect connector = new Connect();
+	private DBConnectTestMethods connector = new DBConnectTestMethods();
 
 	@Test
 	public void checkConnectionDrivers() {
-		//connector.connect();
-		if (connector != null) {
+		Connection connection = connector.make_connect();
+		if (connection != null) {
             connector.closeConnection();
 			System.out.println("Connection closed.");
         }
@@ -22,7 +23,6 @@ public class ConnectTest {
 	@Test
 	public void insertNewUser() {
 		Connect connect = new Connect();
-		Connection connector = connect.make_connect(); 
 		boolean didconnect = false;
 		boolean diddelete = false;
 		try {
@@ -37,57 +37,6 @@ public class ConnectTest {
 			fail("User not successfully deleted.");
 		}
 		assertEquals("user not deleted successfully", diddelete, true);
-		connect.closeConnection();
 	}
-	/*
-	 * Old Tests Prior to refactoring with more complex orders
-	 * 
-	@Test
-	public void addNewOrder() {
-		connector.connect();
-		Order order = new Order(1, 1, 1, 1);
-		PointOfService pos = new PointOfService();
-		String user = "Mainies";
-		try{
-			connector.newOrder(order, pos, user);
-			System.out.println("Orders added succesfully");
-		} catch (Exception e) {
-			fail("failed to connect and add order successfully");
-		}
-		int delete = connector.getOrderNumber();
-		String removeTestOrder = "DELETE FROM Orders WHERE orderNumber = ?";
-		String removeFromUserOrders = "DELETE FROM UserOrders WHERE orderNumber = ?";
-		connector.deleteOrders(delete);
-		connector.closeConnection();
-	}
-	
-	@Test
-	public void pickUpOrder() {
-		connector.connect();
-		Order order = new Order(1, 1, 1, 1);
-		PointOfService pos = new PointOfService();
-		String user = "Mainies";
-		try{
-			connector.newOrder(order, pos, user);
-			System.out.println("Order added succesfully.");
-		} catch (Exception e) {
-			fail("failed to connect and add order successfully");
-		}
-
-		int delete = connector.getOrderNumber();
-		try{
-			connector.pickUpOrder(delete);
-			System.out.println("Order picked up succesfully");
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		String removeTestOrder = "DELETE FROM Orders WHERE orderNumber = ?";
-		String removeFromUserOrders = "DELETE FROM UserOrders WHERE orderNumber = ?";
-		connector.deleteOrders(delete);
-		connector.closeConnection();
-	}
-	*/
-	
-
 
 }

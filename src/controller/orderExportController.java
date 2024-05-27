@@ -18,7 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class OrderExportController {
+public class OrderExportController extends AppController{
     /*missing for submission
      * need to implement ability to select different parts the order for export
      * planning to implement via more editable buttons
@@ -33,11 +33,7 @@ public class OrderExportController {
     @FXML private CheckBox dateSelect;
     @FXML private CheckBox foodSelect;
     @FXML private CheckBox priceSelect;
-    
-        
-    private UserService userService = UserService.getInstance();
-    private Connect connector = new Connect();
-    
+       
     //Tableview columns to show orders
     @FXML private TableView<Order> orders;
     @FXML private TableColumn<Order, String> date;
@@ -50,11 +46,11 @@ public class OrderExportController {
     @FXML private TableColumn<Order, Boolean> selected;
     
     @FXML
+    @Override
     public void initialize() {
     	//Editable to change selected to be true or false
     	orders.setEditable(true);
     	selected.setEditable(true);
-    	
     	//Used factory method from Tableview and Property Value Factory to get values from the ObservableList<Order> documentation
     	//https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableColumn.html#:~:text=T%3E%3E%20value
     	date.setCellValueFactory(new PropertyValueFactory<>("dateCreated"));
@@ -72,7 +68,7 @@ public class OrderExportController {
     private ObservableList<Order> fetchOrdersForUser() {
     	//Facade Pattern and separating database connectivity
     	String username = userService.getObject().getUsername();
-    	ObservableList<Order> ordersList = connector.getOrdersForExport(username);
+    	ObservableList<Order> ordersList = connection.getOrdersForExport(username);
         return ordersList;
     }
     

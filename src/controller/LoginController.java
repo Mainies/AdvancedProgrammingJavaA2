@@ -5,21 +5,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import model.database.Connect;
 import model.database.NormalUser;
 import model.database.User;
-import model.database.VIPUser;
-import model.service.UserService; 
+import model.database.VIPUser; 
 
-public class LoginController {
+public class LoginController extends AppController{
 	/*Login controller linked to Login.fxml and CreateNewUser
 	 * Purpose is to authenticate username and login details to get a correct user from Connect
 	 * Also provides the ability to create a new user and password
 	 */
 	
-    private Connect connector = new Connect();
-    private UserService userService = UserService.getInstance(); 
-
     // User Login Interface
     private @FXML TextField userNameText;
     private @FXML PasswordField passwordText;
@@ -34,7 +29,7 @@ public class LoginController {
  
     //Login Page ActionEvents
     private User login() {
-        boolean userExists = connector.isUser(userNameText.getText());
+        boolean userExists = connection.isUser(userNameText.getText());
         //check if user is a valid user
         if (!userExists) {
         	//Invalid User
@@ -42,10 +37,10 @@ public class LoginController {
             return null;
         } else {
         	//Very poor cybersecurity but it does check if the two strings are the same
-            boolean correctPassword = connector.checkPassword(userNameText.getText(), passwordText.getText());
+            boolean correctPassword = connection.checkPassword(userNameText.getText(), passwordText.getText());
             if (correctPassword) {
             	//If correct return correct user from database
-                return connector.getUserFromDatabase(userNameText.getText());
+                return connection.getUserFromDatabase(userNameText.getText());
             } else {
                 errorMessage.setText("Error: Wrong Password");
                 return null;
@@ -74,7 +69,7 @@ public class LoginController {
     //Create new user action event
     public void createNewUser(ActionEvent event) {
     	//Connect to db
-        boolean userExists = connector.isUser(newUserName.getText());
+        boolean userExists = connection.isUser(newUserName.getText());
         //check if user exists before trying to insert the same primary key
         if (!userExists) {
         	User user = null;
@@ -89,10 +84,10 @@ public class LoginController {
             	 * 
             	 */
                 user = new NormalUser(username, pass, first, last);
-                connector.createUser(username, pass, first, last);
+                connection.createUser(username, pass, first, last);
             } else {
                 user = new VIPUser(username, pass, first, last, email, 0);
-                connector.createVIPUser(username, pass, first, last, email, 0);
+                connection.createVIPUser(username, pass, first, last, email, 0);
             }
             userService.setObject(user); 
             // update message to inform user created succesfully

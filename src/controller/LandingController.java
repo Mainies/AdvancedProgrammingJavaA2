@@ -18,12 +18,11 @@ import model.service.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class LandingController {
+public class LandingController extends AppController implements ILandingControllerViewChanger, ILandingControllerDataFetcher{
     /* Landing Class Controller. 
      * Central Controller that provides access to all other parts of the program
      * 
      */
-	
 	//View of User Details
     @FXML private Label userName; 
     @FXML private Label fullName;
@@ -31,11 +30,7 @@ public class LandingController {
     @FXML private Label vipLabel;
     @FXML private Label vipPoints;
     @FXML private Label joinVIPmessage;
-        
-    private UserService userService = UserService.getInstance();
-    private Connect connection = new Connect();
-    
-    
+               
     //Table Attributes to See Current ORders
     @FXML private TableView<Order> orders;
     @FXML private TableColumn<Order, String> date;
@@ -50,6 +45,7 @@ public class LandingController {
     private Button updatePointsButton;
     
     @FXML
+    @Override
     public void initialize() {
     	//display details per assignment specs
         updateUserName();
@@ -59,7 +55,6 @@ public class LandingController {
         //hides/shows buttons depending on user type
         updateButtonVisibility();
         updateVIPmessageVisibility();        
-        
         //user Orders initialise for uncollected orders for tableview
         //ordering managed by SQL query in Connect class
         //factory method standard for Table column in fxml
@@ -141,7 +136,7 @@ public class LandingController {
     	SceneChanger.changeScene(event, "PastOrders.fxml");
     }
     
-    private ObservableList<Order> fetchDataForUser() {
+    public ObservableList<Order> fetchDataForUser() {
     	//creating an observable list for population of table
     	//Interacts with connector to return a list of all order data that the user in the current UserSerivice has active
     	//Facade pattern keeping databse connectivity in database
@@ -198,5 +193,49 @@ public class LandingController {
         }
         connection.logoutPoints(username, points);
     }
-
 }
+
+
+abstract class AppController{
+	protected final Connect connection = new Connect();
+	protected final UserService userService = UserService.getInstance();
+    protected final POSService posService = POSService.getInstance();
+    protected final KitchenService kitchenService = KitchenService.getInstance();
+    protected final OrderService orderService = OrderService.getInstance();
+		
+	@FXML
+	public void initialize() {
+	}
+	
+}
+
+interface ILandingControllerViewChanger{
+	
+    public default void openOrderPane(ActionEvent event) {
+    }
+        
+    public default void managerLogin(ActionEvent event) {
+    }
+    
+    public default void goToPickup(ActionEvent event) {
+    }
+    
+    public default void goToPast(ActionEvent event) {
+    }
+    
+    public default void goToUpdateDetails(ActionEvent event) {
+    }
+    
+    public default void toVIPPortal(ActionEvent event) {
+    }
+    
+    public default void logOut(ActionEvent event) {
+    }   
+}
+
+interface ILandingControllerDataFetcher{
+	public void updatePoints();
+	
+	public ObservableList<Order> fetchDataForUser();
+}
+

@@ -14,12 +14,10 @@ import model.service.*;
 
 import java.sql.*;
 
-public class OrderManagerController {
+public class OrderManagerController extends AppController{
 	/*Controller for managing the ability to collect or cancel orders, Linked to CollectOrder.fxml"
 	 * 
 	 */
-	private UserService userService = UserService.getInstance();
-	private Connect connector = new Connect();
 	
 	//Column attributes for table view
     @FXML private TableView<Order> orders;
@@ -34,6 +32,7 @@ public class OrderManagerController {
     
     
     @FXML
+    @Override
     public void initialize() {
         //user Orders initialise for uncollected orders for tableview
         //Technically factory design pattern but documentation taken from
@@ -51,7 +50,7 @@ public class OrderManagerController {
     private ObservableList<Order> fetchDataForUser() {
     	String username = userService.getObject().getUsername();
     	//Observable list for setCellValueFacotry and Property Value factory
-        ObservableList<Order> ordersList = connector.getActiveOrders(username);
+        ObservableList<Order> ordersList = connection.getActiveOrders(username);
         return ordersList;
     } 
     
@@ -66,7 +65,7 @@ public class OrderManagerController {
     	//Checks if the order number is correct for orders to be collected
         int orderNumber = Integer.parseInt(orderNo.getText());
         String userName = userService.getObject().getUsername();
-        boolean validOrder = connector.checkValidOrder(orderNumber, userName);
+        boolean validOrder = connection.checkValidOrder(orderNumber, userName);
         if(validOrder) {
         	return true;
         } else {
@@ -85,9 +84,9 @@ public class OrderManagerController {
             //check order number
             if (checkIfValidOrder()) {
             	//checking ready to pick up
-                if (connector.checkIfReadyForPickUp(orderNum)) {
+                if (connection.checkIfReadyForPickUp(orderNum)) {
                 	// change status to collected
-                    connector.collectOrder(orderNum);
+                    connection.collectOrder(orderNum);
                     backToLanding(event);
                 } else {
                     warningMsg.setText("Your meal is still being cooked. Please be patient.");
@@ -103,7 +102,7 @@ public class OrderManagerController {
     public void cancelOrder(ActionEvent event) {
     	//option to also cancel number if collected. Important to change to cancelled so that the user cannot claim VIP points
     	if (checkIfValidOrder()) {
-    		connector.makeCancelOrder(Integer.parseInt(orderNo.getText()));
+    		connection.makeCancelOrder(Integer.parseInt(orderNo.getText()));
     		backToLanding(event);
     	}
     }

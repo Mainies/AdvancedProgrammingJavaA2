@@ -5,10 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 
-//import service.POSService;
-//import service.UserService; 
 
-public class ManagerController {
+public class ManagerController extends AppController{
 	/* Further functionality that is not required from assignment 2
 	 * Had a password portal.
 	 * Plans beyond assignment to implement functionality to change items

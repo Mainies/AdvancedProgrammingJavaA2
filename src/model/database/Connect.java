@@ -52,6 +52,7 @@ public class Connect implements IConnect{
 		orderOutput = new OrderOutput();
 		vipDB = new VIPUserDB();
 	}
+	
 	@Override
 	public void updateFirstName(String newName, String currentUser) {
 		// database connection to update first name for user. Performed as programming is running for stability
@@ -981,33 +982,10 @@ abstract class DBConnect {
             System.out.println(e.getMessage());
         } 
     }
-        
-    //this method might be void due to encapsulation within the connection class. super.connect() does the same thing
-    public Connection make_connect() {
-        try {
-            // db parameters - fixed path for stability
-            // create a connection to the database
-            connection = DriverManager.getConnection(dbURL);
-            System.out.println("Connection to SQLite has been established.");
-            
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } 
-        return connection;
-    }
-    public void closeConnection() {
-    	//closes connection for stability
-        if (connection != null) {
-            try {
-                connection.close();
-                System.out.println("Connection closed.");
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }      
-   
+     
 }
+
+
 
 
 

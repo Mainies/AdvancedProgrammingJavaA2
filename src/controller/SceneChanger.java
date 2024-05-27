@@ -33,11 +33,13 @@ public class SceneChanger {
     }
     
     public static void popUp(ActionEvent event) {
+    	/*popup method is implemented for the use of a popup notification when a newOrder is succesfully placed
+    	 * implemented as some practice to see how to add a popup window/second window for scene changing 
+    	 */
 			try {
 				FXMLLoader loader = new FXMLLoader(SceneChanger.class.getResource("/view/Popup.fxml"));
 				Parent root = loader.load();
-				Stage stage = new Stage();
-				//This doesn't override the root node hence difference in code to changeScene()
+				Stage stage = new Stage(); //doesnt retrieve scene source and instead creates a new stage
 				String css = SceneChanger.class.getResource("/view/application.css").toExternalForm();
 	            //update view
 				Scene scene = new Scene(root);

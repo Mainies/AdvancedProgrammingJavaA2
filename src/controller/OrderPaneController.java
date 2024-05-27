@@ -6,7 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import model.database.Connect;
 import model.database.User;
 import model.database.VIPUser;
 import model.restaurant.Kitchen;
@@ -19,14 +18,10 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.LocalTime;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class OrderPaneController {
+public class OrderPaneController extends AppController{
 	//Order Panel to handle orders. Linked to ConfirmOrder.fxml and Orderer.fxml;
-	private Connect connect = new Connect();
 		
 	//FXML labels for intaking user order values for Orderer.fxml
 	@FXML private TextField burrito;
@@ -47,14 +42,8 @@ public class OrderPaneController {
 	@FXML private TextField usedPoints;
 	@FXML private CheckBox usePointsButon;
 
-	
-	//Get various singleton services for processing orders in model
-    private UserService userService = UserService.getInstance();
-    private POSService posService = POSService.getInstance();
-    private KitchenService kitchenService = KitchenService.getInstance();
-    private OrderService orderService = OrderService.getInstance();
-
     @FXML
+    @Override
     public void initialize() {
     	//Initalise loading of FXML page, if order available then update wait times
         updateUserName();
@@ -89,9 +78,9 @@ public class OrderPaneController {
     }
 
     private int getWaitTime(){
-	Order order = orderService.getObject();
-        Kitchen kitchen = kitchenService.getObject();
-        int waitMinutes = kitchen.cookTime(order); 
+		Order order = orderService.getObject();
+	    Kitchen kitchen = kitchenService.getObject();
+	    int waitMinutes = kitchen.cookTime(order); 
 	return waitMinutes;
     }
 
@@ -352,7 +341,7 @@ public class OrderPaneController {
     	price = price - discount;
     	order.setPrice(price);
     	String userName = userService.getObject().getUsername();
-    	connect.processOrder(userName, order);
+    	connection.processOrder(userName, order);
     }
     
     public void backToLanding(ActionEvent event) {

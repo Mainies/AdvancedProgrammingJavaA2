@@ -6,18 +6,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import model.database.Connect;
 import model.database.User;
-import model.service.*;
 
-public class UserController {
+public class UserController extends AppController{
 	/* controller that manages BecomeVIP and UpdateDetails
 	 * Allows users to become VIP, update user details
 	 */
-    
-	private UserService userService = UserService.getInstance();
-    private Connect connection = new Connect();
-    
+        
 	//Fxml fields
     @FXML private TextField inputField;
     @FXML private Label updateMessage;
@@ -30,6 +25,7 @@ public class UserController {
     @FXML private CheckBox tickBox;
     
     @FXML
+    @Override
     public void initialize() {
     	//Implements choice box for options to control user input
     	try {
