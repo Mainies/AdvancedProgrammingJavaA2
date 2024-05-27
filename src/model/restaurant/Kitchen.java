@@ -2,7 +2,12 @@ package model.restaurant;
 
 import java.util.*;
 
-public class Kitchen {
+interface IKitchenCapacity{
+	int calculateFriesCookTime(int fries);
+	int cookTime(Order order);
+	int calculateBurritosCookTime(int numBurritos); 
+}
+public class Kitchen implements IKitchenCapacity{
 		/* Main class to hold currently cooked fries and calculate cooking time*/
 		
 		public HashMap<String, Integer> cooked = new HashMap<String, Integer>();
@@ -30,7 +35,8 @@ public class Kitchen {
 	        return Math.max(friesCookTime, burritosCookTime);
 	    }
 	    
-	    private int calculateFriesCookTime(int numFries) {
+	    @Override
+		public int calculateFriesCookTime(int numFries) {
 	    	// Finds if more fries need to be cooked for the order, and then calculates cooking time based on batches of 5.
 	    	Fries fries = new Fries();
 	        int availableFries = cooked.get("Fries");
@@ -49,8 +55,9 @@ public class Kitchen {
 	        cooked.put("Fries", leftoverFries); 
 	        return cookTime;
 	    }
-
-	    private int calculateBurritosCookTime(int numBurritos) {
+	    
+	    @Override
+		public int calculateBurritosCookTime(int numBurritos) {
 	    	// Simple ceiling equation for each burrito cook time/2
 	    	Burrito burrito = new Burrito();
 	        int cookTimePerPair = burrito.getCookTime(); 
