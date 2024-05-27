@@ -87,7 +87,7 @@ public class OrderManagerController {
             	//checking ready to pick up
                 if (connector.checkIfReadyForPickUp(orderNum)) {
                 	// change status to collected
-                    connector.pickUpOrder(orderNum);
+                    connector.collectOrder(orderNum);
                     backToLanding(event);
                 } else {
                     warningMsg.setText("Your meal is still being cooked. Please be patient.");
@@ -103,7 +103,7 @@ public class OrderManagerController {
     public void cancelOrder(ActionEvent event) {
     	//option to also cancel number if collected. Important to change to cancelled so that the user cannot claim VIP points
     	if (checkIfValidOrder()) {
-    		connector.cancelOrder(Integer.parseInt(orderNo.getText()));
+    		connector.makeCancelOrder(Integer.parseInt(orderNo.getText()));
     		backToLanding(event);
     	}
     }

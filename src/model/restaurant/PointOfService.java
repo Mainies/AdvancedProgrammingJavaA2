@@ -3,8 +3,11 @@ package model.restaurant;
 import exceptions.*;
 import java.util.HashMap;
 
+interface priceCalculator{
+	double checkout(Order order, boolean vip);
+}
 
-public class PointOfService {
+public class PointOfService implements priceCalculator {
 	// Core class used to maintain pricing for a user. Holds methods to take input and send to kitchen class for cooking as per functionality in assignment 1
 	
 	// Instantiates a new food item on opening to access attributes for sales
@@ -75,8 +78,8 @@ public class PointOfService {
 		soldItems.put(item, (soldItems.get(item) + price));
 	}
 	
-
-	private double checkout(Order order, boolean vip) {
+	@Override
+	public double checkout(Order order, boolean vip) {
 		//Calculates total price for current sale.
 		double sale = 0.00;
 		sale += order.getFries() * this.fries.getPrice();
