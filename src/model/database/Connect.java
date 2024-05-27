@@ -15,223 +15,241 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.restaurant.*;
 
-interface IConnect{
+interface IConnect extends IUserInput, IUserOutput, IOrderInput, IOrderOutput, IVIPUser{
+
+	void updateFirstName(String newName, String currentUser);
 	
-	//IOrderInput
-	boolean checkValidOrder(int orderNumber, String username);
+	void collectOrder(int orderNumber);
 	
-	void pickUpOrder(int orderNumber);
+	void makeCancelOrder(int orderNumber);
+
+	void updateLastName(String newName, String currentUser);
 	
-	void cancelOrder(int orderNumber);
+	void updatePassword(String newPass, String currentUser);
 	
-	void deleteOrders(int OrderNumber);
+	void updateEmail(String email, String currentUser);
 	
-	void newOrder(String userName, Order order);
+	void checkIfPopulated(ArrayList<Integer> orderNumbersList);
 	
-	ArrayList<Integer> fetchVipOrders();
+	void updatePointsFull(VIPUser vipUser);
 	
-	boolean checkIfReadyForPickUp(int orderNumber);
+	void processOrder(String userName, Order order);
 	
-	ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders);
-	
-	ArrayList<Integer> getListOfUserOrderNumbers(String userName);
-	
-	ObservableList<Order> getActiveOrders(String username);
-	
-	ObservableList<Order> getOrdersForExport(String username);
-	
-	void MaxValue();
-	
-	void logoutPoints(String username, int points);
-	
-	boolean createUser(String userName, String password, String firstName, String lastName);
-	
-	boolean createVIPUser(String userName, String password, String firstName, String lastName, String email, int points);
-	
-	boolean deleteUser(String userName);
-	
-	void addUserOrder(String userName, int orderNumber);
-	
-	void updateDetails(String condition, String newValue, String currentUser);
-	
-	void updatePointsInDB(VIPUser vipUser);
-	
-	void insertMissingVipOrders(ArrayList<Integer> numsToPopulate);
-	
-	void updatePoints(String currentUser);
-	
-	void collectPoints(int orderNumber);
-	
-	boolean isVIP(String userName);
-	
-	boolean checkPassword(String user, String inputPassword);
-	
-	boolean isUser(String user);
-	
-	User getUserFromDatabase(String username);
 }
 
 public class Connect implements IConnect{
+	private OrderInput orderInput;
+	private UserInput userInput;
+	private UserOutput userOutput;
+	private OrderOutput orderOutput;
+	private VIPUserDB vipDB;
+	
+	/* This class is intended to be a facade to make connection with program easier to understand*/
+
+	@Override
+	public void updateFirstName(String newName, String currentUser) {
+		// database connection to update first name for user. Performed as programming is running for stability
+		userInput.updateDetails("FirstName", newName, currentUser); 
+	}
+	
+	@Override
+	public void updateLastName(String newName, String currentUser) {
+		// database connection to update last name for user. Performed as programming is running for stability
+		userInput.updateDetails("LastName", newName, currentUser); 
+	}
+	
+	@Override
+	public void updatePassword(String newPass, String currentUser) {
+		// database connection to update password for user. Performed as programming is running for stability
+		userInput.updateDetails("Password", newPass, currentUser);
+	}
+	
+	@Override
+	public void updateEmail(String email, String currentUser) {
+		// database connection to update email for user. Performed as programming is running for stability. Called for when creating a VIP user
+		userInput.updateDetails("Email", email, currentUser);
+	}
+	
+	@Override
+    public void checkIfPopulated(ArrayList<Integer> orderNumbersList) {
+    	//Get list of VIP user orders
+        ArrayList<Integer> vipOrders = fetchVipOrders();
+        //Compare VIP orders to all orders
+        ArrayList<Integer> numsToPopulate = getMissingVipOrders(orderNumbersList, vipOrders);
+        //Populate VIP list with orders that are not in VIPUser Table
+        insertMissingVipOrders(numsToPopulate);
+    } 
+    
+	@Override
+    public void updatePointsFull(VIPUser vipUser) {
+    	String username = vipUser.getUsername();
+    	ArrayList<Integer> userOrderNumbers = getListOfUserOrderNumbers(username);
+    	checkIfPopulated(userOrderNumbers);
+    	updatePointsInDB(vipUser);
+    }
+    
+	public void processOrder(String userName, Order order) {
+		newOrder(userName, order);
+		addUserOrder(userName, orderInput.getOrderNumber());
+	}
+		   
 	
 	@Override
 	public boolean checkValidOrder(int orderNumber, String username) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void pickUpOrder(int orderNumber) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void cancelOrder(int orderNumber) {
-		// TODO Auto-generated method stub
-		
+		return orderInput.checkValidOrder(orderNumber, username);
 	}
 
 	@Override
 	public void deleteOrders(int OrderNumber) {
-		// TODO Auto-generated method stub
+		orderInput.deleteOrders(OrderNumber);
 		
 	}
 
 	@Override
 	public void newOrder(String userName, Order order) {
-		// TODO Auto-generated method stub
+		orderInput.newOrder(userName, order);
 		
 	}
 
 	@Override
 	public ArrayList<Integer> fetchVipOrders() {
-		// TODO Auto-generated method stub
-		return null;
+		return orderOutput.fetchVipOrders();
 	}
 
 	@Override
 	public boolean checkIfReadyForPickUp(int orderNumber) {
-		// TODO Auto-generated method stub
-		return false;
+		return orderOutput.checkIfReadyForPickUp(orderNumber);
 	}
 
 	@Override
 	public ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders) {
-		// TODO Auto-generated method stub
-		return null;
+		return orderOutput.getMissingVipOrders(orderNumbersList, vipOrders);
 	}
 
 	@Override
 	public ArrayList<Integer> getListOfUserOrderNumbers(String userName) {
-		// TODO Auto-generated method stub
-		return null;
+		return orderOutput.getListOfUserOrderNumbers(userName);
 	}
 
 	@Override
 	public ObservableList<Order> getActiveOrders(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		return orderOutput.getActiveOrders(username);
 	}
 
 	@Override
 	public ObservableList<Order> getOrdersForExport(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		return orderOutput.getOrdersForExport(username);
 	}
 
 	@Override
 	public void MaxValue() {
-		// TODO Auto-generated method stub
-		
+		orderInput.MaxValue();
 	}
 
 	@Override
 	public void logoutPoints(String username, int points) {
-		// TODO Auto-generated method stub
-		
+		userInput.logoutPoints(username, points);
 	}
 
 	@Override
 	public boolean createUser(String userName, String password, String firstName, String lastName) {
-		// TODO Auto-generated method stub
-		return false;
+		return userInput.createUser(userName, password, firstName, lastName);
 	}
 
 	@Override
 	public boolean createVIPUser(String userName, String password, String firstName, String lastName, String email,
 			int points) {
-		// TODO Auto-generated method stub
-		return false;
+		return userInput.createVIPUser(userName, password, firstName, lastName, email, points);
 	}
 
 	@Override
 	public boolean deleteUser(String userName) {
-		// TODO Auto-generated method stub
-		return false;
+		return userInput.deleteUser(userName);
 	}
 
 	@Override
 	public void addUserOrder(String userName, int orderNumber) {
-		// TODO Auto-generated method stub
-		
+		userInput.addUserOrder(userName, orderNumber);		
 	}
 
 	@Override
 	public void updateDetails(String condition, String newValue, String currentUser) {
-		// TODO Auto-generated method stub
+		userInput.updateDetails(condition, newValue, currentUser);
 		
 	}
 
 	@Override
 	public void updatePointsInDB(VIPUser vipUser) {
-		// TODO Auto-generated method stub
-		
+		vipDB.updatePointsInDB(vipUser);		
 	}
 
 	@Override
 	public void insertMissingVipOrders(ArrayList<Integer> numsToPopulate) {
-		// TODO Auto-generated method stub
+		vipDB.insertMissingVipOrders(numsToPopulate);
 		
 	}
 
 	@Override
 	public void updatePoints(String currentUser) {
-		// TODO Auto-generated method stub
+		vipDB.updatePoints(currentUser);
 		
 	}
 
 	@Override
 	public void collectPoints(int orderNumber) {
-		// TODO Auto-generated method stub
-		
+		vipDB.collectPoints(orderNumber);		
 	}
 
 	@Override
 	public boolean isVIP(String userName) {
-		// TODO Auto-generated method stub
-		return false;
+		return userOutput.isVIP(userName);
 	}
 
 	@Override
 	public boolean checkPassword(String user, String inputPassword) {
-		// TODO Auto-generated method stub
-		return false;
+		return userOutput.checkPassword(user, inputPassword);
 	}
 
 	@Override
 	public boolean isUser(String user) {
-		// TODO Auto-generated method stub
-		return false;
+		return userOutput.isUser(user);
 	}
 
 	@Override
 	public User getUserFromDatabase(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		return userOutput.getUserFromDatabase(username);
 	}
-	/* This class is intended to be a facade to make connection with program easier to understand*/
+	
+	@Override
+	public void pickUpOrder(int orderNumber, String formattedDate) {
+		orderInput.pickUpOrder(orderNumber, formattedDate);
+		
+	}
+
+	@Override
+	public void cancelOrder(int orderNumber, String formattedDate) {
+		orderInput.cancelOrder(orderNumber, formattedDate);
+		
+	}
+
+	@Override
+	public void collectOrder(int orderNumber) {
+		GetDate clock = new GetDate();
+		String formattedDate = clock.getStringNow();
+		pickUpOrder(orderNumber, formattedDate);
+		
+	}
+
+	@Override
+	public void makeCancelOrder(int orderNumber) {
+		GetDate clock = new GetDate();
+		String formattedDate = clock.getStringNow();
+		cancelOrder(orderNumber, formattedDate);
+		
+	}
 }
 
+//Done
 interface IOrderInput {
 	boolean checkValidOrder(int orderNumber, String username);
 	
@@ -246,8 +264,20 @@ interface IOrderInput {
 	void newOrder(String userName, Order order);
 }
 
+//Done
 interface DateTime{
-	public String getNow();
+	public String getStringNow();
+}
+
+class GetDate implements DateTime {
+	public String getStringNow() {
+    	//Method for returning the current date and time to put into the database
+    	LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+        String formattedDate = currentDateTime.format(formatter);
+        return formattedDate;
+    }
+	
 }
 
 class OrderInput extends DBConnect implements IOrderInput{
@@ -399,7 +429,7 @@ class OrderInput extends DBConnect implements IOrderInput{
 	    }
 }
 
-
+//Done
 interface IOrderOutput{
 	ArrayList<Integer> fetchVipOrders();
 	
@@ -580,18 +610,20 @@ interface IUserInput{
 }
 
 
-
-interface IVIPUserInput{
+//Done
+interface IVIPUser{
 	void updatePointsInDB(VIPUser vipUser);
 	
 	void insertMissingVipOrders(ArrayList<Integer> numsToPopulate);
 	
 	void updatePoints(String currentUser);
-}
-
-interface IVIPUserOutput{
+	
 	void collectPoints(int orderNumber);
 }
+
+
+
+
 
 
 //Done
@@ -605,7 +637,7 @@ interface IUserOutput{
 	User getUserFromDatabase(String username);
 }
 
-class VIPUserInput extends DBConnect implements IVIPUserInput{
+class VIPUserDB extends DBConnect implements IVIPUser{
 	@Override
     public void updatePointsInDB(VIPUser vipUser) {
     	String query = "SELECT ord.OrderNumber, ord.Price, v.Collected " +
@@ -675,6 +707,18 @@ class VIPUserInput extends DBConnect implements IVIPUserInput{
 		        e.printStackTrace();
 		    }
 		}
+	 
+	 @Override
+	    public void collectPoints(int orderNumber) {
+	    	String updateQuery = "UPDATE VipPoints SET Collected = true WHERE OrderNumber = ?";
+	        try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+	            updateStmt.setInt(1, orderNumber);
+	            updateStmt.executeUpdate();
+	        } catch(SQLException e) {
+	        	System.err.println("SQL Error: " + e.getMessage());
+	        }
+	        
+	    }
 }
 
 class UserInput extends DBConnect implements IUserInput{
@@ -889,7 +933,6 @@ class UserOutput extends DBConnect implements IUserOutput{
         String query = "SELECT UserName, Password, FirstName, LastName, Email, Points FROM Users WHERE UserName = ?";
         try {
             connect(); 
-            
             //SQL update
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setString(1, username);
@@ -962,99 +1005,10 @@ abstract class DBConnect {
                 System.out.println(e.getMessage());
             }
         }
-    }
-       
-    
-   
-    
-    	
-    
-    
-    
-    
-    private String getStringNow() {
-    	//Method for returning the current date and time to put into the database
-    	LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-        String formattedDate = currentDateTime.format(formatter);
-        return formattedDate;
-    }
-    
-    
-    
-	
-	public void updateFirstName(String newName, String currentUser) {
-		// database connection to update first name for user. Performed as programming is running for stability
-		updateDetails("FirstName", newName, currentUser); 
-	}
-
-	public void updateLastName(String newName, String currentUser) {
-		// database connection to update last name for user. Performed as programming is running for stability
-		updateDetails("LastName", newName, currentUser); 
-	}
-		
-	public void updatePassword(String newPass, String currentUser) {
-		// database connection to update password for user. Performed as programming is running for stability
-		updateDetails("Password", newPass, currentUser);
-	}
-	
-	public void updateEmail(String email, String currentUser) {
-		// database connection to update email for user. Performed as programming is running for stability. Called for when creating a VIP user
-		updateDetails("Email", email, currentUser);
-	}
-	
-	@Override
-	public void updateDetails(String condition, String newValue, String currentUser) {
-		connect();
-	}	
-	
-	public void processOrder(String userName, Order order) {
-		newOrder(userName, order);
-		addUserOrder(userName, this.getOrderNumber());
-	}
-		
-	@Override
-    public void addUserOrder(String userName, int orderNumber) {
-    }   
-    
-    public void checkIfPopulated(ArrayList<Integer> orderNumbersList) {
-    	//Get list of VIP user orders
-        ArrayList<Integer> vipOrders = fetchVipOrders();
-        //Compare VIP orders to all orders
-        ArrayList<Integer> numsToPopulate = getMissingVipOrders(orderNumbersList, vipOrders);
-        //Populate VIP list with orders that are not in VIPUser Table
-        insertMissingVipOrders(numsToPopulate);
-    }
-    
-    
-    
-    
-    @Override
-    public void collectPoints(int orderNumber) {
-    	String updateQuery = "UPDATE VipPoints SET Collected = true WHERE OrderNumber = ?";
-        try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
-            updateStmt.setInt(1, orderNumber);
-            updateStmt.executeUpdate();
-        } catch(SQLException e) {
-        	System.err.println("SQL Error: " + e.getMessage());
-        }
-        
-    }
-    
-    public void updatePointsFull(VIPUser vipUser) {
-    	String username = vipUser.getUsername();
-    	ArrayList<Integer> userOrderNumbers = getListOfUserOrderNumbers(username);
-    	checkIfPopulated(userOrderNumbers);
-    	updatePointsInDB(vipUser);
-    }
-    
-    @Override
-    public void logoutPoints(String username, int points) {
-    	connect();
-    }  
-    
+    }      
    
 }
+
 
 
 
