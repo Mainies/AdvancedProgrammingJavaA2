@@ -45,7 +45,7 @@ public class PointOfService implements priceCalculator {
 		return this.burrito;
 	}
 	
-	private void updateSaleQuantities(Order order, boolean vip) {
+	private void updateSaleQuantities(BaseOrder order, boolean vip) {
 		this.soldItems.put("Fries", (this.soldItems.get("Fries") + order.getFries()));
 		this.soldItems.put("Burrito", (this.soldItems.get("Burrito") + order.getBurritos()));
 		this.soldItems.put("Soda", (this.soldItems.get("Soda") + order.getSodas()));
@@ -60,7 +60,7 @@ public class PointOfService implements priceCalculator {
 		this.updateSaleQuantities(order, vip);
 	}
 	
-	private void updateSales(Order order, boolean vip) {
+	private void updateSales(BaseOrder order, boolean vip) {
 		// Gets current price for each food item in order and adds to sales total.
 		// Allows for changing sales totals.
 		double sale = this.totalSales;
@@ -74,7 +74,7 @@ public class PointOfService implements priceCalculator {
 	}
 	
 	
-	public void updatePOS(Order order, boolean vip) {
+	public void updatePOS(BaseOrder order, boolean vip) {
 		// Calls 2 methods to handle updating quantity of food sold and monetary value.
 		this.updateSaleQuantities(order, vip);
 		this.updateSales(order, vip);

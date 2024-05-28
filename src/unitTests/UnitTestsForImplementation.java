@@ -3,25 +3,24 @@ package unitTests;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import controller.OrderPaneController;
 import exceptions.InvalidNegativeNumber;
 import exceptions.NotANumberException;
 import exceptions.NotWholeNumber;
-import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
-import model.database.Connect;
+import model.database.ConnectMediator;
+import model.database.DBConnectTestMethods;
 import model.database.NormalUser;
 import model.database.User;
 import model.database.VIPUser;
-import model.restaurant.Order;
+import model.restaurant.BaseOrder;
+import model.restaurant.Kitchen;
 import model.restaurant.PointOfService;
 import model.service.KitchenService;
 import model.service.OrderService;
 import model.service.POSService;
 import model.service.UserService;
+
 
 public class UnitTestsForImplementation {
 	NormalUser user;
@@ -30,9 +29,9 @@ public class UnitTestsForImplementation {
 	POSService posService;
 	KitchenService kitchenService;
 	OrderService orderService;
-	Connect connection;
-	Order order;
-	
+	DBConnectTestMethods connectionTester;
+	ConnectMediator connection = new ConnectMediator();
+	BaseOrder order;
 	String burrito;
 	
 	@Before
@@ -43,7 +42,7 @@ public class UnitTestsForImplementation {
 		posService = POSService.getInstance();
 		kitchenService = KitchenService.getInstance();
 		orderService = OrderService.getInstance();
-		Connect connection = new Connect();
+		DBConnectTestMethods connection = new DBConnectTestMethods();
 	}
 
 	@Test
@@ -55,6 +54,7 @@ public class UnitTestsForImplementation {
 
 	@Test
 	public void updateDetails() {
+		//Issues pertaining to inability to use DB at the moment hmm
 		connection.createUser("testUsername", "TestPassword", "TestFirstName", "TestLastName");
 		User user = connection.getUserFromDatabase("testUsername");
 		if (user instanceof VIPUser){
@@ -71,10 +71,24 @@ public class UnitTestsForImplementation {
 	
 	@Test
 	public void testGetWaitTime() {
-		//make an order and test that it cooks correctly
-		//test method (getWaitTime();
-		fail("Not yet implemented");
+		System.out.println("made it here");
+		Kitchen kitchen = kitchenService.getObject();
+		if(kitchen == null) {
+			fail("Failure to load kitchen");
+		}
+		BaseOrder order = new BaseOrder(3, 1, 0);
+		//Burritos cook in 9 minutes and 2 can be cooked at a time. Expected 18
+		//In the kitchen there should be 4 fries left over
+		int waittime = kitchen.cookTime(order);
+		assertEquals(waittime, 18);
 		
+		order = new BaseOrder(0, 4, 0);
+		//expecting 0
+		waittime = kitchen.cookTime(order);
+		assertEquals(waittime, 0);
+		//same order, expecting fries cook time which is 8
+		waittime = kitchen.cookTime(order);
+		assertEquals(waittime, 8);		
 	}
 	
 	@Test

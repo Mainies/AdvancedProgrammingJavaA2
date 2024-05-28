@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.database.Connect;
+import model.database.ConnectMediator;
 import model.database.NormalUser;
 import model.database.User;
 import model.database.VIPUser;
@@ -202,20 +202,16 @@ abstract class AppController implements InitializeFXML{
 	 * across the database
 	 */
 	//Database Connection
-	protected final Connect connection = new Connect();
+	protected final ConnectMediator connection = new ConnectMediator();
 	
 	//Singletonservice classes. GetInstance instantiates the first time and then calls the instance concurrently
 	protected final UserService userService = UserService.getInstance();
     protected final POSService posService = POSService.getInstance();
     protected final KitchenService kitchenService = KitchenService.getInstance();
     protected final OrderService orderService = OrderService.getInstance();
-		
-	@FXML
-	@Override
-	public void initialize() {
-		/* Initalize method to be overridden where relevant by classes
-		 */
-	}
+    
+    @FXML
+	public void initialize() {};
 }
 
 

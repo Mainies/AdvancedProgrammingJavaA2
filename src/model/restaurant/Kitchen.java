@@ -4,7 +4,7 @@ import java.util.*;
 
 interface IKitchenCapacity{
 	int calculateFriesCookTime(int fries);
-	int cookTime(Order order);
+	int cookTime(BaseOrder order);
 	int calculateBurritosCookTime(int numBurritos); 
 }
 public class Kitchen implements IKitchenCapacity{
@@ -32,7 +32,7 @@ public class Kitchen implements IKitchenCapacity{
 	    }
 	    
 	    
-	    public int cookTime(Order order) {
+	    public int cookTime(BaseOrder order) {
 	    	// Calculates the cooking time required to find the limiting factor. Returns the highest cooking time.
 	        int friesCookTime = calculateFriesCookTime(order.getFries());
 	        int burritosCookTime = calculateBurritosCookTime(order.getBurritos());

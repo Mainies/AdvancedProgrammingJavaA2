@@ -100,7 +100,5 @@ public class LoginController extends AppController{
     
 	public void backtoLogin(ActionEvent event) {
 		SceneChanger.changeScene(event, "Login.fxml");
-	}
-	
-	
+	}	
 }

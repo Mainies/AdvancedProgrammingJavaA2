@@ -4,8 +4,7 @@ import static org.junit.Assert.*;
 
 import java.sql.Connection;
 import org.junit.Test;
-
-import model.database.Connect;
+import model.database.ConnectMediator;
 import model.database.DBConnectTestMethods;
 
 public class ConnectTest {
@@ -22,7 +21,7 @@ public class ConnectTest {
 	
 	@Test
 	public void insertNewUser() {
-		Connect connect = new Connect();
+		ConnectMediator connect = new ConnectMediator();
 		boolean didconnect = false;
 		boolean diddelete = false;
 		try {
