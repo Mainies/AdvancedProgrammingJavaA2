@@ -19,18 +19,16 @@ The time for Picking up orders is specified by using the system date and time in
 Usage:
 Application run in Eclipse IDE from file:
 '/src/application/main.java' 
+Note: The application was built in a Windows OS. There may be some compatibility issues in a MacOS or nix environment. I was unable to get my DB connection working early in MacOS which is why this was developped in Windows. 
 
-Design:
-"programDesign.pdf" contains a visual guide for the Model-View-Controller architecture.
-"databaseDesign.pdf" shows the SQLite database structure, and the SQL queries used to create these tables in SQLite3 can be seen in program files.
+Design Explanation and Choices:
+"GlobalMVCDesign.pdf" contains a visual guide for the Model-View-Controller architecture.
+"DBDesignBurritoKing.pdf" shows the SQLite database structure, and the SQL queries used to create these tables in SQLite3 can be seen in program files.
+"ControllerOOPDesign.pdf" demonstrates how I have used polymorphism and interitance from AppController, SecureAppController and different interfaces that these programs have implemented.
+"DatabaseConnectionOOPDesign.pdf" demonstrates how the backend has used polymorphism and SOLID interface principles, as well as implementing the ConnectMediator to mediate interaction with the database.
 
-OOP design highlights:
+
 The application follows the Model-View-Controller design pattern. Relevant controllers handle data sent to and from the model. Due to the constraints of FXML, separate controllers were made across different files as the FXML files cannot access non-public classes.
-- A singleton design for the AppService interface is implemented by fetching one recurrent User, Order, Kitchen, and PointOfService as required. 
+- A singleton design for the AppService interface is implemented by fetching one recurrent User, Order, Kitchen, and PointOfService as required. These are attributes in AppController that are inherited.
 The connection to the database is handled through a single Connect class that provides simple methods for making connections and sending/receiving data from the SQL-lite database. Data is sent and received as it is finalised (i.e., the order is fully confirmed). This was made for stability and allows for returning to a state after the program crashes.
-- Food -> {Burrito, Fries and Soda} and User -> {NormalUser, VIPUser} demonstrate use of abstract data types and polymorphism.
 - Note: While I recognise that the factory pattern is used in creating a TableColumn in FXML, this is implemented by the Java libraries (PropertyValueFactory and setCellValueFactory), which are standard methods in the FX library and thus do not contribute towards my OO choices.
-
-
-
-
