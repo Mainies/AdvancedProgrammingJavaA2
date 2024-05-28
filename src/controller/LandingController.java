@@ -107,6 +107,7 @@ public class LandingController extends SecureAppController implements ILandingCo
     @FXML private Label vipLabel;
     @FXML private Label vipPoints;
     @FXML private Label joinVIPmessage;
+    @FXML private Button normalEmail;
                
     //Table Attributes to See Current ORders
     @FXML private TableView<Order> orders;
@@ -131,7 +132,7 @@ public class LandingController extends SecureAppController implements ILandingCo
         updateVipPointsLabels();
         //hides/shows buttons depending on user type
         updateButtonVisibility();
-        updateVIPmessageVisibility();        
+        updateVIPmessageVisibility();
         //user Orders initialise for uncollected orders for tableview
         //ordering managed by SQL query in Connect class
         //factory method standard for Table column in fxml
@@ -153,7 +154,9 @@ public class LandingController extends SecureAppController implements ILandingCo
     private void updateVIPmessageVisibility() {
     	//Shows vip message if not a vip user
         User user = userService.getObject();
-        joinVIPmessage.setVisible(user instanceof NormalUser);  
+        joinVIPmessage.setVisible(user instanceof NormalUser); 
+        normalEmail.setVisible(user instanceof NormalUser);
+        
     }
     
     

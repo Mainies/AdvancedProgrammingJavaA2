@@ -7,6 +7,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.database.User;
+import model.database.VIPUser;
 
 interface IVIPControlManager{
 	public void becomeVIP(ActionEvent e);
@@ -37,13 +38,21 @@ public class UserController extends SecureAppController implements IVIPControlMa
     @Override
     public void initialize() {
     	//Implements choice box for options to control user input
-    	try {
-        choices.getItems().addAll("First Name", "Last Name", "Password");
-        choices.setValue("First Name");}  // Set the default value
-    	catch (Exception e) {
-    	}
+	    	if(userService.getInstance().getObject() instanceof VIPUser) {
+			    try {
+			        choices.getItems().addAll("First Name", "Last Name", "Password", "Email");
+			        choices.setValue("First Name");
+			    	}catch (Exception e) {
+			    }
+	    	}else {
+	    		try {
+		        choices.getItems().addAll("First Name", "Last Name", "Password");
+		        choices.setValue("First Name");}  // Set the default value
+		    	catch (Exception e) {
+		   }
+	    }   
     }
-           
+               
     //Method in BecomeVIP.fxml
     public void becomeVIP(ActionEvent e) {
     	//requires tickbox be selected
@@ -88,6 +97,12 @@ public class UserController extends SecureAppController implements IVIPControlMa
                 connection.updatePassword(text, username);
                 user.setPassword(text);
                 updateMessage.setText("Password Updated Successfully");
+                break;
+            case "Email":
+            	//use connector to update user password
+                connection.updateEmail(text, username);
+                user.setEmail(text);
+                updateMessage.setText("Email Updated Successfully");
                 break;
             default:
             	//default for programming safety
