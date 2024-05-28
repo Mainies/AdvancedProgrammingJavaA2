@@ -10,7 +10,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.restaurant.Order;
 
-public class OrderManagerController extends AppController{
+
+interface IOrderManager{
+	public void pickUpOrder(ActionEvent e);
+	public void cancelOrder(ActionEvent e);
+}
+
+public class OrderManagerController extends SecureAppController implements IOrderFetcher, IOrderManager{
 	/*Controller for managing the ability to collect or cancel orders, Linked to CollectOrder.fxml"
 	 * Provides the data and interface for a user to collect or cancel active orders
 	 * by inputting a valid number and waiting until their order is ready.
@@ -41,21 +47,17 @@ public class OrderManagerController extends AppController{
         fries.setCellValueFactory(new PropertyValueFactory<>("fries"));
         sodas.setCellValueFactory(new PropertyValueFactory<>("sodas"));
         price.setCellValueFactory(new PropertyValueFactory<>("price"));  
-        orders.setItems(fetchDataForUser());
+        orders.setItems(fetchOrdersForUser());
     }
     
-
-    private ObservableList<Order> fetchDataForUser() {
+    @Override
+    public ObservableList<Order> fetchOrdersForUser() {
     	String username = userService.getObject().getUsername();
     	//Observable list for setCellValueFacotry and Property Value factory
         ObservableList<Order> ordersList = connection.getActiveOrders(username);
         return ordersList;
     } 
-    
-    public void backToLanding(ActionEvent event) {
-    	SceneChanger.changeScene(event, "LandingPage.fxml");
-    }
-    
+        
     /*
      * This needs to be moved to the connector database
      */
@@ -85,7 +87,7 @@ public class OrderManagerController extends AppController{
                 if (connection.checkIfReadyForPickUp(orderNum)) {
                 	// change status to collected
                     connection.collectOrder(orderNum);
-                    backToLanding(event);
+                    goBack(event);
                 } else {
                     warningMsg.setText("Your meal is still being cooked. Please be patient.");
                 }
@@ -101,10 +103,11 @@ public class OrderManagerController extends AppController{
     	//option to also cancel number if collected. Important to change to cancelled so that the user cannot claim VIP points
     	if (checkIfValidOrder()) {
     		connection.makeCancelOrder(Integer.parseInt(orderNo.getText()));
-    		backToLanding(event);
+    		goBack(event);
     	}
     }
     
-
-    
+   
 }
+
+

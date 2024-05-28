@@ -8,7 +8,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.database.User;
 
-public class UserController extends AppController{
+interface IVIPControlManager{
+	public void becomeVIP(ActionEvent e);
+}
+
+interface IUserHandling{
+	public void updateDetails(ActionEvent e);
+}
+
+public class UserController extends SecureAppController implements IVIPControlManager, IUserHandling{
 	/* controller that manages BecomeVIP.fxml and UpdateDetails.fxml
 	 * Allows users to become VIP, update user details in both the application and 
 	 * sends data to the database for validation
@@ -35,11 +43,7 @@ public class UserController extends AppController{
     	catch (Exception e) {
     	}
     }
-    
-    public void backToLanding(ActionEvent event) {
-    	SceneChanger.changeScene(event, "LandingPage.fxml");
-    }
-       
+           
     //Method in BecomeVIP.fxml
     public void becomeVIP(ActionEvent e) {
     	//requires tickbox be selected

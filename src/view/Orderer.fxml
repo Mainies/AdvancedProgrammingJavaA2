@@ -26,6 +26,6 @@
       <Label layoutX="171.0" layoutY="238.0" prefHeight="17.0" prefWidth="283.0" text="Note: 1 Meal is 1 x Burrito, 1 x Fries and 1 x Soda" />
       <Label fx:id="errorMessage" layoutX="170.0" layoutY="333.0" prefHeight="17.0" prefWidth="251.0" textFill="#eb2d2d" />
       <Label fx:id="currentUser" layoutX="73.0" layoutY="297.0" text="Label" />
-      <Button layoutX="316.0" layoutY="338.0" mnemonicParsing="false" onAction="#backToLanding" text="Go Back" />
+      <Button layoutX="316.0" layoutY="338.0" mnemonicParsing="false" onAction="#goBack" text="Go Back" />
    </children>
 </AnchorPane>

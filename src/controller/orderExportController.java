@@ -15,13 +15,22 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class OrderExportController extends AppController{
+
+interface IOrderFetcher{
+	public ObservableList<Order> fetchOrdersForUser();
+}
+
+interface IExportOrderFiles{
+	public boolean checkCSVfield();
+	public void exportToCSV(ArrayList<String> ordersList, String header);
+}
+
+public class OrderExportController extends SecureAppController implements IOrderFetcher, IExportOrderFiles{
     /* Order pane that allows the user to select which orders and which parts of the order (date, food items and price)
      * to export to a file. Shows functionality for file writing
      * Linked to PastOrders.fxml
      * 
      */
-	
 	//Labels to display user information and take in information for file writing
     @FXML private Label userName; 
     @FXML private Label fullName;
@@ -65,7 +74,7 @@ public class OrderExportController extends AppController{
         orders.setItems(fetchOrdersForUser());
     }
     
-    private ObservableList<Order> fetchOrdersForUser() {
+    public ObservableList<Order> fetchOrdersForUser() {
     	//Facade Pattern and separating database connectivity
     	String username = userService.getObject().getUsername();
     	ObservableList<Order> ordersList = connection.getOrdersForExport(username);
@@ -134,7 +143,7 @@ public class OrderExportController extends AppController{
     	return headerString;
     }
     
-        
+    @Override
     public boolean checkCSVfield() {
     	//checks that the CSV field is valid, creates a new file if not and overwrites old file if exists
     	String filePath = csvFileLocation.getText(); 
@@ -161,8 +170,8 @@ public class OrderExportController extends AppController{
 	        warningMsg.setText("File exported!");
     	}
     }
-    
-    public void goBack(ActionEvent event) {
-    	SceneChanger.changeScene(event, "LandingPage.fxml");
-    }
+
 }
+
+
+

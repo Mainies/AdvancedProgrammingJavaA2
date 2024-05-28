@@ -15,7 +15,84 @@ import model.database.VIPUser;
 import model.restaurant.Order;
 import model.service.*;
 
-public class LandingController extends AppController implements ILandingControllerViewChanger, ILandingControllerDataFetcher{
+abstract class AppController implements InitializeFXML{
+	/* Parent class for all controller 
+	 * subclasses. Implements services and a connection
+	 * across the database
+	 */
+	//Database Connection
+	protected final ConnectMediator connection = new ConnectMediator();
+	
+	//Singletonservice classes. GetInstance instantiates the first time and then calls the instance concurrently
+	protected final UserService userService = UserService.getInstance();
+    protected final POSService posService = POSService.getInstance();
+    protected final KitchenService kitchenService = KitchenService.getInstance();
+    protected final OrderService orderService = OrderService.getInstance();
+    
+    @FXML
+	public void initialize() {};
+}
+
+
+abstract class SecureAppController extends AppController implements IReturnHome{
+	/*SecureAppController is for controllers that are past the UserLogin Interface
+	 * so that they can all have the method to return to the dashboard
+	 */
+	
+	public void goBack(ActionEvent event) {
+		SceneChanger.changeScene(event, "LandingPage.fxml");
+	}
+}
+
+interface IReturnHome{
+	/*Interface for SecureApps that all SecureAppControllers can use to return to HomeDashboard*/
+	public void goBack(ActionEvent event);
+}
+
+interface InitializeFXML {
+	//Attempt at abstracting initalize from classes
+	@FXML
+	void initialize();
+}
+
+interface ILandingControllerViewChanger{
+	/* Collection of methods for the landing controller to 
+	 * change views to the relevant fxml files where required
+	 * in the program
+	 */
+	
+    public default void openOrderPane(ActionEvent event) {
+    }
+        
+    public default void managerLogin(ActionEvent event) {
+    }
+    
+    public default void goToPickup(ActionEvent event) {
+    }
+    
+    public default void goToPast(ActionEvent event) {
+    }
+    
+    public default void goToUpdateDetails(ActionEvent event) {
+    }
+    
+    public default void toVIPPortal(ActionEvent event) {
+    }
+    
+    public default void logOut(ActionEvent event) {
+    }   
+}
+
+interface ILandingControllerDataFetcher{
+	/* Interface to retrieve data required to be displayed in
+	 * the landing page
+	 */
+	public void updatePoints();
+	
+	public ObservableList<Order> fetchDataForUser();
+}
+
+public class LandingController extends SecureAppController implements ILandingControllerViewChanger, ILandingControllerDataFetcher{
     /* Landing Class Controller. 
      * Connected to LandingPage.fxml
      * Central Controller that provides access to all other parts of the program
@@ -195,66 +272,4 @@ public class LandingController extends AppController implements ILandingControll
     }
 }
 
-
-abstract class AppController implements InitializeFXML{
-	/* Parent class for all controller 
-	 * subclasses. Implements services and a connection
-	 * across the database
-	 */
-	//Database Connection
-	protected final ConnectMediator connection = new ConnectMediator();
-	
-	//Singletonservice classes. GetInstance instantiates the first time and then calls the instance concurrently
-	protected final UserService userService = UserService.getInstance();
-    protected final POSService posService = POSService.getInstance();
-    protected final KitchenService kitchenService = KitchenService.getInstance();
-    protected final OrderService orderService = OrderService.getInstance();
-    
-    @FXML
-	public void initialize() {};
-}
-
-
-interface InitializeFXML {
-	//Attempt at abstracting initalize from classes
-	@FXML
-	void initialize();
-}
-
-interface ILandingControllerViewChanger{
-	/* Collection of methods for the landing controller to 
-	 * change views to the relevant fxml files where required
-	 * in the program
-	 */
-	
-    public default void openOrderPane(ActionEvent event) {
-    }
-        
-    public default void managerLogin(ActionEvent event) {
-    }
-    
-    public default void goToPickup(ActionEvent event) {
-    }
-    
-    public default void goToPast(ActionEvent event) {
-    }
-    
-    public default void goToUpdateDetails(ActionEvent event) {
-    }
-    
-    public default void toVIPPortal(ActionEvent event) {
-    }
-    
-    public default void logOut(ActionEvent event) {
-    }   
-}
-
-interface ILandingControllerDataFetcher{
-	/* Interface to retrieve data required to be displayed in
-	 * the landing page
-	 */
-	public void updatePoints();
-	
-	public ObservableList<Order> fetchDataForUser();
-}
 

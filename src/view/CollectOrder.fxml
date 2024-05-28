@@ -10,7 +10,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="512.0" prefWidth="754.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.OrderManagerController">
    <children>
-      <Button layoutX="601.0" layoutY="273.0" mnemonicParsing="false" onAction="#backToLanding" text="GoBack" />
+      <Button layoutX="601.0" layoutY="273.0" mnemonicParsing="false" onAction="#goBack" text="GoBack" />
       <ScrollPane layoutX="71.0" layoutY="95.0" prefHeight="235.0" prefWidth="447.0">
          <content>
             <TableView fx:id="orders" prefHeight="242.0" prefWidth="441.0">

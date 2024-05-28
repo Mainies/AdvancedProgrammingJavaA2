@@ -12,7 +12,7 @@
       <ChoiceBox fx:id="choices" layoutX="219.0" layoutY="151.0" prefWidth="150.0" />
       <TextField fx:id="inputField" layoutX="220.0" layoutY="188.0" />
       <Button layoutX="268.0" layoutY="236.0" mnemonicParsing="false" onAction="#updateDetails" text="Update" />
-      <Button fx:id="backButton" layoutX="264.0" layoutY="301.0" mnemonicParsing="false" onAction="#backToLanding" text="Go Back" />
+      <Button fx:id="backButton" layoutX="264.0" layoutY="301.0" mnemonicParsing="false" onAction="#goBack" text="Go Back" />
       <Label fx:id="updateMessage" layoutX="208.0" layoutY="274.0" prefHeight="17.0" prefWidth="185.0" />
       <Label layoutX="205.0" layoutY="72.0" prefHeight="48.0" prefWidth="236.0" text="Update User Details">
          <font>

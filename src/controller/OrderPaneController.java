@@ -20,7 +20,23 @@ import java.time.format.DateTimeParseException;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 
-public class OrderPaneController extends AppController{
+
+interface IOrderToDB{
+	public void sendOrderToDB(Order order);
+}
+
+interface IOrderValidator{
+	public void validateOrderInput() throws Exception;
+}
+
+interface IPaymentValidator{
+	public boolean isValidCardNumber(String cardNumber);
+	public boolean isValidExpiryFormat(String expiry);
+	public boolean isValidCSV(String csv);
+	public boolean validatePaymentInfo();
+}
+
+public class OrderPaneController extends SecureAppController implements IOrderToDB, IOrderValidator, IPaymentValidator{
 	/*Order Panel to handle orders. Linked to ConfirmOrder.fxml and Orderer.fxml;
 	 * Contains methods to create a new order and validate order
 	 * handles user input as it is entered so that only safe information makes it to the database
@@ -335,7 +351,7 @@ public class OrderPaneController extends AppController{
 		orderService.clearObject();
 		//clear the order object so further objects can be made
 		SceneChanger.popUp(e);
-		backToLanding(e);
+		goBack(e);
 		}
 	}
 	
@@ -348,10 +364,6 @@ public class OrderPaneController extends AppController{
     	order.setPrice(price);
     	String userName = userService.getObject().getUsername();
     	connection.processOrder(userName, order);
-    }
-    
-    public void backToLanding(ActionEvent event) {
-    	SceneChanger.changeScene(event, "LandingPage.fxml");
     }
     
     @FXML private CheckBox usePointsButton;

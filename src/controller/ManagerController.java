@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 
 
-public class ManagerController extends AppController{
+public class ManagerController extends SecureAppController{
 	/* Further functionality that is not required from assignment 2
 	 * Had a password portal.
 	 * Linked to AccessControl.fxml and ManagerOptions.fxml
@@ -20,11 +20,6 @@ public class ManagerController extends AppController{
     
     
     //Interface and Password Section
-    
-    public void goBack(ActionEvent event) {
-    	//return to landing page
-    	SceneChanger.changeScene(event, "LandingPage.fxml");
-    }
     
     public void managerLogin(ActionEvent event) {
     	//login to manager
@@ -40,7 +35,5 @@ public class ManagerController extends AppController{
     		errorMessage.setText("Incorrect password. Please try again.");
     	}
     }
-    
-    
-    
+        
 }	

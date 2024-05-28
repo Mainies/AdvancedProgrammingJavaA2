@@ -9,7 +9,15 @@ import model.database.NormalUser;
 import model.database.User;
 import model.database.VIPUser; 
 
-public class LoginController extends AppController{
+
+interface ILogin{
+	User login();
+	void attemptLogin(ActionEvent event);
+	void createNewUser(ActionEvent event);
+	
+}
+
+public class LoginController extends AppController implements ILogin{
 	/*Login controller linked to Login.fxml and CreateNewUser.fxml
 	 * Purpose is to authenticate username and login details to get a correct user from Connect
 	 * Also provides the ability to create a new user and password
@@ -28,7 +36,7 @@ public class LoginController extends AppController{
     private @FXML Label errorMessageNewUser;
  
     //Login Page ActionEvents
-    private User login() {
+    public User login() {
         boolean userExists = connection.isUser(userNameText.getText());
         //check if user is a valid user
         if (!userExists) {
@@ -102,3 +110,4 @@ public class LoginController extends AppController{
 		SceneChanger.changeScene(event, "Login.fxml");
 	}	
 }
+
