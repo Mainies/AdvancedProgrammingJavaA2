@@ -28,7 +28,7 @@
             </TableView>
          </content>
       </ScrollPane>
-      <Button layoutX="646.0" layoutY="316.0" mnemonicParsing="false" onAction="#toVIPPortal" text="Add/Update Email" />
+      <Button fx:id="normalEmail" layoutX="646.0" layoutY="316.0" mnemonicParsing="false" onAction="#toVIPPortal" text="Add/Update Email" />
       <Label fx:id="joinVIPmessage" layoutX="220.0" layoutY="432.0" prefHeight="17.0" prefWidth="516.0" text="Don't forget to add your email to become a VIP member and get a $3  discount on meals!" />
       <FlowPane layoutX="61.0" layoutY="38.0" prefHeight="17.0" prefWidth="191.0">
          <children>

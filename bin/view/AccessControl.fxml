@@ -17,6 +17,6 @@
       </Label>
       <PasswordField fx:id="passWord" layoutX="226.0" layoutY="188.0" />
       <Label layoutX="241.0" layoutY="159.0" prefHeight="17.0" prefWidth="119.0" text="Enter Staff Password:" />
-      <Label fx:id="errorMessage" layoutX="240.0" layoutY="226.0" prefHeight="17.0" prefWidth="132.0" textFill="RED" />
+      <Label fx:id="errorMessage" layoutX="173.0" layoutY="226.0" prefHeight="17.0" prefWidth="251.0" textFill="RED" />
    </children>
 </AnchorPane>
