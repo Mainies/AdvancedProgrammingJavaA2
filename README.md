@@ -1,6 +1,6 @@
 <h1>Assignment 2 - Advanced Programming</h1>
 
-This assignment contains the repository for assignment 2. The last commit to this repository before the due date should be considered my submission for assignment. Following this course's submission and successful completion, I will also port this code to my own personal GitHub repository. The project builds on the solution for assignment 1 which is hosted in my own <a href = "https://github.com/Mainies/AdvProgA1">Personal Github Repository</a>
+This assignment contains the repository for assignment 2. The last commit to this repository before the due date should be considered my submission for assignment. Following this course's submission and successful completion, I will also port this code to my own personal GitHub repository. The project builds on the solution for assignment 1, which is hosted in my own <a href = "https://github.com/Mainies/AdvProgA1">Personal Github Repository</a>
 <br>
 <div style="margin-left:auto;margin-right:auto;text-align:center">
     <p>
