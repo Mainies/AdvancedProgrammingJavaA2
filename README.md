@@ -1,6 +1,6 @@
 <h1>Assignment 2 - Advanced Programming</h1>
 
-This assignment contains the repository for assignment 2. The last commit to this repository before the due date should be considered my submission for assignment. Following this course's submission and successful completion, I will also port this code to my own personal GitHub repository. The project builds on the solution for assignment 1, which is hosted in my own <a href = "https://github.com/Mainies/AdvProgA1">Personal Github Repository</a>
+The assignment contains the repository for assignment 2. The last commit to this repository before the due date should be considered my submission for assignment. Following this course's submission and successful completion, I will also port this code to my own personal GitHub repository. The project builds on the solution for assignment 1, which is hosted in my own <a href = "https://github.com/Mainies/AdvProgA1">Personal Github Repository</a>
 <br>
 <div style="margin-left:auto;margin-right:auto;text-align:center">
     <p>
@@ -30,7 +30,7 @@ The time for Picking up orders is specified by using the system date and time in
 Application run in Eclipse IDE from file:
 <b>'/src/application/main.java'</b>
 
-<b>Note:</b> The application was built on Windows OS. There may be some compatibility issues in a MacOS or *nix environment. I could not get my DB connection working early in the development cycle in MacOS, which is why this was developed in Windows. 
+<b>Note:</b> The application was built on Windows OS with some editing done directly to/from the GitHub repository. There may be some compatibility issues in a MacOS or *nix environment. I could not get my DB connection working early in the development cycle in MacOS, which is why this was developed in Windows. 
 
 <h3>Design Explanation and Choices:</h3>
 <a href = "/GlobalMVCDesign.pdf">GlobalMVCDesign.pdf</a> contains a visual guide for the Model-View-Controller architecture.
@@ -39,7 +39,11 @@ Application run in Eclipse IDE from file:
 <a href = "/DatabaseConnectionOOPDesign.pdf">DatabaseConnectionOOPDesign.pdf</a> demonstrates how the backend has used polymorphism and SOLID interface principles, as well as implementing the ConnectMediator to mediate interaction with the database.
 <br>
 <br>
-The application follows the Model-View-Controller design pattern. Relevant controllers handle data sent to and from the model. Due to the constraints of FXML, separate controllers were made across different files as the FXML files cannot access non-public classes. A singleton design for the AppService interface is implemented by fetching one recurrent User, Order, Kitchen, and PointOfService as required. These are attributes in AppController that are inherited. The connection to the database is handled through a single Connect class that provides simple methods for making connections and sending/receiving data from the SQL-lite database. Data is sent and received as it is finalised (i.e., the order is fully confirmed). This was made for stability and for returning to a state after the program crashes.
+The application follows the Model-View-Controller design pattern. Relevant controllers handle data sent to and from the model. Due to the constraints of FXML, separate controllers were made across different files, as the FXML files cannot access non-public classes. A singleton design for the AppService interface is implemented by fetching one recurrent User, Order, Kitchen, and PointOfService as required. These are attributes in AppController that are inherited. The connection to the database is handled through a single Connect class that provides simple methods for making connections and sending/receiving data from the SQL-lite database. Data is sent and received as finalised (i.e., the order is fully confirmed). This was made for stability and for returning to a state after the program crashes. Some other OOP highlights are the ConnectMediator demonstrating a mediator design pattern for database connection. My controller and connection classes implement abstraction, inheritance and polymorphism and I'd like to believe they demonstrate encapsulation.
 <br>
 <br>
 <b>Note:</b> While I recognise that the factory pattern is used in creating a TableColumn in FXML, this is implemented by the Java libraries (PropertyValueFactory and setCellValueFactory), which are standard methods in the FX library and thus do not contribute towards my OO choices.
+<br>
+<div>
+    <b>Known Issue:</b> If a user has too many orders or an order is illogically large, the SQL update seems delayed and not displaying in the Active Orders but shows later. I will have to figure this out after submission.  
+</div>
