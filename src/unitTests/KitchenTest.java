@@ -28,7 +28,7 @@ public class KitchenTest{
     
 	@Test
     public void cookTimeForMoreBurritos(){
-        Order order = new Order(3, 2, 0);
+        BaseOrder order = new BaseOrder(3, 2, 0);
         int expectedFriesCookTime = 8;
         int expectedBurritosCookTime = 18;
         int cookTime = kitchen.cookTime(order);
@@ -39,7 +39,7 @@ public class KitchenTest{
 	
 	@Test
     public void cookTimeForMoreFries(){
-        Order order = new Order(1, 6, 0);
+        BaseOrder order = new BaseOrder(1, 6, 0);
         int expectedFriesCookTime = 16;
         int expectedBurritosCookTime = 9;
         int cookTime = kitchen.cookTime(order);
@@ -50,7 +50,7 @@ public class KitchenTest{
 	
 	@Test
     public void checkLeftOverFries(){
-        Order order = new Order(3, 2, 0);
+        BaseOrder order = new BaseOrder(3, 2, 0);
         int cookTime = kitchen.cookTime(order);
         assertEquals((int) kitchen.cooked.get("Fries"), 3);
     }
@@ -58,7 +58,7 @@ public class KitchenTest{
 	@Test
     public void cookTimeWithFries(){
 		kitchen.cooked.put("Fries", 2);
-        Order order = new Order(0, 2, 0);
+        BaseOrder order = new BaseOrder(0, 2, 0);
         int expectedFriesCookTime = 0;
         int expectedBurritosCookTime = 0;
         int cookTime = kitchen.cookTime(order);

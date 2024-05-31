@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 
 interface IOrderFetcher{
+	//Interface to fetch orders for user. Implemented by OrderExportController and OrderManagerController
 	public ObservableList<Order> fetchOrdersForUser();
 }
 

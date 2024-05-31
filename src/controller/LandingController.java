@@ -33,7 +33,6 @@ abstract class AppController implements InitializeFXML{
 	public void initialize() {};
 }
 
-
 abstract class SecureAppController extends AppController implements IReturnHome{
 	/*SecureAppController is for controllers that are past the UserLogin Interface
 	 * so that they can all have the method to return to the dashboard

@@ -10,7 +10,7 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 public class SceneChanger {
-	/*Static object that handles view changing. static method(s) for readability and Facade pattern*/
+	/*Static object that handles view changing. static method(s) for readability and ?Facade pattern*/
 	
     public static void changeScene(ActionEvent event, String fxmlFile) {
         try {

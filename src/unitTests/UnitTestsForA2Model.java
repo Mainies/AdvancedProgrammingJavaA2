@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-
+import controller.OrderPaneController;
 import exceptions.InvalidNegativeNumber;
 import exceptions.NotANumberException;
 import exceptions.NotWholeNumber;
@@ -22,7 +22,7 @@ import model.service.POSService;
 import model.service.UserService;
 
 
-public class UnitTestsForImplementation {
+public class UnitTestsForA2Model {
 	NormalUser user;
 	VIPUser vipUser;
 	UserService userService;
@@ -70,7 +70,7 @@ public class UnitTestsForImplementation {
 	}
 	
 	@Test
-	public void testGetWaitTime() {
+	public void testGetWaitTimeTest() {
 		System.out.println("made it here");
 		Kitchen kitchen = kitchenService.getObject();
 		if(kitchen == null) {
@@ -91,32 +91,84 @@ public class UnitTestsForImplementation {
 		assertEquals(waittime, 8);		
 	}
 	
+	/*Card testing pretty simple due to validating strings
+	 * no other checks for correct numbers and date-time conversions
+	 */
+	
 	@Test
-	public void cardNumberValidator() {
-		//test the card fields, should return booleans for values
-		//isValidCardNumber
-		//is valid expiry format
-		//is valid expirty date
-		// is valid csv
-		fail("Not yet implemented");		
+	public void cardNumberValidatorTest() {
+		OrderPaneController pane = new OrderPaneController();
+		//not enough numbers
+		boolean TestCondition = pane.isValidCardNumber("1234");
+		assertFalse(TestCondition);
+		//Not digits
+		TestCondition = pane.isValidCardNumber("thiswordhas16dig");
+		assertFalse(TestCondition);
+		//Correct
+		TestCondition = pane.isValidCardNumber("1234123412341234");
+		assertTrue(TestCondition);
 	}
+	
+	@Test
+	public void monthValidatorTest() {
+		OrderPaneController pane = new OrderPaneController();
+		//not right format
+		boolean TestCondition = pane.isValidExpiryFormat("1234");
+		assertFalse(TestCondition);
+		//right format
+		TestCondition = pane.isValidExpiryFormat("12/21");
+		assertTrue(TestCondition);
+		//but expired card
+		TestCondition = pane.isValidExpiryDate("12/21");
+		assertFalse(TestCondition);
+		//Wrong format
+		TestCondition = pane.isValidExpiryFormat("03/01/29");
+		assertFalse(TestCondition);
+		//Wrong Format
+		TestCondition = pane.isValidExpiryFormat("06 Mar");
+		assertFalse(TestCondition);
+		//Correct and in the future
+		TestCondition = pane.isValidExpiryFormat("12/99");
+		assertTrue(TestCondition);
+	}
+	
+	@Test
+	public void csvValidatorTest() {
+		OrderPaneController pane = new OrderPaneController();
+		boolean TestCondition = pane.isValidCSV("abc");
+		assertFalse(TestCondition);
+		TestCondition = pane.isValidCSV("1234");
+		assertFalse(TestCondition);
+		TestCondition = pane.isValidCSV("123");
+		assertTrue(TestCondition);
+	}
+	
 	
 	@Test
 	public void checkPointsDiscount() {
-		fail("Not yet implemented");
-		//check that the discount is being applied correctly for vip and non-vip
-	}
-	
-	@Test
-	public void checkUserCreation() {
-		//check that the constructors instantiate the correct type of user
-		fail("Not yet implemented");
+		NormalUser user = new NormalUser("Test", "Test", "Test", "Test");
+		VIPUser vipuser = new VIPUser("Test", "Test", "Test", "Test", "Test", 0);
+		//ordermeal
+		BaseOrder order = new BaseOrder(1, 1, 1, 1);
+		PointOfService pos = POSService.getInstance().getObject();
+		double price = pos.checkout(order, user.isVIP());
+		assertEquals(price, 15, 0.0000001);
+		price = pos.checkout(order, vipuser.isVIP());
 	}
 	
 	@Test
 	public void testAppService() {
-		//test the right user gets brought in/out or other class
-		fail("not yet implemented");
+		POSService service = POSService.getInstance();
+		//AssertTheSame. 2 pointer should reference same object
+		PointOfService pos1 = service.getObject();
+		PointOfService pos2 = service.getObject();
+		assertEquals(pos1, pos2);
+		//AssertEmptiesObject
+		service.clearObject();
+		PointOfService pos3 = service.getObject();
+		assertNull(pos3);
+		//adding it back to use for other testing
+		service.setObject(pos1);
 	}
 	
 	@Test (expected = NotANumberException.class)

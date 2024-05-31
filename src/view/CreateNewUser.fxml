@@ -42,9 +42,9 @@
             <Font size="25.0" />
          </font>
       </Label>
-      <Label layoutX="156.0" layoutY="260.0" prefHeight="17.0" prefWidth="373.0" text="Please add your email if you want to become a VIP at Burrito King!" />
+      <Label layoutX="121.0" layoutY="260.0" prefHeight="17.0" prefWidth="408.0" text="Please add your email if you want to become a VIP at Burrito King!" />
       <Label layoutX="253.0" layoutY="87.0" text="New User Sign Up" />
       <Button layoutX="247.0" layoutY="346.0" mnemonicParsing="false" onAction="#backtoLogin" text="Go Back to Login" />
-      <Label fx:id="errorMessageNewUser" layoutX="187.0" layoutY="284.0" prefHeight="17.0" prefWidth="235.0" textFill="RED" />
+      <Label fx:id="errorMessageNewUser" layoutX="131.0" layoutY="284.0" prefHeight="17.0" prefWidth="340.0" textFill="RED" />
    </children>
 </AnchorPane>

@@ -14,7 +14,6 @@ interface ILogin{
 	User login();
 	void attemptLogin(ActionEvent event);
 	void createNewUser(ActionEvent event);
-	
 }
 
 public class LoginController extends AppController implements ILogin{

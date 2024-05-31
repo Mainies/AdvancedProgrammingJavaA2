@@ -8,6 +8,9 @@ import model.database.ConnectMediator;
 import model.database.DBConnectTestMethods;
 
 public class ConnectTest {
+	/*Class created for unit testing of the connection to the database.
+	 * Tests connection url and connection method.
+	 */
 	private DBConnectTestMethods connector = new DBConnectTestMethods();
 
 	@Test

@@ -4,7 +4,7 @@ import exceptions.*;
 import java.util.HashMap;
 
 interface priceCalculator{
-	double checkout(Order order, boolean vip);
+	double checkout(BaseOrder order, boolean vip);
 }
 
 public class PointOfService implements priceCalculator {
@@ -86,7 +86,7 @@ public class PointOfService implements priceCalculator {
 	}
 	
 	@Override
-	public double checkout(Order order, boolean vip) {
+	public double checkout(BaseOrder order, boolean vip) {
 		//Calculates total price for current sale.
 		double sale = 0.00;
 		sale += order.getFries() * this.fries.getPrice();

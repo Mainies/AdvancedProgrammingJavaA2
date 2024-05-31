@@ -118,7 +118,8 @@ class OrderInput extends DBConnect implements IOrderInput{
 	    	int orderNumber = getOrderNumber();
 	    	orderNumber++;
 	    	//query to insert full order into database
-	    	String query = "INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price, dateCollected) VALUES(?, ?, ?, ?, ?, ?, ?, ?,?)";
+	    	String query = "INSERT INTO Orders(dateCreated, OrderNumber, Burritos, Fries, Sodas, Meals, Status, Price, dateCollected) "
+	    			+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	    	try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	    		pstmt.setString(1, order.getDateCreated());
 	            pstmt.setInt(2, orderNumber);
@@ -162,8 +163,8 @@ class OrderInput extends DBConnect implements IOrderInput{
 	    }
 }
 
-//Done
 interface IOrderInput {
+	//Interface for order Input in the Database
 	boolean checkValidOrder(int orderNumber, String username);
 	
 	void MaxValue();
@@ -177,10 +178,8 @@ interface IOrderInput {
 	void newOrder(String userName, Order order);
 }
 
-
-
-//Done
 interface IOrderOutput{
+	//Interface for Order Output into the Database
 	ArrayList<Integer> fetchVipOrders();
 	
 	boolean checkIfReadyForPickUp(int orderNumber);
@@ -196,86 +195,85 @@ interface IOrderOutput{
 }
 
 class OrderOutput extends DBConnect implements IOrderOutput{
-	
 	@Override
-  public ArrayList<Integer> fetchVipOrders() {
-  	//Query database and return list of orders
-  	super.connect();
-      ArrayList<Integer> vipOrders = new ArrayList<>();
-      String query = "SELECT OrderNumber FROM VIPPoints";
-      try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-          ResultSet rs = pstmt.executeQuery();
-          while (rs.next()) {
-              vipOrders.add(rs.getInt("OrderNumber"));
-          }
-      } catch (SQLException e) {
-          System.err.println("SQL Error: " + e.getMessage());
-      }
-      return vipOrders;
-  }
+	public ArrayList<Integer> fetchVipOrders() {
+	  	//Query database and return list of orders
+	  	super.connect();
+	      ArrayList<Integer> vipOrders = new ArrayList<>();
+	      String query = "SELECT OrderNumber FROM VIPPoints";
+	      try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	          ResultSet rs = pstmt.executeQuery();
+	          while (rs.next()) {
+	              vipOrders.add(rs.getInt("OrderNumber"));
+	          }
+	      } catch (SQLException e) {
+	          System.err.println("SQL Error: " + e.getMessage());
+	      }
+	      return vipOrders;
+	  }
   
-  @Override
-  public ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders) {
-  	//Compare user orders with vip list of orders. Return those that havent' been added to VIP points table
-      ArrayList<Integer> numsToPopulate = new ArrayList<>();
-      for (Integer orderNum : orderNumbersList) {
-          if (!vipOrders.contains(orderNum)) {
-              numsToPopulate.add(orderNum);
-          }
-      }
-      return numsToPopulate;
-  }
+    @Override
+    public ArrayList<Integer> getMissingVipOrders(ArrayList<Integer> orderNumbersList, ArrayList<Integer> vipOrders) {
+	  	//Compare user orders with vip list of orders. Return those that havent' been added to VIP points table
+	      ArrayList<Integer> numsToPopulate = new ArrayList<>();
+	      for (Integer orderNum : orderNumbersList) {
+	          if (!vipOrders.contains(orderNum)) {
+	              numsToPopulate.add(orderNum);
+	          }
+	      }
+	      return numsToPopulate;
+	  }
 
-  @Override    
-  public boolean checkIfReadyForPickUp(int orderNumber) {
-  	super.connect();
-  	/* back end method that checks if a user order is ready. Called in order manager controller*/      
-      //query to return ready date and time
-      String orderQuery = "SELECT dateCollected FROM Orders WHERE OrderNumber = ?";
-      
-      //current date and time
-      LocalDateTime currentDateTime = LocalDateTime.now();
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-      //execute statement
-      try (PreparedStatement pstmt = connection.prepareStatement(orderQuery)) {
-          pstmt.setInt(1, orderNumber);
-          ResultSet rs = pstmt.executeQuery();
-          if (rs.next()) {
-              String pickUpTime = rs.getString("dateCollected");
-              LocalDateTime pickUpDateTime = LocalDateTime.parse(pickUpTime, formatter);
-              //return condtion for whether the order is ready
-              return currentDateTime.isAfter(pickUpDateTime) || currentDateTime.isEqual(pickUpDateTime);
-          }
-      } catch (SQLException e) {
-          System.err.println("SQL Error: " + e.getMessage());
-      } catch (DateTimeParseException e) {
-          System.err.println("Date Parsing Error: " + e.getMessage());
-      }
-      return false;
-  }
+	  @Override    
+	  public boolean checkIfReadyForPickUp(int orderNumber) {
+	  	super.connect();
+	  	/* back end method that checks if a user order is ready. Called in order manager controller*/      
+	      //query to return ready date and time
+	      String orderQuery = "SELECT dateCollected FROM Orders WHERE OrderNumber = ?";
+	      
+	      //current date and time
+	      LocalDateTime currentDateTime = LocalDateTime.now();
+	      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+	      //execute statement
+	      try (PreparedStatement pstmt = connection.prepareStatement(orderQuery)) {
+	          pstmt.setInt(1, orderNumber);
+	          ResultSet rs = pstmt.executeQuery();
+	          if (rs.next()) {
+	              String pickUpTime = rs.getString("dateCollected");
+	              LocalDateTime pickUpDateTime = LocalDateTime.parse(pickUpTime, formatter);
+	              //return condtion for whether the order is ready
+	              return currentDateTime.isAfter(pickUpDateTime) || currentDateTime.isEqual(pickUpDateTime);
+	          }
+	      } catch (SQLException e) {
+	          System.err.println("SQL Error: " + e.getMessage());
+	      } catch (DateTimeParseException e) {
+	          System.err.println("Date Parsing Error: " + e.getMessage());
+	      }
+	      return false;
+	  }
 
 
-  @Override
-  public ArrayList<Integer> getListOfUserOrderNumbers(String userName) {
-  	//returns a list of order numbers that a user has ordered to be checked if they have already been claimed
-      super.connect();
-      //Query to return all ordernumbers by username
-      String query = "SELECT OrderNumber FROM UserOrders WHERE UserName = ?";
-      ArrayList<Integer> orderNumbers = new ArrayList<>();
-      try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-          pstmt.setString(1, userName);
-          //executing query
-          ResultSet rs = pstmt.executeQuery();
-          while (rs.next()) {
-              orderNumbers.add(rs.getInt("OrderNumber"));
-          }
-      } catch (SQLException e) {
-          System.err.println("SQL Error: " + e.getMessage());
-      }
-      return orderNumbers;
-  }
+	  @Override
+	  public ArrayList<Integer> getListOfUserOrderNumbers(String userName) {
+	  	//returns a list of order numbers that a user has ordered to be checked if they have already been claimed
+	      super.connect();
+	      //Query to return all ordernumbers by username
+	      String query = "SELECT OrderNumber FROM UserOrders WHERE UserName = ?";
+	      ArrayList<Integer> orderNumbers = new ArrayList<>();
+	      try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	          pstmt.setString(1, userName);
+	          //executing query
+	          ResultSet rs = pstmt.executeQuery();
+	          while (rs.next()) {
+	              orderNumbers.add(rs.getInt("OrderNumber"));
+	          }
+	      } catch (SQLException e) {
+	          System.err.println("SQL Error: " + e.getMessage());
+	      }
+	      return orderNumbers;
+	  }
 
-  @Override
+    @Override
 	public ObservableList<Order> getActiveOrders(String username){
   	//Observable list allows for iteration through the tableview
 		super.connect();
@@ -306,7 +304,7 @@ class OrderOutput extends DBConnect implements IOrderOutput{
       return ordersList;
 	}
 
-  @Override
+    @Override
 	public ObservableList<Order> getOrdersForExport(String username){
 		//Same as landing page, logic to return orders based on 
   	super.connect();
@@ -321,7 +319,7 @@ class OrderOutput extends DBConnect implements IOrderOutput{
           ResultSet rs = pstmt.executeQuery();
 
           while (rs.next()) {
-          	int orderNum = rs.getInt("OrderNumber");
+          	  int orderNum = rs.getInt("OrderNumber");
               int burritos = rs.getInt("Burritos");
               int fries = rs.getInt("Fries");
               int sodas = rs.getInt("Sodas");
